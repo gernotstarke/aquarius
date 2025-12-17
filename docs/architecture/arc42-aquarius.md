@@ -1384,6 +1384,15 @@ result = db.execute(text("EXPLAIN QUERY PLAN SELECT ..."))
 
 ## 8.11 Testbarkeit
 
+> **Vollständiges Testkonzept:** Siehe [ADR-009: Testkonzept mit realer Datenbank](adr/ADR-009-testkonzept.md)
+
+**Zusammenfassung:**
+- **Test-Strategie:** 70% Unit, 25% Integration (mit echter DB), 5% E2E
+- **Test-DB:** SQLite In-Memory für schnelle, isolierte Tests
+- **Fixtures:** Factory Pattern + Szenario "kleine_liga" (~20 Kinder mit Faker-Daten)
+- **Transactional Tests:** Automatisches Rollback nach jedem Test
+- **Tools:** Pytest, Faker, SQLAlchemy
+
 ### 8.11.1 Test-Pyramide
 
 ```
