@@ -391,6 +391,392 @@ Diese Begriffe werden durchgängig verwendet: in der Datenbank, API, UI und Doku
 
 **Regel:** Module dürfen nur über definierte Schnittstellen kommunizieren, keine direkten Datenbankzugriffe über Modulgrenzen.
 
+### 8.1.3 Wiederkehrender Aufbau fachlicher Module
+
+Jedes fachliche Modul folgt einer **einheitlichen 3-Schichten-Architektur**:
+
+```
+┌──────────────────────────────────────┐
+│         Router (API Layer)           │  ← REST-Endpunkte, HTTP-Handling
+│  - Request-Validierung (Pydantic)    │
+│  - Response-Serialisierung           │
+│  - HTTP-Status-Codes                 │
+└─────────────┬────────────────────────┘
+              │
+              │ DTOs (Data Transfer Objects)
+              ▼
+┌──────────────────────────────────────┐
+│        Service (Business Layer)      │  ← Geschäftslogik, Orchestrierung
+│  - Business-Rules                    │
+│  - Workflow-Koordination             │
+│  - Inter-Modul-Kommunikation         │
+│  - Transaktionssteuerung             │
+└─────────────┬────────────────────────┘
+              │
+              │ Domain-Objekte
+              ▼
+┌──────────────────────────────────────┐
+│      Repository (Data Layer)         │  ← Datenbankzugriff
+│  - CRUD-Operationen                  │
+│  - Queries                           │
+│  - ORM-Mapping                       │
+└──────────────────────────────────────┘
+```
+
+#### Verantwortlichkeiten pro Schicht
+
+**1. Router (API Layer)**
+
+```python
+# backend/app/routers/anmeldung.py
+from fastapi import APIRouter, Depends, HTTPException, status
+from app.schemas.anmeldung import AnmeldungCreate, AnmeldungResponse
+from app.services.anmeldung_service import AnmeldungService
+
+router = APIRouter(prefix="/api/anmeldungen", tags=["anmeldungen"])
+
+@router.post("/", response_model=AnmeldungResponse, status_code=status.HTTP_201_CREATED)
+async def create_anmeldung(
+    data: AnmeldungCreate,
+    service: AnmeldungService = Depends()
+):
+    """Neue Anmeldung erstellen"""
+    try:
+        result = service.create_anmeldung(data)
+        return result
+    except DoppelmeldungError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+```
+
+**Aufgaben:**
+- HTTP-Request entgegennehmen
+- DTO-Validierung (automatisch durch Pydantic)
+- Service-Methoden aufrufen
+- Exceptions in HTTP-Status-Codes übersetzen
+- Response serialisieren
+
+**Keine Business-Logik im Router!**
+
+---
+
+**2. Service (Business Layer)**
+
+```python
+# backend/app/services/anmeldung_service.py
+from app.repositories.anmeldung_repository import AnmeldungRepository
+from app.services.kind_service import KindService
+from app.services.wettkampf_service import WettkampfService
+
+class AnmeldungService:
+    def __init__(
+        self,
+        anmeldung_repo: AnmeldungRepository,
+        kind_service: KindService,
+        wettkampf_service: WettkampfService
+    ):
+        self.anmeldung_repo = anmeldung_repo
+        self.kind_service = kind_service
+        self.wettkampf_service = wettkampf_service
+
+    def create_anmeldung(self, data: AnmeldungCreate) -> Anmeldung:
+        """
+        Business-Logik für Anmeldung:
+        1. Kind validieren (startberechtigt?)
+        2. Wettkampf prüfen (verfügbar?)
+        3. Doppelmeldung ausschließen
+        4. Startnummer vergeben
+        5. Anmeldung speichern
+        """
+        # 1. Kind validieren
+        kind = self.kind_service.get_kind(data.kind_id)
+        if not kind.ist_startberechtigt:
+            raise ValidationError("Kind ist nicht startberechtigt")
+
+        # 2. Wettkampf prüfen
+        wettkampf = self.wettkampf_service.get_wettkampf(data.wettkampf_id)
+        if wettkampf.ist_voll():
+            raise WettkampfVollError("Wettkampf ist ausgebucht")
+
+        # 3. Doppelmeldung prüfen
+        existing = self.anmeldung_repo.find_by_kind_und_wettkampf(
+            data.kind_id, data.wettkampf_id
+        )
+        if existing:
+            raise DoppelmeldungError("Kind bereits angemeldet")
+
+        # 4. Startnummer vergeben
+        startnummer = self._vergebe_startnummer(data.wettkampf_id)
+
+        # 5. Anmeldung erstellen
+        anmeldung = Anmeldung(
+            kind_id=data.kind_id,
+            wettkampf_id=data.wettkampf_id,
+            startnummer=startnummer,
+            status=AnmeldungStatus.BESTAETIGT
+        )
+
+        return self.anmeldung_repo.save(anmeldung)
+
+    def _vergebe_startnummer(self, wettkampf_id: int) -> int:
+        """Private Hilfsmethode für Startnummernvergabe"""
+        max_nummer = self.anmeldung_repo.get_max_startnummer(wettkampf_id)
+        return (max_nummer or 0) + 1
+```
+
+**Aufgaben:**
+- Geschäftsregeln implementieren
+- Workflow orchestrieren
+- Andere Services aufrufen (Inter-Modul-Kommunikation)
+- Fachliche Exceptions werfen
+- Transaktionsgrenzen definieren
+
+**Keine Datenbankdetails im Service!**
+
+---
+
+**3. Repository (Data Layer)**
+
+```python
+# backend/app/repositories/anmeldung_repository.py
+from sqlalchemy.orm import Session
+from app.models import Anmeldung
+
+class AnmeldungRepository:
+    def __init__(self, session: Session):
+        self.session = session
+
+    def save(self, anmeldung: Anmeldung) -> Anmeldung:
+        """Anmeldung speichern"""
+        self.session.add(anmeldung)
+        self.session.commit()
+        self.session.refresh(anmeldung)
+        return anmeldung
+
+    def find_by_id(self, id: int) -> Optional[Anmeldung]:
+        """Anmeldung nach ID suchen"""
+        return self.session.get(Anmeldung, id)
+
+    def find_by_kind_und_wettkampf(
+        self, kind_id: int, wettkampf_id: int
+    ) -> Optional[Anmeldung]:
+        """Prüfen ob Anmeldung bereits existiert"""
+        return self.session.query(Anmeldung).filter(
+            Anmeldung.kind_id == kind_id,
+            Anmeldung.wettkampf_id == wettkampf_id,
+            Anmeldung.status != AnmeldungStatus.STORNIERT
+        ).first()
+
+    def get_max_startnummer(self, wettkampf_id: int) -> Optional[int]:
+        """Höchste vergebene Startnummer für Wettkampf"""
+        result = self.session.query(func.max(Anmeldung.startnummer)).filter(
+            Anmeldung.wettkampf_id == wettkampf_id
+        ).scalar()
+        return result
+```
+
+**Aufgaben:**
+- CRUD-Operationen
+- Datenbank-Queries
+- ORM-Mapping
+- Performance-Optimierung (Eager Loading, Indizes)
+
+**Keine Business-Logik im Repository!**
+
+---
+
+#### Dependency Injection
+
+Module werden über FastAPI's Dependency Injection verdrahtet:
+
+```python
+# backend/app/dependencies.py
+from fastapi import Depends
+from sqlalchemy.orm import Session
+from app.database import get_db
+
+def get_anmeldung_repository(db: Session = Depends(get_db)) -> AnmeldungRepository:
+    return AnmeldungRepository(db)
+
+def get_kind_service(db: Session = Depends(get_db)) -> KindService:
+    kind_repo = KindRepository(db)
+    return KindService(kind_repo)
+
+def get_anmeldung_service(
+    anmeldung_repo: AnmeldungRepository = Depends(get_anmeldung_repository),
+    kind_service: KindService = Depends(get_kind_service),
+    wettkampf_service: WettkampfService = Depends(get_wettkampf_service)
+) -> AnmeldungService:
+    return AnmeldungService(anmeldung_repo, kind_service, wettkampf_service)
+```
+
+**Vorteile:**
+- Testbarkeit: Services und Repositories leicht durch Mocks ersetzbar
+- Entkopplung: Keine direkten Abhängigkeiten zwischen Modulen
+- Konfigurierbarkeit: Implementierungen austauschbar
+
+---
+
+#### Verzeichnisstruktur pro Modul
+
+```
+backend/app/
+├── models/
+│   ├── __init__.py
+│   ├── anmeldung.py      # SQLAlchemy Models
+│   ├── kind.py
+│   └── ...
+├── schemas/
+│   ├── __init__.py
+│   ├── anmeldung.py      # Pydantic DTOs (AnmeldungCreate, AnmeldungResponse)
+│   ├── kind.py
+│   └── ...
+├── repositories/
+│   ├── __init__.py
+│   ├── anmeldung_repository.py
+│   ├── kind_repository.py
+│   └── ...
+├── services/
+│   ├── __init__.py
+│   ├── anmeldung_service.py
+│   ├── kind_service.py
+│   └── ...
+├── routers/
+│   ├── __init__.py
+│   ├── anmeldung.py      # FastAPI Router
+│   ├── kind.py
+│   └── ...
+└── main.py               # FastAPI App mit Router-Registration
+```
+
+**Namenskonventionen:**
+- Model: `Anmeldung` (Singular, Domain-Objekt)
+- Repository: `AnmeldungRepository`
+- Service: `AnmeldungService`
+- Router: `anmeldung.py` (Dateiname lowercase)
+- Schema: `AnmeldungCreate`, `AnmeldungResponse`, `AnmeldungUpdate`
+
+---
+
+#### Data Transfer Objects (DTOs)
+
+**Warum DTOs?**
+- API-Schnittstelle unabhängig von Datenbank-Schema
+- Validierung auf API-Ebene
+- Verschiedene DTOs für verschiedene Operations (Create vs. Update vs. Response)
+
+```python
+# backend/app/schemas/anmeldung.py
+from pydantic import BaseModel, Field
+from datetime import datetime
+
+class AnmeldungCreate(BaseModel):
+    """DTO für Anmeldungs-Erstellung"""
+    kind_id: int = Field(..., gt=0)
+    wettkampf_id: int = Field(..., gt=0)
+    figuren: list[int] = Field(..., min_length=1)
+
+class AnmeldungResponse(BaseModel):
+    """DTO für API-Response"""
+    id: int
+    kind_id: int
+    wettkampf_id: int
+    startnummer: int
+    status: str
+    erstellt_am: datetime
+
+    class Config:
+        from_attributes = True  # Ermöglicht Mapping von ORM-Objekten
+
+class AnmeldungUpdate(BaseModel):
+    """DTO für Änderungen"""
+    figuren: list[int] = Field(..., min_length=1)
+```
+
+---
+
+#### Inter-Modul-Kommunikation
+
+**Regel:** Module kommunizieren nur über Service-Schnittstellen
+
+```python
+# ✅ RICHTIG: Über Service
+class AnmeldungService:
+    def __init__(self, kind_service: KindService):
+        self.kind_service = kind_service
+
+    def create_anmeldung(self, data):
+        kind = self.kind_service.get_kind(data.kind_id)  # Service-Call
+        # ...
+
+# ❌ FALSCH: Direkter Repository-Zugriff
+class AnmeldungService:
+    def __init__(self, kind_repo: KindRepository):
+        self.kind_repo = kind_repo  # Verletzt Modulgrenzen!
+
+    def create_anmeldung(self, data):
+        kind = self.kind_repo.find_by_id(data.kind_id)  # Direkter Zugriff
+        # ...
+```
+
+**Warum?**
+- Services kapseln Business-Logik (z.B. "ist_startberechtigt" prüfen)
+- Repositories sind Implementierungsdetails
+- Bessere Testbarkeit
+- Flexibilität: Service-Implementierung austauschbar
+
+---
+
+#### Ausnahmen von der 3-Schichten-Regel
+
+**1. Lesezugriffe für Performance**
+
+Bei reinen Leseoperationen ohne Business-Logik kann Repository direkt genutzt werden:
+
+```python
+@router.get("/api/anmeldungen")
+async def list_anmeldungen(
+    repo: AnmeldungRepository = Depends(),
+    skip: int = 0,
+    limit: int = 100
+):
+    """Einfache Liste ohne Business-Logik"""
+    return repo.find_all(skip=skip, limit=limit)
+```
+
+**2. Utility-Funktionen**
+
+Reine Berechnungen ohne Datenbankzugriff:
+
+```python
+# backend/app/utils/bewertung_calculator.py
+def berechne_endpunkte(bewertungen: list[Decimal], schwierigkeitsfaktor: Decimal) -> Decimal:
+    """Stateless Berechnung, kein Service nötig"""
+    sortiert = sorted(bewertungen)
+    verbleibend = sortiert[1:-1]
+    durchschnitt = sum(verbleibend) / len(verbleibend)
+    return durchschnitt * schwierigkeitsfaktor
+```
+
+---
+
+#### Zusammenfassung
+
+**Jedes fachliche Modul besteht aus:**
+1. **Router** - HTTP-Endpunkte
+2. **Service** - Geschäftslogik
+3. **Repository** - Datenzugriff
+4. **Models** - Domain-Objekte (SQLAlchemy)
+5. **Schemas** - DTOs (Pydantic)
+
+**Vorteile dieser Struktur:**
+- ✅ Klare Verantwortlichkeiten (Single Responsibility)
+- ✅ Testbarkeit (jede Schicht isoliert testbar)
+- ✅ Wartbarkeit (Änderungen lokal begrenzt)
+- ✅ Verständlichkeit (einheitliche Struktur in allen Modulen)
+- ✅ Austauschbarkeit (z.B. Repository-Implementierung ändern)
+
 ## 8.2 Persistenz und Datenzugriff
 
 ### 8.2.1 Datenbank-Schema
