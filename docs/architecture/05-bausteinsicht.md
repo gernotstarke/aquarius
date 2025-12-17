@@ -8,35 +8,9 @@
 
 Das Aquarius-System besteht aus zwei Hauptanwendungen, die auf einem gemeinsamen Backend operieren:
 
-```plantuml
-@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+**Diagramm:** [puml/01-system-overview.puml](puml/01-system-overview.puml)
 
-LAYOUT_WITH_LEGEND()
-
-Person(praesident, "Präsident", "Plant Saison und Wettkämpfe")
-Person(verein, "Verein", "Meldet Kinder an")
-Person(punktrichter, "Punktrichter", "Verwaltet Wettkampf vor Ort")
-Person(kampfrichter, "Kampfrichter", "Bewertet Starts")
-
-System_Boundary(aquarius, "Aquarius") {
-    Container(planning_app, "Planungs-App", "React SPA", "Desktop-optimierte Oberfläche für Verwaltung und Planung")
-    Container(execution_app, "Durchführungs-App", "React PWA", "Touch-optimierte Oberfläche für Live-Bewertung")
-    Container(backend, "Backend API", "FastAPI", "REST API, Business-Logik, Datenzugriff")
-    ContainerDb(database, "Datenbank", "Turso (libSQL)", "Persistente Speicherung mit Cloud-Sync")
-}
-
-Rel(praesident, planning_app, "Plant Saison, verwaltet Stammdaten", "HTTPS")
-Rel(verein, planning_app, "Meldet Kinder an", "HTTPS")
-Rel(punktrichter, execution_app, "Führt Wettkampf durch", "HTTPS/Offline")
-Rel(kampfrichter, execution_app, "Erfasst Punkte", "HTTPS/Offline")
-
-Rel(planning_app, backend, "API Calls", "JSON/HTTPS")
-Rel(execution_app, backend, "API Calls + Sync", "JSON/HTTPS")
-Rel(backend, database, "SQL Queries", "libSQL Protocol")
-
-@enduml
-```
+![System Overview](puml/01-system-overview.png)
 
 **Begründung:**
 - **Zwei Frontend-Anwendungen** für unterschiedliche Nutzungskontexte (Büro vs. Schwimmbad)
@@ -49,35 +23,9 @@ Rel(backend, database, "SQL Queries", "libSQL Protocol")
 
 Das Backend ist in **6 fachliche Module** (Bounded Contexts) strukturiert:
 
-```plantuml
-@startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+**Diagramm:** [puml/02-backend-modules.puml](puml/02-backend-modules.puml)
 
-LAYOUT_TOP_DOWN()
-
-Container_Boundary(backend, "Backend API") {
-    Component(stammdaten, "Stammdaten", "Modul", "Vereine, Teams, Kinder, Offizielle")
-    Component(saisonplanung, "Saisonplanung", "Modul", "Saison, Figuren, Wettkämpfe, Schwimmbäder")
-    Component(anmeldung, "Anmeldung", "Modul", "Wettkampfanmeldungen, Startnummernvergabe")
-    Component(wettkampf, "Wettkampf", "Modul", "Stationen, Gruppen, Durchgänge")
-    Component(bewertung, "Bewertung", "Modul", "Punkteerfassung, Bewertungsberechnung")
-    Component(auswertung, "Auswertung", "Modul", "Ranglisten, Preisvergabe, Export")
-}
-
-Rel(anmeldung, stammdaten, "Liest Kinder, Teams", "API")
-Rel(anmeldung, saisonplanung, "Liest Wettkämpfe, Figuren", "API")
-
-Rel(wettkampf, anmeldung, "Liest Anmeldungen", "API")
-Rel(wettkampf, stammdaten, "Liest Offizielle", "API")
-
-Rel(bewertung, wettkampf, "Liest Durchgänge, Gruppen", "API")
-Rel(bewertung, saisonplanung, "Liest Schwierigkeitsfaktoren", "API")
-
-Rel(auswertung, bewertung, "Liest Bewertungen", "API")
-Rel(auswertung, wettkampf, "Liest Wettkampfstruktur", "API")
-
-@enduml
-```
+![Backend Modules](puml/02-backend-modules.png)
 
 ### Übersicht der Module
 
@@ -103,59 +51,9 @@ Rel(auswertung, wettkampf, "Liest Wettkampfstruktur", "API")
 
 Detaillierte Struktur des Anmeldungs-Moduls:
 
-```plantuml
-@startuml
-package "Anmeldung Modul" {
-    [AnmeldungRouter] <<REST>>
-    [AnmeldungService] <<Business Logic>>
-    [AnmeldungRepository] <<Data Access>>
+**Diagramm:** [puml/03-anmeldung-module.puml](puml/03-anmeldung-module.puml)
 
-    package "Domain" {
-        class Anmeldung {
-            +id: int
-            +kind_id: int
-            +wettkampf_id: int
-            +startnummer: int
-            +figuren: List[int]
-            +status: AnmeldungStatus
-            +erstellt_am: datetime
-        }
-
-        enum AnmeldungStatus {
-            VORLAEUFIG
-            BESTAETIGT
-            STORNIERT
-        }
-    }
-
-    package "Schemas" {
-        class AnmeldungCreate <<DTO>>
-        class AnmeldungResponse <<DTO>>
-    }
-}
-
-' Externe Abhängigkeiten
-package "Stammdaten Modul" {
-    [KindService]
-}
-
-package "Saisonplanung Modul" {
-    [WettkampfService]
-    [FigurService]
-}
-
-' Beziehungen
-[AnmeldungRouter] --> [AnmeldungService] : verwendet
-[AnmeldungService] --> [AnmeldungRepository] : verwendet
-[AnmeldungService] --> [KindService] : validiert Kind
-[AnmeldungService] --> [WettkampfService] : prüft Verfügbarkeit
-[AnmeldungService] --> [FigurService] : validiert Figuren
-[AnmeldungRepository] --> Anmeldung : CRUD
-
-[AnmeldungRouter] ..> AnmeldungCreate : empfängt
-[AnmeldungRouter] ..> AnmeldungResponse : sendet
-@enduml
-```
+![Anmeldung Module](puml/03-anmeldung-module.png)
 
 ### Schnittstellen des Anmeldungs-Moduls
 
@@ -216,67 +114,9 @@ def vergebe_startnummer(self, anmeldung_id: int) -> int:
 
 ## 5.4 Level 2 - Modul "Bewertung" (Beispiel)
 
-```plantuml
-@startuml
-package "Bewertung Modul" {
-    [BewertungRouter] <<REST>>
-    [BewertungService] <<Business Logic>>
-    [BewertungRepository] <<Data Access>>
-    [StartRepository] <<Data Access>>
+**Diagramm:** [puml/04-bewertung-module.puml](puml/04-bewertung-module.puml)
 
-    package "Domain" {
-        class Start {
-            +id: int
-            +durchgang_id: int
-            +kind_id: int
-            +reihenfolge: int
-            +status: StartStatus
-        }
-
-        class Bewertung {
-            +id: int
-            +start_id: int
-            +kampfrichter_id: int
-            +vorlaeufige_punkte: Decimal
-            +timestamp: datetime
-        }
-
-        class Endpunkte {
-            +start_id: int
-            +endpunkte: Decimal
-            +gestrichene_werte: List[Decimal]
-            +durchschnitt: Decimal
-            +schwierigkeitsfaktor: Decimal
-        }
-
-        enum StartStatus {
-            WARTEND
-            AUFGERUFEN
-            ABGESCHLOSSEN
-        }
-    }
-}
-
-' Externe Abhängigkeiten
-package "Wettkampf Modul" {
-    [DurchgangService]
-}
-
-package "Saisonplanung Modul" {
-    [FigurService]
-}
-
-' Beziehungen
-[BewertungRouter] --> [BewertungService]
-[BewertungService] --> [BewertungRepository]
-[BewertungService] --> [StartRepository]
-[BewertungService] --> [DurchgangService] : liest Durchgang
-[BewertungService] --> [FigurService] : liest Schwierigkeitsfaktor
-
-[BewertungRepository] --> Bewertung
-[StartRepository] --> Start
-@enduml
-```
+![Bewertung Module](puml/04-bewertung-module.png)
 
 ### Kernalgorithmus: Endpunkteberechnung
 
@@ -331,50 +171,9 @@ def berechne_endpunkte(self, start_id: int) -> Endpunkte:
 
 ## 5.5 Level 2 - Frontend-Struktur
 
-```plantuml
-@startuml
-package "Frontend" {
-    package "Planungs-App" {
-        [Saisonplanung-Pages]
-        [Stammdaten-Pages]
-        [Anmeldung-Pages]
-        [Reporting-Pages]
-    }
+**Diagramm:** [puml/05-frontend-structure.puml](puml/05-frontend-structure.puml)
 
-    package "Durchführungs-App" {
-        [Wettkampf-Setup-Pages]
-        [Bewertung-Pages]
-        [Auswertung-Pages]
-    }
-
-    package "Shared Components" {
-        [UI-Components] <<buttons, forms, tables>>
-        [Domain-Components] <<KindCard, FigurSelect>>
-    }
-
-    package "Services" {
-        [API-Client] <<TanStack Query>>
-        [Auth-Service]
-        [Sync-Service] <<PWA>>
-    }
-
-    package "State Management" {
-        [Zustand-Stores] <<lokaler State>>
-    }
-}
-
-' Beziehungen
-[Saisonplanung-Pages] --> [UI-Components]
-[Saisonplanung-Pages] --> [Domain-Components]
-[Saisonplanung-Pages] --> [API-Client]
-
-[Bewertung-Pages] --> [UI-Components]
-[Bewertung-Pages] --> [API-Client]
-[Bewertung-Pages] --> [Sync-Service]
-
-[API-Client] --> [Auth-Service]
-@enduml
-```
+![Frontend Structure](puml/05-frontend-structure.png)
 
 ### Frontend-Module
 

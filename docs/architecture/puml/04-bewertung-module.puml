@@ -1,0 +1,59 @@
+@startuml
+package "Bewertung Modul" {
+    [BewertungRouter] <<REST>>
+    [BewertungService] <<Business Logic>>
+    [BewertungRepository] <<Data Access>>
+    [StartRepository] <<Data Access>>
+
+    package "Domain" {
+        class Start {
+            +id: int
+            +durchgang_id: int
+            +kind_id: int
+            +reihenfolge: int
+            +status: StartStatus
+        }
+
+        class Bewertung {
+            +id: int
+            +start_id: int
+            +kampfrichter_id: int
+            +vorlaeufige_punkte: Decimal
+            +timestamp: datetime
+        }
+
+        class Endpunkte {
+            +start_id: int
+            +endpunkte: Decimal
+            +gestrichene_werte: List[Decimal]
+            +durchschnitt: Decimal
+            +schwierigkeitsfaktor: Decimal
+        }
+
+        enum StartStatus {
+            WARTEND
+            AUFGERUFEN
+            ABGESCHLOSSEN
+        }
+    }
+}
+
+' Externe Abhängigkeiten
+package "Wettkampf Modul" {
+    [DurchgangService]
+}
+
+package "Saisonplanung Modul" {
+    [FigurService]
+}
+
+' Beziehungen
+[BewertungRouter] --> [BewertungService]
+[BewertungService] --> [BewertungRepository]
+[BewertungService] --> [StartRepository]
+[BewertungService] --> [DurchgangService] : liest Durchgang
+[BewertungService] --> [FigurService] : liest Schwierigkeitsfaktor
+
+[BewertungRepository] --> Bewertung
+[StartRepository] --> Start
+@enduml

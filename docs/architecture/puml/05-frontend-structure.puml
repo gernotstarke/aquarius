@@ -1,0 +1,42 @@
+@startuml
+package "Frontend" {
+    package "Planungs-App" {
+        [Saisonplanung-Pages]
+        [Stammdaten-Pages]
+        [Anmeldung-Pages]
+        [Reporting-Pages]
+    }
+
+    package "Durchführungs-App" {
+        [Wettkampf-Setup-Pages]
+        [Bewertung-Pages]
+        [Auswertung-Pages]
+    }
+
+    package "Shared Components" {
+        [UI-Components] <<buttons, forms, tables>>
+        [Domain-Components] <<KindCard, FigurSelect>>
+    }
+
+    package "Services" {
+        [API-Client] <<TanStack Query>>
+        [Auth-Service]
+        [Sync-Service] <<PWA>>
+    }
+
+    package "State Management" {
+        [Zustand-Stores] <<lokaler State>>
+    }
+}
+
+' Beziehungen
+[Saisonplanung-Pages] --> [UI-Components]
+[Saisonplanung-Pages] --> [Domain-Components]
+[Saisonplanung-Pages] --> [API-Client]
+
+[Bewertung-Pages] --> [UI-Components]
+[Bewertung-Pages] --> [API-Client]
+[Bewertung-Pages] --> [Sync-Service]
+
+[API-Client] --> [Auth-Service]
+@enduml
