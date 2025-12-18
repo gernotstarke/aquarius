@@ -1,0 +1,382 @@
+# Contributing to Aquarius
+
+Thank you for your interest in contributing to Aquarius! This document provides guidelines and information for contributors.
+
+## Table of Contents
+
+- [Code of Conduct](#code-of-conduct)
+- [Getting Started](#getting-started)
+- [Development Workflow](#development-workflow)
+- [Coding Standards](#coding-standards)
+- [Testing Guidelines](#testing-guidelines)
+- [Commit Messages](#commit-messages)
+- [Pull Request Process](#pull-request-process)
+
+## Code of Conduct
+
+### Our Pledge
+
+We are committed to providing a welcoming and inclusive environment for all contributors, regardless of experience level, background, or identity.
+
+### Expected Behavior
+
+- Be respectful and considerate
+- Welcome newcomers and help them get started
+- Provide constructive feedback
+- Focus on what is best for the project
+- Show empathy towards other community members
+
+### Unacceptable Behavior
+
+- Harassment, discrimination, or offensive comments
+- Personal attacks or trolling
+- Publishing others' private information
+- Any other conduct inappropriate in a professional setting
+
+## Getting Started
+
+### Prerequisites
+
+Before contributing, ensure you have:
+- Java 17 or later installed
+- Gradle 8.x or later
+- Git configured on your machine
+- A GitHub account
+
+### Setting Up Your Development Environment
+
+1. Fork the repository on GitHub
+2. Clone your fork locally:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/aquarius.git
+   cd aquarius
+   ```
+3. Add the upstream repository:
+   ```bash
+   git remote add upstream https://github.com/gernotstarke/aquarius.git
+   ```
+4. Create a branch for your work:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+## Development Workflow
+
+### 1. Sync with Upstream
+
+Before starting work, sync your fork with the upstream repository:
+
+```bash
+git checkout main
+git fetch upstream
+git merge upstream/main
+git push origin main
+```
+
+### 2. Create a Feature Branch
+
+Create a branch with a descriptive name:
+
+```bash
+git checkout -b feature/add-user-authentication
+# or
+git checkout -b fix/resolve-database-connection-issue
+```
+
+### 3. Make Your Changes
+
+- Make small, focused changes
+- Follow the coding standards (see below)
+- Write or update tests as needed
+- Update documentation if required
+
+### 4. Test Your Changes
+
+Run the test suite to ensure everything works:
+
+```bash
+./gradlew test
+./gradlew integrationTest
+```
+
+### 5. Commit Your Changes
+
+Follow our commit message guidelines (see below):
+
+```bash
+git add .
+git commit -m "feat: add user authentication endpoint"
+```
+
+### 6. Push and Create Pull Request
+
+```bash
+git push origin feature/your-feature-name
+```
+
+Then create a pull request on GitHub.
+
+## Coding Standards
+
+### General Principles
+
+- **KISS (Keep It Simple, Stupid):** Favor simple solutions over complex ones
+- **DRY (Don't Repeat Yourself):** Avoid code duplication
+- **YAGNI (You Aren't Gonna Need It):** Don't add functionality until needed
+- **SOLID Principles:** Follow object-oriented design principles
+
+### Java Code Style
+
+- Use **4 spaces** for indentation (no tabs)
+- Maximum line length: **120 characters**
+- Use **meaningful variable and method names**
+- One statement per line
+- Always use braces for control structures, even for single-line blocks
+
+### Example
+
+```java
+// Good
+public class UserService {
+    private final UserRepository userRepository;
+    
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+    
+    public User findById(Long id) {
+        return userRepository.findById(id)
+            .orElseThrow(() -> new UserNotFoundException(id));
+    }
+}
+
+// Avoid
+public class UserService {
+  private UserRepository userRepository; // Missing final
+  
+  public User findById(Long id) {
+    return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id)); // Too long
+  }
+}
+```
+
+### Spring Boot Best Practices
+
+- Use constructor injection over field injection
+- Keep controllers thin - business logic belongs in services
+- Use proper HTTP status codes
+- Follow RESTful conventions
+- Externalize configuration
+
+### Package Structure
+
+```
+src/main/java/com/example/aquarius/
+├── controller/      # REST controllers
+├── service/         # Business logic
+├── repository/      # Data access
+├── model/           # Domain entities
+├── dto/             # Data transfer objects
+├── exception/       # Custom exceptions
+└── config/          # Configuration classes
+```
+
+## Testing Guidelines
+
+### Test Coverage
+
+- Aim for **> 80%** code coverage
+- All new features must include tests
+- Bug fixes should include regression tests
+
+### Types of Tests
+
+1. **Unit Tests**
+   - Test individual methods and classes
+   - Use Mockito for mocking dependencies
+   - Fast and isolated
+
+2. **Integration Tests**
+   - Test interactions between components
+   - Use @SpringBootTest annotation
+   - May use test containers or H2
+
+3. **API Tests**
+   - Test REST endpoints end-to-end
+   - Use MockMvc or RestAssured
+   - Validate request/response formats
+
+### Test Naming Convention
+
+```java
+// Pattern: methodName_condition_expectedBehavior
+
+@Test
+void findById_whenUserExists_returnsUser() {
+    // Test implementation
+}
+
+@Test
+void findById_whenUserDoesNotExist_throwsException() {
+    // Test implementation
+}
+```
+
+### Example Test
+
+```java
+@SpringBootTest
+class UserServiceTest {
+    
+    @Mock
+    private UserRepository userRepository;
+    
+    @InjectMocks
+    private UserService userService;
+    
+    @Test
+    void findById_whenUserExists_returnsUser() {
+        // Given
+        Long userId = 1L;
+        User expectedUser = new User(userId, "John Doe");
+        when(userRepository.findById(userId))
+            .thenReturn(Optional.of(expectedUser));
+        
+        // When
+        User actualUser = userService.findById(userId);
+        
+        // Then
+        assertThat(actualUser).isEqualTo(expectedUser);
+        verify(userRepository).findById(userId);
+    }
+}
+```
+
+## Commit Messages
+
+We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification.
+
+### Format
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+### Types
+
+- **feat:** New feature
+- **fix:** Bug fix
+- **docs:** Documentation changes
+- **style:** Code style changes (formatting, no code change)
+- **refactor:** Code refactoring
+- **test:** Adding or updating tests
+- **chore:** Maintenance tasks
+
+### Examples
+
+```
+feat(auth): add JWT authentication
+
+Implement JWT-based authentication for API endpoints.
+- Add JWT token generation
+- Add token validation filter
+- Update security configuration
+
+Closes #123
+```
+
+```
+fix(database): resolve connection pool exhaustion
+
+Increase connection pool size and add proper connection release
+in error scenarios.
+
+Fixes #456
+```
+
+```
+docs(api): update endpoint documentation
+
+Add examples for all user management endpoints.
+```
+
+### Guidelines
+
+- Use imperative mood ("add" not "added" or "adds")
+- Don't capitalize first letter
+- No period at the end of subject line
+- Limit subject line to 50 characters
+- Wrap body at 72 characters
+- Separate subject from body with blank line
+- Use body to explain what and why, not how
+
+## Pull Request Process
+
+### Before Submitting
+
+1. ✅ Ensure all tests pass
+2. ✅ Update documentation if needed
+3. ✅ Add tests for new functionality
+4. ✅ Follow coding standards
+5. ✅ Rebase on latest main branch
+6. ✅ Ensure commit messages follow guidelines
+
+### PR Description Template
+
+```markdown
+## Description
+Brief description of changes
+
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+
+## Related Issue
+Closes #(issue number)
+
+## Changes Made
+- Change 1
+- Change 2
+- Change 3
+
+## Testing
+Describe testing performed
+
+## Screenshots (if applicable)
+Add screenshots for UI changes
+
+## Checklist
+- [ ] Tests added/updated
+- [ ] Documentation updated
+- [ ] Code follows style guidelines
+- [ ] All tests pass
+```
+
+### Review Process
+
+1. **Automated Checks:** CI pipeline must pass
+2. **Code Review:** At least one approval required
+3. **Testing:** Reviewer should test changes locally if significant
+4. **Feedback:** Address review comments promptly
+5. **Merge:** Once approved, maintainer will merge
+
+### After Merge
+
+1. Delete your feature branch
+2. Sync your fork with upstream
+3. Celebrate! 🎉
+
+## Questions?
+
+If you have questions or need help:
+- Open an issue with the "question" label
+- Reach out to maintainers
+- Check existing documentation
+
+Thank you for contributing to Aquarius! 🙏
