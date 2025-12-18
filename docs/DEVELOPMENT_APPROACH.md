@@ -84,7 +84,7 @@ Short iterations with regular feedback to validate direction and approach.
 - All CRUD operations work correctly
 - Proper HTTP status codes returned
 - Input validation working
-- Test coverage > 80%
+- Tests coverage > 80%
 - API documentation updated
 
 ### Iteration 3: Database Persistence (Week 4)

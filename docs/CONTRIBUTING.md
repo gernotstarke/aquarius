@@ -152,10 +152,10 @@ public class UserService {
 
 // Avoid
 public class UserService {
-  private UserRepository userRepository; // Missing final
+  private UserRepository userRepository; // Should be final
   
   public User findById(Long id) {
-    return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id)); // Too long
+    return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id)); // Line too long, should be wrapped
   }
 }
 ```
