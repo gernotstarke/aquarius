@@ -38,10 +38,12 @@ We are committed to providing a welcoming and inclusive environment for all cont
 ### Prerequisites
 
 Before contributing, ensure you have:
-- Java 17 or later installed
-- Gradle 8.x or later
+- The required programming language runtime/compiler installed
+- The project's build tools installed
 - Git configured on your machine
 - A GitHub account
+
+> **Note:** Specific version requirements will be documented once the technology stack is finalized.
 
 ### Setting Up Your Development Environment
 
@@ -95,8 +97,12 @@ git checkout -b fix/resolve-database-connection-issue
 Run the test suite to ensure everything works:
 
 ```bash
-./gradlew test
-./gradlew integrationTest
+# Command will depend on chosen technology stack
+# Examples:
+# npm test
+# pytest
+# go test ./...
+# cargo test
 ```
 
 ### 5. Commit Your Changes
@@ -123,62 +129,40 @@ Then create a pull request on GitHub.
 - **KISS (Keep It Simple, Stupid):** Favor simple solutions over complex ones
 - **DRY (Don't Repeat Yourself):** Avoid code duplication
 - **YAGNI (You Aren't Gonna Need It):** Don't add functionality until needed
-- **SOLID Principles:** Follow object-oriented design principles
+- **SOLID Principles:** Follow good design principles
 
-### Java Code Style
+### Code Style
 
-- Use **4 spaces** for indentation (no tabs)
+Specific code style guidelines will be established once the technology stack is selected. General principles:
+
+- Use consistent indentation (typically 2 or 4 spaces, no tabs)
 - Maximum line length: **120 characters**
-- Use **meaningful variable and method names**
-- One statement per line
-- Always use braces for control structures, even for single-line blocks
+- Use **meaningful variable and function names**
+- Keep functions/methods focused and small
+- Comment complex logic, but prefer self-documenting code
 
-### Example
+### API Development Best Practices
 
-```java
-// Good
-public class UserService {
-    private final UserRepository userRepository;
-    
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-    
-    public User findById(Long id) {
-        return userRepository.findById(id)
-            .orElseThrow(() -> new UserNotFoundException(id));
-    }
-}
-
-// Avoid
-public class UserService {
-  private UserRepository userRepository; // Should be final
-  
-  public User findById(Long id) {
-    return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id)); // Line too long, should be wrapped
-  }
-}
-```
-
-### Spring Boot Best Practices
-
-- Use constructor injection over field injection
-- Keep controllers thin - business logic belongs in services
+- Keep API handlers/controllers thin - business logic belongs in services
 - Use proper HTTP status codes
 - Follow RESTful conventions
+- Validate input at API boundaries
 - Externalize configuration
+- Handle errors consistently
 
-### Package Structure
+### Project Structure
+
+Structure will be defined based on chosen technology stack and framework conventions. Typical layers include:
 
 ```
-src/main/java/com/example/aquarius/
-├── controller/      # REST controllers
-├── service/         # Business logic
-├── repository/      # Data access
-├── model/           # Domain entities
+src/
+├── api/             # API handlers/controllers
+├── services/        # Business logic
+├── data/            # Data access layer
+├── models/          # Domain entities/models
 ├── dto/             # Data transfer objects
-├── exception/       # Custom exceptions
-└── config/          # Configuration classes
+├── middleware/      # Middleware/interceptors
+└── config/          # Configuration
 ```
 
 ## Testing Guidelines
@@ -192,65 +176,43 @@ src/main/java/com/example/aquarius/
 ### Types of Tests
 
 1. **Unit Tests**
-   - Test individual methods and classes
-   - Use Mockito for mocking dependencies
+   - Test individual functions and modules
+   - Use mocking for dependencies
    - Fast and isolated
 
 2. **Integration Tests**
    - Test interactions between components
-   - Use @SpringBootTest annotation
-   - May use test containers or H2
+   - May use test containers or in-memory databases
+   - Test actual integrations
 
 3. **API Tests**
    - Test REST endpoints end-to-end
-   - Use MockMvc or RestAssured
    - Validate request/response formats
+   - Test error handling
 
 ### Test Naming Convention
 
-```java
-// Pattern: methodName_condition_expectedBehavior
+Use descriptive test names that indicate:
+- What is being tested
+- The condition or scenario
+- The expected behavior
 
-@Test
-void findById_whenUserExists_returnsUser() {
-    // Test implementation
-}
+Examples:
+- `test_find_by_id_when_user_exists_returns_user`
+- `should_return_404_when_resource_not_found`
+- `findById_withValidId_returnsUser`
 
-@Test
-void findById_whenUserDoesNotExist_throwsException() {
-    // Test implementation
-}
+### Test Structure
+
+Follow the Arrange-Act-Assert (AAA) pattern:
+
+```
+// Arrange: Set up test data and conditions
+// Act: Execute the code being tested
+// Assert: Verify the expected outcome
 ```
 
-### Example Test
-
-```java
-@SpringBootTest
-class UserServiceTest {
-    
-    @Mock
-    private UserRepository userRepository;
-    
-    @InjectMocks
-    private UserService userService;
-    
-    @Test
-    void findById_whenUserExists_returnsUser() {
-        // Given
-        Long userId = 1L;
-        User expectedUser = new User(userId, "John Doe");
-        when(userRepository.findById(userId))
-            .thenReturn(Optional.of(expectedUser));
-        
-        // When
-        User actualUser = userService.findById(userId);
-        
-        // Then
-        assertThat(actualUser).isEqualTo(expectedUser);
-        verify(userRepository).findById(userId);
-    }
-}
-```
+Specific testing frameworks and examples will be provided once the technology stack is selected.
 
 ## Commit Messages
 

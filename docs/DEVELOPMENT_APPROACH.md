@@ -28,10 +28,10 @@ Short iterations with regular feedback to validate direction and approach.
 **Goal:** Establish the foundational project structure and tooling
 
 **Tasks:**
-- [ ] Set up basic Spring Boot project structure
-- [ ] Configure Gradle build system
+- [ ] Set up basic project structure (choose language and framework)
+- [ ] Configure build/package management system
 - [ ] Set up Git repository with proper .gitignore
-- [ ] Configure basic logging (SLF4J/Logback)
+- [ ] Configure basic logging
 - [ ] Create README with setup instructions
 - [ ] Set up GitHub Actions for basic CI (build verification)
 
@@ -50,10 +50,10 @@ Short iterations with regular feedback to validate direction and approach.
 - [ ] Create a single REST endpoint (e.g., GET /health)
 - [ ] Return a simple JSON response
 - [ ] Write a basic integration test
-- [ ] Set up H2 in-memory database
-- [ ] Create one simple entity (e.g., Status)
-- [ ] Implement basic repository layer
-- [ ] Add Swagger/OpenAPI documentation
+- [ ] Set up in-memory or simple database
+- [ ] Create one simple entity/model (e.g., Status)
+- [ ] Implement basic data access layer
+- [ ] Add API documentation (OpenAPI/Swagger or equivalent)
 
 **Walking Skeleton State:** Application starts, responds to HTTP requests, can read from database
 
@@ -93,10 +93,10 @@ Short iterations with regular feedback to validate direction and approach.
 
 **Tasks:**
 - [ ] Set up PostgreSQL (local development)
-- [ ] Configure Spring Data JPA
-- [ ] Implement database migrations (Flyway or Liquibase)
+- [ ] Configure ORM/database library
+- [ ] Implement database migrations
 - [ ] Add database connection pooling
-- [ ] Update tests to use test containers or H2
+- [ ] Update tests to use test database or containers
 - [ ] Document database setup
 
 **Walking Skeleton State:** Data persists across application restarts
@@ -173,7 +173,7 @@ Short iterations with regular feedback to validate direction and approach.
 **Goal:** Add basic security measures
 
 **Tasks:**
-- [ ] Add Spring Security
+- [ ] Add security framework/middleware
 - [ ] Implement basic authentication
 - [ ] Add authorization for endpoints
 - [ ] Implement CORS configuration
@@ -217,7 +217,7 @@ Short iterations with regular feedback to validate direction and approach.
 - [ ] Write docker-compose for local dev
 - [ ] Add health check endpoints
 - [ ] Configure production-ready logging
-- [ ] Add metrics/monitoring (Actuator)
+- [ ] Add metrics/monitoring endpoints
 - [ ] Create deployment documentation
 - [ ] Set up CD pipeline
 
