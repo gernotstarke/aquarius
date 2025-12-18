@@ -851,13 +851,16 @@ Das Datenmodell ist in **6 fachliche Bereiche** strukturiert, die den Bounded Co
 
 | Entität | Deutsche Bezeichnung | Beschreibung | Wichtige Attribute |
 |---------|---------------------|--------------|-------------------|
-| **ScoringJudge** | Punktrichter/Kampfrichter | Bewertet Starts | official_id |
-| **Performance** | Start/Leistung | Tatsächlicher Start eines Kindes | score, prelim_score, round_id, enrollment_id |
+| **ScoringJudge** | Punktrichter/Kampfrichter | Bewertet einzelne Versuche | official_id |
+| **Performance** | Versuch/Start | Ein Versuch eines Kindes, eine Figur zu zeigen | score, prelim_score, round_id, enrollment_id, figure_id |
 
 **Neue Erkenntnisse:**
-- **Performance** (Start):
-  - Hat sowohl `score` (Endpunktzahl) als auch `prelim_score` (vorläufige Punkte)
-  - Verknüpft mit Round (wann/wo) und Enrollment (wer)
+- **Performance** (Versuch):
+  - **Wichtig:** Ein Performance = ein Versuch eines Kindes, **eine** Figur zu zeigen
+  - Ein Kind hat mehrere Performances pro Wettkampf (eine pro Figur)
+  - `score`: Endpunktzahl für diesen Versuch (nach Streichung höchster/niedrigster Werte und Multiplikation mit Schwierigkeitsfaktor)
+  - `prelim_score`: Vorläufige Punkte einzelner Kampfrichter (vor Berechnung)
+  - Verknüpft mit Round (wann/wo), Enrollment (wer) und Figur (was)
 
 - **ScoringJudge**:
   - Ist ein Offizieller (Spezialisierung)
@@ -876,11 +879,19 @@ Club (1) ─── (*) Team (1) ─── (*) Child
 
 **Wettkampf-Ablauf:**
 ```
-Season (1) ─── (*) Competition (1/*) ─── (*) Round (1) ─── (*) Performance
-                                 │                │
-                                 │                └─── (3..*) ScoringJudge
+Season (1) ─── (*) Competition ─┬─── (*) Round (1) ─── (*) Performance ─── (1) Figure
+                                 │            │
+                                 │            └─── (3..*) ScoringJudge
                                  │
                                  └─── (*) Enrollment ─── (*) Performance
+                                              │
+                                              └─── (1) Child
+
+Legende:
+- Competition besteht aus mehreren Rounds (Durchgängen)
+- Jeder Round hat mehrere Performances (Versuche)
+- Ein Performance = ein Kind zeigt eine Figur
+- Pro Kind mehrere Performances (eine pro Figur)
 ```
 
 **Stations-Organisation:**
@@ -922,11 +933,19 @@ Das Modell führt **Stationen** als eigenständige Entität ein. Dies ermöglich
 
 **Vorteil:** Trennung zwischen fachlicher Kategorisierung (Altersgruppe für Preisvergabe) und organisatorischer Gruppierung (Gruppe für Durchführung)
 
-**3. Preliminary-Flags**
+**3. Performance-Konzept (Ein Versuch = Eine Figur)**
 
-Sowohl `Enrollment.preliminary` als auch `Performance.prelim_score` existieren:
-- **Enrollment.preliminary**: Anmeldung noch nicht bestätigt (vor Startnummernvergabe)
-- **Performance.prelim_score**: Vorläufige Punkte vor Streichung höchster/niedrigster Werte
+Ein **Performance** repräsentiert einen einzelnen Versuch:
+- Ein Kind zeigt **eine** Figur in einem Durchgang
+- Pro angemeldete Figur gibt es ein separates Performance
+- Beispiel: Kind meldet sich für 3 Figuren an → 3 Performance-Einträge
+
+**Score-Berechnung:**
+1. Mehrere Kampfrichter vergeben `prelim_score` (vorläufige Punkte)
+2. System berechnet `score` (Endpunktzahl):
+   - Höchste/niedrigste Bewertung streichen
+   - Durchschnitt der verbleibenden Werte
+   - Multiplikation mit Schwierigkeitsfaktor der Figur
 
 **4. Mindestanzahl Punktrichter**
 
@@ -942,10 +961,10 @@ Die **3..*** Multiplizität bei Round ↔ ScoringJudge kodiert die Geschäftsreg
 
 #### Offene Fragen
 
-- [ ] **Performance.score vs prelim_score**: Wann wird `score` berechnet/gesetzt?
 - [ ] **Competition.organization-Beziehung**: Was bedeutet "1/*" Multiplizität genau?
 - [ ] **Auswertung**: Rangliste und Preisvergabe noch nicht modelliert
 - [ ] **Altersgruppe**: Wo wird die Altersgruppe für Preisvergabe gespeichert? Separate Entität oder Attribut von Kind?
+- [ ] **Performance-Figure-Beziehung**: Ist die Beziehung zu Figure direkt oder über Enrollment → wanted_figure?
 
 ---
 
