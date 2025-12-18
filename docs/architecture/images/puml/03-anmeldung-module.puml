@@ -1,0 +1,51 @@
+@startuml
+package "Anmeldung Modul" {
+    [AnmeldungRouter] <<REST>>
+    [AnmeldungService] <<Business Logic>>
+    [AnmeldungRepository] <<Data Access>>
+
+    package "Domain" {
+        class Anmeldung {
+            +id: int
+            +kind_id: int
+            +wettkampf_id: int
+            +startnummer: int
+            +figuren: List[int]
+            +status: AnmeldungStatus
+            +erstellt_am: datetime
+        }
+
+        enum AnmeldungStatus {
+            VORLAEUFIG
+            BESTAETIGT
+            STORNIERT
+        }
+    }
+
+    package "Schemas" {
+        class AnmeldungCreate <<DTO>>
+        class AnmeldungResponse <<DTO>>
+    }
+}
+
+' Externe Abhängigkeiten
+package "Stammdaten Modul" {
+    [KindService]
+}
+
+package "Saisonplanung Modul" {
+    [WettkampfService]
+    [FigurService]
+}
+
+' Beziehungen
+[AnmeldungRouter] --> [AnmeldungService] : verwendet
+[AnmeldungService] --> [AnmeldungRepository] : verwendet
+[AnmeldungService] --> [KindService] : validiert Kind
+[AnmeldungService] --> [WettkampfService] : prüft Verfügbarkeit
+[AnmeldungService] --> [FigurService] : validiert Figuren
+[AnmeldungRepository] --> Anmeldung : CRUD
+
+[AnmeldungRouter] ..> AnmeldungCreate : empfängt
+[AnmeldungRouter] ..> AnmeldungResponse : sendet
+@enduml
