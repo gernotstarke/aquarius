@@ -2,7 +2,7 @@
 
 ## Overview
 
-Aquarius is a modern software application project. This repository contains the initial documentation and architecture decisions to guide the development process.
+Aquarius is a modern software application project. This repository contains the initial documentation to guide the development process.
 
 ## Project Status
 
@@ -11,7 +11,6 @@ Aquarius is a modern software application project. This repository contains the 
 ## Documentation
 
 - [Development Approach](docs/DEVELOPMENT_APPROACH.md) - Incremental development strategy and walking skeleton approach
-- [Architecture Decisions](docs/ARCHITECTURE_DECISIONS.md) - Technology stack and architectural choices
 - [Contributing Guidelines](docs/CONTRIBUTING.md) - How to contribute to the project
 
 ## Quick Start
