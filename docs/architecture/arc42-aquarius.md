@@ -827,7 +827,7 @@ Das Datenmodell ist in **6 fachliche Bereiche** strukturiert, die den Bounded Co
 | **Station** | Station | Bewertungsstation am Beckenrand | name, location |
 | **StationChief** | Stationsleiter | Verantwortlicher Offizieller für eine Station | official_id, station_id |
 | **Round** | Durchgang | Wettkampfdurchgang an einer Station | starttime, station_id, group_id |
-| **Group** | Gruppe | Gruppierung von Durchgängen (z.B. nach Altersklasse) | id |
+| **Group** | Gruppe | Organisatorische Gruppierung von Kindern zur Ablauf-Optimierung | id |
 
 **Neue Erkenntnisse:**
 - **Station**: Physische Bewertungsstationen am Schwimmbad (bisher nicht dokumentiert!)
@@ -841,7 +841,11 @@ Das Datenmodell ist in **6 fachliche Bereiche** strukturiert, die den Bounded Co
   - Gehört zu einer Gruppe
   - Mindestens 3 Punktrichter pro Durchgang (3..* Multiplizität!)
 
-- **Group**: Organisationseinheit für Durchgänge (vermutlich Altersgruppen)
+- **Group** (Gruppe):
+  - **Wichtig:** NICHT identisch mit Altersgruppe!
+  - Eine Menge von Kindern, die für einen Wettkampf zur Optimierung des Ablaufs zusammengefasst wurden
+  - Dient der organisatorischen Strukturierung (z.B. nach Leistungsniveau, Becken-Verfügbarkeit, zeitlicher Planung)
+  - Durchgänge werden Gruppen zugeordnet
 
 **5. Bewertung**
 
@@ -905,18 +909,31 @@ Das Modell führt **Stationen** als eigenständige Entität ein. Dies ermöglich
 - **Problem:** Keine Abbildung der räumlichen Organisation
 - **Problem:** Unklar, wer für welchen Bereich verantwortlich ist
 
-**2. Preliminary-Flags**
+**2. Group-Konzept (Ablauf-Optimierung)**
+
+**Gruppen** sind organisatorische Einheiten zur Wettkampf-Optimierung:
+- Fassen Kinder zusammen für effizienten Ablauf
+- **Nicht** identisch mit Altersgruppen (fachliche Kategorisierung)
+- Ermöglichen flexible Planung nach verschiedenen Kriterien:
+  - Leistungsniveau (ähnliche Schwierigkeitsgrade zusammen)
+  - Becken-Verfügbarkeit (mehrere Gruppen parallel)
+  - Zeitliche Strukturierung (Vormittags-/Nachmittags-Gruppe)
+  - Anzahl verfügbarer Punktrichter
+
+**Vorteil:** Trennung zwischen fachlicher Kategorisierung (Altersgruppe für Preisvergabe) und organisatorischer Gruppierung (Gruppe für Durchführung)
+
+**3. Preliminary-Flags**
 
 Sowohl `Enrollment.preliminary` als auch `Performance.prelim_score` existieren:
 - **Enrollment.preliminary**: Anmeldung noch nicht bestätigt (vor Startnummernvergabe)
 - **Performance.prelim_score**: Vorläufige Punkte vor Streichung höchster/niedrigster Werte
 
-**3. Mindestanzahl Punktrichter**
+**4. Mindestanzahl Punktrichter**
 
 Die **3..*** Multiplizität bei Round ↔ ScoringJudge kodiert die Geschäftsregel:
 > Ein Durchgang benötigt mindestens 3 Punktrichter (damit höchste/niedrigste Bewertung gestrichen werden können und noch ≥1 Wert übrig bleibt)
 
-**4. Official als Oberklasse**
+**5. Official als Oberklasse**
 
 `StationChief` und `ScoringJudge` sind Spezialisierungen von `Official`:
 - Ermöglicht flexible Rollenzuweisung
@@ -925,10 +942,10 @@ Die **3..*** Multiplizität bei Round ↔ ScoringJudge kodiert die Geschäftsreg
 
 #### Offene Fragen
 
-- [ ] **Group-Entität**: Ist dies identisch mit "Altersgruppe"? Oder separate Gruppierung?
 - [ ] **Performance.score vs prelim_score**: Wann wird `score` berechnet/gesetzt?
 - [ ] **Competition.organization-Beziehung**: Was bedeutet "1/*" Multiplizität genau?
 - [ ] **Auswertung**: Rangliste und Preisvergabe noch nicht modelliert
+- [ ] **Altersgruppe**: Wo wird die Altersgruppe für Preisvergabe gespeichert? Separate Entität oder Attribut von Kind?
 
 ---
 
