@@ -779,7 +779,160 @@ def berechne_endpunkte(bewertungen: list[Decimal], schwierigkeitsfaktor: Decimal
 
 ## 8.2 Persistenz und Datenzugriff
 
-### 8.2.1 Datenbank-Schema
+### 8.2.0 Konzeptionelles Datenmodell
+
+Das folgende Entity-Relationship-Modell zeigt alle Entitäten und ihre Beziehungen im Aquarius-System:
+
+**Diagramm:** [puml/06-entity-relationship-model.puml](puml/06-entity-relationship-model.puml)
+
+![Entity Relationship Model](puml/06-entity-relationship-model.png)
+
+#### Entitäten-Übersicht
+
+Das Datenmodell ist in **6 fachliche Bereiche** strukturiert, die den Bounded Contexts entsprechen:
+
+**1. Stammdaten**
+
+| Entität | Deutsche Bezeichnung | Beschreibung | Wichtige Attribute |
+|---------|---------------------|--------------|-------------------|
+| **Club** | Verein | Schwimmverein in der Liga | name |
+| **Team** | Team | Mannschaft innerhalb eines Vereins | name, club_id |
+| **Child** | Kind | Teilnehmendes Kind | name, first_name, birth_date, address, team_id |
+| **Official** | Offizieller | Kampfrichter, Punktrichter, Stationsleiter | name, phone |
+
+**2. Saisonplanung**
+
+| Entität | Deutsche Bezeichnung | Beschreibung | Wichtige Attribute |
+|---------|---------------------|--------------|-------------------|
+| **Season** | Saison | Wettkampfsaison (z.B. 2024/2025) | name, from_date, to_date |
+| **Pool** | Schwimmbad | Austragungsort | phone_no, manager |
+| **Competition** | Wettkampf | Einzelner Wettkampf | date, location, max_participants, season_id, pool_id |
+| **Figure** | Figur | Schwimmfigur mit Schwierigkeitsgrad | id, difficulty |
+
+**3. Anmeldung**
+
+| Entität | Deutsche Bezeichnung | Beschreibung | Wichtige Attribute |
+|---------|---------------------|--------------|-------------------|
+| **Enrollment** | Anmeldung | Anmeldung eines Kindes zu einem Wettkampf | starting_no, preliminary, enrol_time, child_id, competition_id |
+
+**Neue Erkenntnisse:**
+- `preliminary` (vorläufig): Boolean-Flag, ob Anmeldung noch vorläufig ist
+- `enrol_time` (Anmeldezeitpunkt): Timestamp der Anmeldung
+- Beziehung zu gewünschten Figuren (wanted_figure): n:m-Beziehung
+
+**4. Wettkampf-Organisation**
+
+| Entität | Deutsche Bezeichnung | Beschreibung | Wichtige Attribute |
+|---------|---------------------|--------------|-------------------|
+| **Station** | Station | Bewertungsstation am Beckenrand | name, location |
+| **StationChief** | Stationsleiter | Verantwortlicher Offizieller für eine Station | official_id, station_id |
+| **Round** | Durchgang | Wettkampfdurchgang an einer Station | starttime, station_id, group_id |
+| **Group** | Gruppe | Gruppierung von Durchgängen (z.B. nach Altersklasse) | id |
+
+**Neue Erkenntnisse:**
+- **Station**: Physische Bewertungsstationen am Schwimmbad (bisher nicht dokumentiert!)
+  - Jede Station hat einen Namen und eine Position/Location
+  - Genau 1 Stationsleiter pro Station (1:1-Beziehung)
+  - Mehrere Durchgänge finden an einer Station statt
+
+- **Round** (Durchgang):
+  - Hat eine `starttime` (Startzeit)
+  - Ist einer Station zugeordnet
+  - Gehört zu einer Gruppe
+  - Mindestens 3 Punktrichter pro Durchgang (3..* Multiplizität!)
+
+- **Group**: Organisationseinheit für Durchgänge (vermutlich Altersgruppen)
+
+**5. Bewertung**
+
+| Entität | Deutsche Bezeichnung | Beschreibung | Wichtige Attribute |
+|---------|---------------------|--------------|-------------------|
+| **ScoringJudge** | Punktrichter/Kampfrichter | Bewertet Starts | official_id |
+| **Performance** | Start/Leistung | Tatsächlicher Start eines Kindes | score, prelim_score, round_id, enrollment_id |
+
+**Neue Erkenntnisse:**
+- **Performance** (Start):
+  - Hat sowohl `score` (Endpunktzahl) als auch `prelim_score` (vorläufige Punkte)
+  - Verknüpft mit Round (wann/wo) und Enrollment (wer)
+
+- **ScoringJudge**:
+  - Ist ein Offizieller (Spezialisierung)
+  - Wird Durchgängen zugewiesen (3 oder mehr pro Round)
+
+**6. Auswertung**
+
+(Noch nicht im Diagramm enthalten - wird bei Bedarf ergänzt: Rangliste, Preisvergabe)
+
+#### Wichtige Beziehungen
+
+**Hierarchien:**
+```
+Club (1) ─── (*) Team (1) ─── (*) Child
+```
+
+**Wettkampf-Ablauf:**
+```
+Season (1) ─── (*) Competition (1/*) ─── (*) Round (1) ─── (*) Performance
+                                 │                │
+                                 │                └─── (3..*) ScoringJudge
+                                 │
+                                 └─── (*) Enrollment ─── (*) Performance
+```
+
+**Stations-Organisation:**
+```
+Station (1) ─── (1) StationChief
+   │
+   └─── (*) Round ─── (*) Performance
+```
+
+**Figuren-Planung:**
+```
+Competition ─── (*) Figure [planned_figure]
+Enrollment ─── (*) Figure [wanted_figure]
+```
+
+#### Design-Entscheidungen
+
+**1. Station-Konzept**
+
+Das Modell führt **Stationen** als eigenständige Entität ein. Dies ermöglicht:
+- Parallele Bewertung an mehreren Becken-Positionen
+- Klare Verantwortlichkeiten durch Stationsleiter
+- Strukturierung des Wettkampfablaufs
+
+**Alternative (verworfen):** Durchgänge direkt dem Wettkampf zuordnen
+- **Problem:** Keine Abbildung der räumlichen Organisation
+- **Problem:** Unklar, wer für welchen Bereich verantwortlich ist
+
+**2. Preliminary-Flags**
+
+Sowohl `Enrollment.preliminary` als auch `Performance.prelim_score` existieren:
+- **Enrollment.preliminary**: Anmeldung noch nicht bestätigt (vor Startnummernvergabe)
+- **Performance.prelim_score**: Vorläufige Punkte vor Streichung höchster/niedrigster Werte
+
+**3. Mindestanzahl Punktrichter**
+
+Die **3..*** Multiplizität bei Round ↔ ScoringJudge kodiert die Geschäftsregel:
+> Ein Durchgang benötigt mindestens 3 Punktrichter (damit höchste/niedrigste Bewertung gestrichen werden können und noch ≥1 Wert übrig bleibt)
+
+**4. Official als Oberklasse**
+
+`StationChief` und `ScoringJudge` sind Spezialisierungen von `Official`:
+- Ermöglicht flexible Rollenzuweisung
+- Ein Offizieller kann mehrere Rollen haben (z.B. bei kleinen Wettkämpfen)
+- Zentrale Kontaktdaten (name, phone)
+
+#### Offene Fragen
+
+- [ ] **Group-Entität**: Ist dies identisch mit "Altersgruppe"? Oder separate Gruppierung?
+- [ ] **Performance.score vs prelim_score**: Wann wird `score` berechnet/gesetzt?
+- [ ] **Competition.organization-Beziehung**: Was bedeutet "1/*" Multiplizität genau?
+- [ ] **Auswertung**: Rangliste und Preisvergabe noch nicht modelliert
+
+---
+
+### 8.2.1 Datenbank-Schema (Technische Umsetzung)
 
 **ORM:** SQLAlchemy 2.0 mit deklarativem Mapping
 
