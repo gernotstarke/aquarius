@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  docs:
+    build:
+      context: .
+      dockerfile: Dockerfile.docs
+    image: aquarius-docs:latest
+    volumes:
+      - ./docs:/docs
+    working_dir: /docs
+    command: ["bash", "-c", "echo 'Aquarius Documentation Build Environment Ready'"]
+
+  # Service for generating diagrams
+  docs-diagrams:
+    image: aquarius-docs:latest
+    volumes:
+      - ./docs:/docs
+    working_dir: /docs
+    command: >
+      bash -c "
+      mkdir -p architecture/images/generated &&
+      plantuml -tpng -o ../generated architecture/images/puml/*.puml &&
+      echo '✓ Diagrams generated'
+      "
+
+  # Service for generating HTML
+  docs-html:
+    image: aquarius-docs:latest
+    volumes:
+      - ./docs:/docs
+    working_dir: /docs
+    command: >
+      asciidoctor architecture.adoc
+      -o architecture.html
+      -a toc=left
+      -a toclevels=3
+      -a sectnums
+      -a icons=font
+      -r asciidoctor-diagram
+
+  # Service for generating PDF
+  docs-pdf:
+    image: aquarius-docs:latest
+    volumes:
+      - ./docs:/docs
+    working_dir: /docs
+    command: >
+      asciidoctor-pdf architecture.adoc
+      -o architecture.pdf
+      -a sectnums
+      -r asciidoctor-diagram
+
+  # Service for watching and rebuilding
+  docs-watch:
+    image: aquarius-docs:latest
+    volumes:
+      - ./docs:/docs
+    working_dir: /docs
+    command: >
+      bash -c "
+      echo 'Watching for changes...' &&
+      while true; do
+        inotifywait -r -e modify,create,delete architecture/ 2>/dev/null &&
+        echo 'Change detected, rebuilding...' &&
+        asciidoctor architecture.adoc -o architecture.html -a toc=left -a toclevels=3
+      done
+      "
