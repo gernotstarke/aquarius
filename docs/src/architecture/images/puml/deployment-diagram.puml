@@ -1,0 +1,23 @@
+@startuml
+!include <C4/C4_Deployment>
+
+Deployment_Node(client, "Client Device", "Browser") {
+    Container(planning, "Planungs-App", "React PWA", "Desktop-optimiert")
+    Container(execution, "Durchführungs-App", "React PWA", "Touch-optimiert")
+}
+
+Deployment_Node(cloud, "Cloud Infrastructure") {
+    Deployment_Node(app_server, "Application Server", "Docker Container") {
+        Container(api, "Backend API", "FastAPI", "REST API, Business Logic")
+    }
+
+    Deployment_Node(db_server, "Database Server", "Turso Edge") {
+        ContainerDb(database, "Database", "libSQL", "Wettkampf-Daten")
+    }
+}
+
+Rel(planning, api, "API Calls", "HTTPS/JSON")
+Rel(execution, api, "API Calls + Sync", "HTTPS/JSON")
+Rel(api, database, "SQL Queries", "libSQL Protocol")
+
+@enduml
