@@ -16,27 +16,39 @@ help: ## Display this help message
 ##@ Docker Build
 
 docs-build-image: ## Build the Docker image for documentation generation
-	@echo "Building documentation Docker image..."
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "🐳 Building documentation Docker image..."
+	@echo "   Image: $(DOCKER_IMAGE)"
+	@echo "   Dockerfile: Dockerfile.docs"
 	@docker build -f Dockerfile.docs -t $(DOCKER_IMAGE) .
-	@echo "✓ Docker image built: $(DOCKER_IMAGE)"
+	@echo "✓ Docker image built successfully: $(DOCKER_IMAGE)"
 
 ##@ Documentation
 
 docs: docs-diagrams docs-html ## Generate all documentation (diagrams + HTML) - Docker-based
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	@echo "✓ Documentation generated successfully"
+	@echo "  📄 HTML: docs/build/architecture.html"
+	@echo "  📊 Diagrams: docs/build/images/"
+	@echo "  View with: make docs-serve"
 
 docs-diagrams: ## Generate PNG diagrams from PlantUML sources (Docker-based)
-	@echo "Generating diagrams from PlantUML..."
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "📊 Generating PlantUML diagrams..."
 	@if docker images -q $(DOCKER_IMAGE) 2>/dev/null | grep -q .; then \
+		echo "🐳 Using Docker image: $(DOCKER_IMAGE)"; \
 		mkdir -p $(DOCS_BUILD)/images; \
+		echo "   Running: plantuml -tpng -o ../../../../build/images ..."; \
 		$(DOCKER_RUN) plantuml -tpng -o ../../../../build/images src/architecture/images/puml/*.puml; \
-		echo "✓ Diagrams generated in $(DOCS_BUILD)/images/"; \
+		echo "✓ Diagrams generated in $(DOCS_BUILD)/images/ (via Docker)"; \
 	elif command -v docker >/dev/null 2>&1; then \
 		echo "⚠ Docker image not found. Building it now..."; \
 		$(MAKE) docs-build-image; \
+		echo "🐳 Using Docker image: $(DOCKER_IMAGE)"; \
 		mkdir -p $(DOCS_BUILD)/images; \
+		echo "   Running: plantuml -tpng -o ../../../../build/images ..."; \
 		$(DOCKER_RUN) plantuml -tpng -o ../../../../build/images src/architecture/images/puml/*.puml; \
-		echo "✓ Diagrams generated in $(DOCS_BUILD)/images/"; \
+		echo "✓ Diagrams generated in $(DOCS_BUILD)/images/ (via Docker)"; \
 	elif command -v plantuml >/dev/null 2>&1; then \
 		echo "⚠ Docker not available, using local plantuml..."; \
 		mkdir -p $(DOCS_BUILD)/images; \
@@ -49,9 +61,12 @@ docs-diagrams: ## Generate PNG diagrams from PlantUML sources (Docker-based)
 	fi
 
 docs-html: ## Generate HTML documentation from AsciiDoc (Docker-based)
-	@echo "Generating HTML documentation..."
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "📄 Generating HTML documentation..."
 	@if docker images -q $(DOCKER_IMAGE) 2>/dev/null | grep -q .; then \
+		echo "🐳 Using Docker image: $(DOCKER_IMAGE)"; \
 		mkdir -p $(DOCS_BUILD); \
+		echo "   Running: asciidoctor src/architecture.adoc -o build/architecture.html ..."; \
 		$(DOCKER_RUN) asciidoctor src/architecture.adoc \
 			-o build/architecture.html \
 			-a toc=left \
@@ -60,12 +75,14 @@ docs-html: ## Generate HTML documentation from AsciiDoc (Docker-based)
 			-a icons=font \
 			-a imagesdir=images \
 			-r asciidoctor-diagram; \
-		echo "✓ HTML documentation generated: $(DOCS_BUILD)/architecture.html"; \
+		echo "✓ HTML documentation generated: $(DOCS_BUILD)/architecture.html (via Docker)"; \
 		echo "  View with: make docs-serve"; \
 	elif command -v docker >/dev/null 2>&1; then \
 		echo "⚠ Docker image not found. Building it now..."; \
 		$(MAKE) docs-build-image; \
+		echo "🐳 Using Docker image: $(DOCKER_IMAGE)"; \
 		mkdir -p $(DOCS_BUILD); \
+		echo "   Running: asciidoctor src/architecture.adoc -o build/architecture.html ..."; \
 		$(DOCKER_RUN) asciidoctor src/architecture.adoc \
 			-o build/architecture.html \
 			-a toc=left \
@@ -74,7 +91,7 @@ docs-html: ## Generate HTML documentation from AsciiDoc (Docker-based)
 			-a icons=font \
 			-a imagesdir=images \
 			-r asciidoctor-diagram; \
-		echo "✓ HTML documentation generated: $(DOCS_BUILD)/architecture.html"; \
+		echo "✓ HTML documentation generated: $(DOCS_BUILD)/architecture.html (via Docker)"; \
 	elif command -v asciidoctor >/dev/null 2>&1; then \
 		echo "⚠ Docker not available, using local asciidoctor..."; \
 		mkdir -p $(DOCS_BUILD); \
@@ -101,25 +118,30 @@ docs-html: ## Generate HTML documentation from AsciiDoc (Docker-based)
 	fi
 
 docs-pdf: ## Generate PDF documentation (Docker-based)
-	@echo "Generating PDF documentation..."
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "📑 Generating PDF documentation..."
 	@if docker images -q $(DOCKER_IMAGE) 2>/dev/null | grep -q .; then \
+		echo "🐳 Using Docker image: $(DOCKER_IMAGE)"; \
 		mkdir -p $(DOCS_BUILD); \
+		echo "   Running: asciidoctor-pdf src/architecture.adoc -o build/architecture.pdf ..."; \
 		$(DOCKER_RUN) asciidoctor-pdf src/architecture.adoc \
 			-o build/architecture.pdf \
 			-a sectnums \
 			-a imagesdir=images \
 			-r asciidoctor-diagram; \
-		echo "✓ PDF documentation generated: $(DOCS_BUILD)/architecture.pdf"; \
+		echo "✓ PDF documentation generated: $(DOCS_BUILD)/architecture.pdf (via Docker)"; \
 	elif command -v docker >/dev/null 2>&1; then \
 		echo "⚠ Docker image not found. Building it now..."; \
 		$(MAKE) docs-build-image; \
+		echo "🐳 Using Docker image: $(DOCKER_IMAGE)"; \
 		mkdir -p $(DOCS_BUILD); \
+		echo "   Running: asciidoctor-pdf src/architecture.adoc -o build/architecture.pdf ..."; \
 		$(DOCKER_RUN) asciidoctor-pdf src/architecture.adoc \
 			-o build/architecture.pdf \
 			-a sectnums \
 			-a imagesdir=images \
 			-r asciidoctor-diagram; \
-		echo "✓ PDF documentation generated: $(DOCS_BUILD)/architecture.pdf"; \
+		echo "✓ PDF documentation generated: $(DOCS_BUILD)/architecture.pdf (via Docker)"; \
 	elif command -v asciidoctor-pdf >/dev/null 2>&1; then \
 		echo "⚠ Docker not available, using local asciidoctor-pdf..."; \
 		mkdir -p $(DOCS_BUILD); \
