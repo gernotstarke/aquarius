@@ -1,0 +1,271 @@
+# Bausteinsicht - Aquarius
+
+**arc42 Kapitel 5**
+
+---
+
+## 5.1 Whitebox Gesamtsystem (Level 0)
+
+Das Aquarius-System besteht aus zwei Hauptanwendungen, die auf einem gemeinsamen Backend operieren:
+
+**Diagramm:** [puml/01-system-overview.puml](puml/01-system-overview.puml)
+
+![System Overview](puml/01-system-overview.png)
+
+**Begründung:**
+- **Zwei Frontend-Anwendungen** für unterschiedliche Nutzungskontexte (Büro vs. Schwimmbad)
+- **Ein Backend** für zentrale Business-Logik und Datenkonsistenz
+- **Eine Datenbank** mit Cloud-Sync für hybride Online/Offline-Nutzung
+
+---
+
+## 5.2 Bausteinsicht Level 1 - Backend-Module
+
+Das Backend ist in **6 fachliche Module** (Bounded Contexts) strukturiert:
+
+**Diagramm:** [puml/02-backend-modules.puml](puml/02-backend-modules.puml)
+
+![Backend Modules](puml/02-backend-modules.png)
+
+### Übersicht der Module
+
+| Modul | Verantwortlichkeit | Zentrale Entitäten | Abhängigkeiten |
+|-------|-------------------|-------------------|----------------|
+| **Stammdaten** | Verwaltung von Basisentitäten | Verein, Team, Kind, Offizieller | - (keine) |
+| **Saisonplanung** | Planung von Saison und Wettkämpfen | Saison, Figur, Wettkampf, Schwimmbad | - (keine) |
+| **Anmeldung** | Wettkampfanmeldung und Startnummernvergabe | Anmeldung | Stammdaten, Saisonplanung |
+| **Wettkampf** | Wettkampfvorbereitung und -struktur | Station, Gruppe, Durchgang | Anmeldung, Stammdaten |
+| **Bewertung** | Live-Punkteerfassung und Berechnung | Start, Bewertung | Wettkampf, Saisonplanung |
+| **Auswertung** | Ergebnisse und Ranglisten | Rangliste, Preis | Bewertung, Wettkampf |
+
+### Abhängigkeitsregeln
+
+1. **Keine zyklischen Abhängigkeiten** zwischen Modulen
+2. **Unabhängige Kernmodule:** Stammdaten und Saisonplanung haben keine Abhängigkeiten
+3. **Abhängigkeiten nur über API-Schnittstellen**, keine direkten Datenbankzugriffe
+4. **Top-Down-Fluss:** Auswertung → Bewertung → Wettkampf → Anmeldung → Basis-Module
+
+---
+
+## 5.3 Level 2 - Modul "Anmeldung" (Beispiel)
+
+Detaillierte Struktur des Anmeldungs-Moduls:
+
+**Diagramm:** [puml/03-anmeldung-module.puml](puml/03-anmeldung-module.puml)
+
+![Anmeldung Module](puml/03-anmeldung-module.png)
+
+### Schnittstellen des Anmeldungs-Moduls
+
+**Bereitgestellte Schnittstellen (API):**
+
+| Endpoint | Methode | Beschreibung |
+|----------|---------|--------------|
+| `/api/anmeldungen` | POST | Neue Anmeldung erstellen |
+| `/api/anmeldungen/{id}` | GET | Anmeldung abrufen |
+| `/api/anmeldungen` | GET | Anmeldungen filtern (nach Kind, Wettkampf) |
+| `/api/anmeldungen/{id}` | PUT | Anmeldung ändern (Figuren) |
+| `/api/anmeldungen/{id}` | DELETE | Anmeldung stornieren |
+| `/api/anmeldungen/{id}/startnummer` | POST | Startnummer vergeben |
+
+**Benötigte Schnittstellen:**
+
+| Modul | Service | Methode | Zweck |
+|-------|---------|---------|-------|
+| Stammdaten | KindService | `get_kind(id)` | Kind-Validierung |
+| Stammdaten | KindService | `ist_startberechtigt(id)` | Berechtigung prüfen |
+| Saisonplanung | WettkampfService | `get_wettkampf(id)` | Wettkampf-Validierung |
+| Saisonplanung | WettkampfService | `ist_voll(id)` | Kapazität prüfen |
+| Saisonplanung | FigurService | `validate_figuren(ids, wettkampf_id)` | Figuren-Validierung |
+
+### Wichtige Algorithmen
+
+**Startnummernvergabe:**
+
+```python
+def vergebe_startnummer(self, anmeldung_id: int) -> int:
+    """
+    Vergibt eine eindeutige Startnummer für einen Wettkampf.
+
+    Algorithmus:
+    1. Finde höchste vergebene Startnummer für Wettkampf
+    2. Nächste freie Nummer = höchste + 1
+    3. Optimistic Lock: Bei Konflikt Retry
+    """
+    anmeldung = self.repo.find_by_id(anmeldung_id)
+    wettkampf_id = anmeldung.wettkampf_id
+
+    max_nummer = self.repo.get_max_startnummer(wettkampf_id)
+    neue_nummer = (max_nummer or 0) + 1
+
+    anmeldung.startnummer = neue_nummer
+    anmeldung.status = AnmeldungStatus.BESTAETIGT
+
+    try:
+        self.repo.save(anmeldung)
+    except StaleDataError:
+        # Retry bei Konflikt
+        return self.vergebe_startnummer(anmeldung_id)
+
+    return neue_nummer
+```
+
+---
+
+## 5.4 Level 2 - Modul "Bewertung" (Beispiel)
+
+**Diagramm:** [puml/04-bewertung-module.puml](puml/04-bewertung-module.puml)
+
+![Bewertung Module](puml/04-bewertung-module.png)
+
+### Kernalgorithmus: Endpunkteberechnung
+
+```python
+def berechne_endpunkte(self, start_id: int) -> Endpunkte:
+    """
+    Berechnet Endpunkte nach Liga-Regeln:
+    1. Höchste und niedrigste Bewertung streichen
+    2. Durchschnitt der verbleibenden Bewertungen
+    3. Multiplikation mit Schwierigkeitsfaktor
+
+    Beispiel:
+    Bewertungen: [7.5, 8.0, 7.0, 8.5, 7.5]
+    Gestrichen: 8.5 (höchste), 7.0 (niedrigste)
+    Durchschnitt: (7.5 + 8.0 + 7.5) / 3 = 7.67
+    Schwierigkeitsfaktor: 2.3
+    Endpunkte: 7.67 × 2.3 = 17.64
+    """
+    bewertungen = self.bewertung_repo.find_by_start(start_id)
+
+    if len(bewertungen) < 3:
+        raise ValidationError("Mindestens 3 Bewertungen erforderlich")
+
+    punkte = [b.vorlaeufige_punkte for b in bewertungen]
+    punkte_sortiert = sorted(punkte)
+
+    # Höchste und niedrigste streichen
+    gestrichene = [punkte_sortiert[0], punkte_sortiert[-1]]
+    verbleibende = punkte_sortiert[1:-1]
+
+    # Durchschnitt
+    durchschnitt = sum(verbleibende) / len(verbleibende)
+
+    # Schwierigkeitsfaktor holen
+    start = self.start_repo.find_by_id(start_id)
+    durchgang = self.durchgang_service.get(start.durchgang_id)
+    figur = self.figur_service.get(durchgang.figur_id)
+
+    # Endpunkte
+    endpunkte_wert = durchschnitt * figur.schwierigkeitsfaktor
+
+    return Endpunkte(
+        start_id=start_id,
+        endpunkte=round(endpunkte_wert, 2),
+        gestrichene_werte=gestrichene,
+        durchschnitt=durchschnitt,
+        schwierigkeitsfaktor=figur.schwierigkeitsfaktor
+    )
+```
+
+---
+
+## 5.5 Level 2 - Frontend-Struktur
+
+**Diagramm:** [puml/05-frontend-structure.puml](puml/05-frontend-structure.puml)
+
+![Frontend Structure](puml/05-frontend-structure.png)
+
+### Frontend-Module
+
+| Modul | Verantwortlichkeit | Technologie |
+|-------|-------------------|-------------|
+| **Planungs-App** | Desktop-optimierte Verwaltungs-UI | React Router, komplexe Formulare |
+| **Durchführungs-App** | Touch-optimierte Wettkampf-UI | React Router, PWA, große Buttons |
+| **Shared Components** | Wiederverwendbare UI-Elemente | Storybook-dokumentiert |
+| **API-Client** | Backend-Kommunikation | TanStack Query (Caching, Sync) |
+| **Sync-Service** | Offline-Fähigkeit | Service Worker, IndexedDB |
+
+---
+
+## 5.6 Modul-Übergreifende Konzepte
+
+### 5.6.1 Inter-Modul-Kommunikation
+
+**Regel:** Module kommunizieren nur über Service-Schnittstellen, niemals direkt über Repositories.
+
+```python
+# ❌ FALSCH: Direkter Repository-Zugriff
+class AnmeldungService:
+    def __init__(self, db: Session):
+        self.kind_repo = KindRepository(db)  # Direkter Zugriff auf fremdes Modul
+
+# ✅ RICHTIG: Über Service-Schnittstelle
+class AnmeldungService:
+    def __init__(
+        self,
+        anmeldung_repo: AnmeldungRepository,
+        kind_service: KindService  # Über Service-Interface
+    ):
+        self.anmeldung_repo = anmeldung_repo
+        self.kind_service = kind_service
+```
+
+### 5.6.2 Schichtenmodell je Modul
+
+Jedes Modul folgt dem 3-Schichten-Modell (siehe Kapitel 8.1.3):
+
+```
+┌─────────────────────────┐
+│   Router (REST API)     │  ← HTTP-Schnittstelle
+└───────────┬─────────────┘
+            │
+┌───────────▼─────────────┐
+│   Service (Business)    │  ← Geschäftslogik
+└───────────┬─────────────┘
+            │
+┌───────────▼─────────────┐
+│   Repository (Data)     │  ← Datenzugriff
+└─────────────────────────┘
+```
+
+---
+
+## 5.7 Design-Entscheidungen
+
+### Warum 6 Module?
+
+| Kriterium | Begründung |
+|-----------|------------|
+| **Fachliche Kohäsion** | Jedes Modul repräsentiert einen klar abgegrenzten fachlichen Bereich |
+| **Lose Kopplung** | Abhängigkeiten nur über Service-Interfaces, keine zyklischen Abhängigkeiten |
+| **Teamstruktur** | Module können parallel entwickelt werden |
+| **Testbarkeit** | Module isoliert testbar durch Mock-Services |
+| **Wartbarkeit** | Änderungen in einem Modul haben begrenzten Impact |
+
+### Warum keine feinere Granularität?
+
+- **Komplexität:** Zu viele Module erhöhen Koordinationsaufwand
+- **Performance:** Jede Modulgrenze bedeutet Service-Call (minimieren)
+- **Pragmatismus:** 6 Module = sweet spot für Teamgröße 3-5 Entwickler
+
+### Alternative Schnitte (verworfen)
+
+1. **Nach Use-Case:** 10+ Module (zu granular, hoher Overhead)
+2. **Nach Entität:** Verein-Modul, Kind-Modul, etc. (schlechte Kohäsion)
+3. **Nach UI:** Planungs-Modul, Durchführungs-Modul (vermischt fachliche Concerns)
+
+---
+
+## 5.8 Offene Punkte
+
+- [ ] **Level 3:** Detaillierung weiterer Module (Wettkampf, Auswertung)?
+- [ ] **API-Gateway:** Brauchen wir eine Abstraktionsschicht vor den Modulen?
+- [ ] **Event-Driven:** Sollten Module über Events kommunizieren? (z.B. "AnmeldungBestätigt")
+- [ ] **Shared Kernel:** Gemeinsame Domain-Objekte (z.B. `Altersgruppe`, `Punktzahl`)?
+
+---
+
+**Nächste Schritte:**
+1. Review dieser Bausteinsicht
+2. Entscheidung über Level-3-Detaillierung
+3. Implementierung der Modul-Struktur im Code

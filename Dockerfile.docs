@@ -1,0 +1,51 @@
+# Dockerfile for Aquarius Documentation Build
+FROM ruby:3.2-alpine
+
+LABEL maintainer="Aquarius Team"
+LABEL description="Documentation build environment with AsciiDoctor, PlantUML, and diagram support"
+
+# Install system dependencies
+RUN apk add --no-cache \
+    graphviz \
+    ttf-dejavu \
+    openjdk11-jre \
+    bash \
+    make \
+    git
+
+# Install PlantUML
+ENV PLANTUML_VERSION=1.2024.7
+ENV PLANTUML_JAR=/usr/local/bin/plantuml.jar
+RUN wget -O ${PLANTUML_JAR} \
+    "https://github.com/plantuml/plantuml/releases/download/v${PLANTUML_VERSION}/plantuml-${PLANTUML_VERSION}.jar" \
+    && echo '#!/bin/bash\njava -jar /usr/local/bin/plantuml.jar "$@"' > /usr/local/bin/plantuml \
+    && chmod +x /usr/local/bin/plantuml
+
+# Install C4-PlantUML library for architecture diagrams
+RUN mkdir -p /usr/local/share/plantuml/C4 \
+    && cd /usr/local/share/plantuml/C4 \
+    && wget -q https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4.puml \
+    && wget -q https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml \
+    && wget -q https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml \
+    && wget -q https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml \
+    && wget -q https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml \
+    && wget -q https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Dynamic.puml
+
+# Set PlantUML include path
+ENV PLANTUML_INCLUDE_PATH=/usr/local/share/plantuml
+
+# Install Ruby gems for AsciiDoctor
+RUN gem install --no-document \
+    asciidoctor:2.0.23 \
+    asciidoctor-diagram:2.3.1 \
+    asciidoctor-pdf:2.3.18 \
+    rouge:4.2.1
+
+# Set environment variables for asciidoctor-diagram to find PlantUML
+ENV DIAGRAM_PLANTUML_CLASSPATH=${PLANTUML_JAR}
+
+# Set working directory
+WORKDIR /docs
+
+# Default command
+CMD ["asciidoctor", "--version"]

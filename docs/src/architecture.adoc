@@ -1,17 +1,32 @@
 = Aquarius: Architektur-Dokumentation
-Gernot Starke
+Aquarius-Team <team@aquarius.io>
 v1.0, 2025-12-18
 :toc: left
 :toclevels: 3
 :sectnums:
 :icons: font
-:imagesdir: images
+:imagesdir: architecture/images
 :source-highlighter: rouge
 :chapter-refsig: Kapitel
 
 [.lead]
 Architektur-Dokumentation für das Aquarius Wettkampf-Bewertungssystem nach arc42-Template.
 
+'''
+
+// Status der Migration
+[NOTE]
+====
+**Migrations-Status:** In Arbeit
+
+* [x] Hauptdokument erstellt
+* [x] Verzeichnisstruktur aufgebaut
+* [x] Kapitel 5 (Bausteinsicht) migriert
+* [x] Kapitel 8 (Querschnittliche Konzepte) migriert
+* [ ] Weitere Kapitel folgen schrittweise
+====
+
+'''
 
 // Kapitel 5: Bausteinsicht
 include::architecture/05-bausteinsicht.adoc[]
@@ -19,19 +34,32 @@ include::architecture/05-bausteinsicht.adoc[]
 // Kapitel 8: Querschnittliche Konzepte
 include::architecture/08-querschnittliche-konzepte.adoc[]
 
-// Kapitel 9: Architekturentscheidungen
-include::architecture/09-architekturentscheidungen.adoc[]
-
-
 '''
 
+[appendix]
+== Architekturentscheidungen (ADRs)
+
+Die detaillierten Architecture Decision Records befinden sich in: `docs/architecture/adr/`
+
+* link:architecture/adr/ADR-009-testkonzept.md[ADR-009: Testkonzept]
+* link:architecture/adr/ADR-010-makefile-build-interface.md[ADR-010: Makefile als Build-Interface]
+* link:architecture/adr/ADR-011-docker-development.md[ADR-011: Docker für Entwicklung]
+* link:architecture/adr/ADR-012-act-local-ci.md[ADR-012: Act für lokale GitHub Actions]
+* link:architecture/adr/ADR-013-react-typescript-frontend.md[ADR-013: React + TypeScript Frontend]
+* link:architecture/adr/ADR-014-python-fastapi-backend.md[ADR-014: Python + FastAPI Backend]
+* link:architecture/adr/ADR-015-turso-database.md[ADR-015: Turso (libSQL) Datenbank]
+* link:architecture/adr/ADR-016-pwa-architecture.md[ADR-016: Progressive Web App Architektur]
+* link:architecture/adr/ADR-017-tailwindcss-styling.md[ADR-017: TailwindCSS für Styling]
+* link:architecture/adr/ADR-018-domain-driven-design.md[ADR-018: Domain-Driven Design mit Bounded Contexts]
+
+'''
 
 [appendix]
 == Über arc42
 
 arc42, das Template zur Dokumentation von Software- und Systemarchitekturen.
 
-Template Version 9.1 DE, Dezember 2025
+Template Version 8.2 DE, Januar 2023
 
 Created, maintained and © by Dr. Peter Hruschka, Dr. Gernot Starke and contributors.
 

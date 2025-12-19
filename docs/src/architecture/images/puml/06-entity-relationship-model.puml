@@ -1,0 +1,131 @@
+@startuml
+
+' Stammdaten
+class Club {
+  <u>id</u>
+  name
+}
+
+class Team {
+  <u>id</u>
+  name
+  club_id
+}
+
+class Child {
+  <u>id</u>
+  name
+  first_name
+  birth_date
+  address
+  team_id
+}
+
+class Official {
+  <u>id</u>
+  name
+  phone
+}
+
+' Saisonplanung
+class Season {
+  <u>id</u>
+  name
+  from_date
+  to_date
+}
+
+class Pool {
+  <u>id</u>
+  phone_no
+  manager
+}
+
+class Competition {
+  <u>id</u>
+  date
+  location
+  max_participants
+  season_id
+  pool_id
+}
+
+class Figure {
+  <u>id</u>
+  difficulty
+}
+
+' Anmeldung
+class Enrollment {
+  <u>id</u>
+  starting_no
+  preliminary
+  enrol_time
+  child_id
+  competition_id
+}
+
+' Wettkampf (Competition Organization)
+class Station {
+  <u>id</u>
+  name
+  location
+}
+
+class StationChief {
+  <u>id</u>
+  official_id
+  station_id
+}
+
+class Round {
+  <u>id</u>
+  starttime
+  station_id
+  group_id
+}
+
+class Group {
+  <u>id</u>
+}
+
+' Bewertung
+class ScoringJudge {
+  <u>id</u>
+  official_id
+}
+
+class Performance {
+  <u>id</u>
+  score
+  prelim_score
+  round_id
+  enrollment_id
+}
+
+' Relationships
+Club "1" -- "*" Team : contains
+Team "1" -- "*" Child : has
+Child "*" -- "*" Enrollment : registers
+
+Season "1" -- "*" Competition : has
+Pool "1" -- "*" Competition : hosts
+Competition "*" -- "*" Figure : planned_figure
+
+Competition "1" -- "*" Enrollment : enrollment
+
+Competition "1/*" -- "*" Round : organization
+Station "1" -- "*" Round : hosts
+Station "1" -- "1" StationChief : station_responsibility
+Group "1" -- "*" Round : presentation
+
+Round "*" -- "3..*" ScoringJudge : scoring_judge_assignment
+Round "1" -- "*" Performance : judging
+
+Enrollment "*" -- "*" Figure : wanted_figure
+Enrollment "1" -- "*" Performance : performs
+
+Official "1" -- "*" StationChief : is_a
+Official "1" -- "*" ScoringJudge : is_a
+
+@enduml

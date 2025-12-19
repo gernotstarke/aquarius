@@ -1,0 +1,27 @@
+@startuml
+!include <C4/C4_Container>
+
+LAYOUT_WITH_LEGEND()
+
+Person(praesident, "Präsident", "Plant Saison und Wettkämpfe")
+Person(verein, "Verein", "Meldet Kinder an")
+Person(punktrichter, "Punktrichter", "Verwaltet Wettkampf vor Ort")
+Person(kampfrichter, "Kampfrichter", "Bewertet Starts")
+
+System_Boundary(aquarius, "Aquarius") {
+    Container(planning_app, "Planungs-App", "React SPA", "Desktop-optimierte Oberfläche für Verwaltung und Planung")
+    Container(execution_app, "Durchführungs-App", "React PWA", "Touch-optimierte Oberfläche für Live-Bewertung")
+    Container(backend, "Backend API", "FastAPI", "REST API, Business-Logik, Datenzugriff")
+    ContainerDb(database, "Datenbank", "Turso (libSQL)", "Persistente Speicherung mit Cloud-Sync")
+}
+
+Rel(praesident, planning_app, "Plant Saison, verwaltet Stammdaten", "HTTPS")
+Rel(verein, planning_app, "Meldet Kinder an", "HTTPS")
+Rel(punktrichter, execution_app, "Führt Wettkampf durch", "HTTPS/Offline")
+Rel(kampfrichter, execution_app, "Erfasst Punkte", "HTTPS/Offline")
+
+Rel(planning_app, backend, "API Calls", "JSON/HTTPS")
+Rel(execution_app, backend, "API Calls + Sync", "JSON/HTTPS")
+Rel(backend, database, "SQL Queries", "libSQL Protocol")
+
+@enduml

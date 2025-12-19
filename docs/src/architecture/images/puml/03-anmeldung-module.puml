@@ -1,0 +1,54 @@
+@startuml
+allowmixing
+skinparam packageStyle rectangle
+
+package "Anmeldung Modul" {
+    rectangle "AnmeldungRouter" <<REST>> as AnmeldungRouter
+    rectangle "AnmeldungService" <<Business Logic>> as AnmeldungService
+    rectangle "AnmeldungRepository" <<Data Access>> as AnmeldungRepository
+
+    package "Domain" {
+        class Anmeldung {
+            +id: int
+            +kind_id: int
+            +wettkampf_id: int
+            +startnummer: int
+            +figuren: List[int]
+            +status: AnmeldungStatus
+            +erstellt_am: datetime
+        }
+
+        enum AnmeldungStatus {
+            VORLAEUFIG
+            BESTAETIGT
+            STORNIERT
+        }
+    }
+
+    package "Schemas" {
+        class AnmeldungCreate <<DTO>>
+        class AnmeldungResponse <<DTO>>
+    }
+}
+
+' Externe Abhängigkeiten
+package "Stammdaten Modul" {
+    rectangle "KindService" as KindService
+}
+
+package "Saisonplanung Modul" {
+    rectangle "WettkampfService" as WettkampfService
+    rectangle "FigurService" as FigurService
+}
+
+' Beziehungen
+AnmeldungRouter --> AnmeldungService : verwendet
+AnmeldungService --> AnmeldungRepository : verwendet
+AnmeldungService --> KindService : validiert Kind
+AnmeldungService --> WettkampfService : prüft Verfügbarkeit
+AnmeldungService --> FigurService : validiert Figuren
+AnmeldungRepository --> Anmeldung : CRUD
+
+AnmeldungRouter ..> AnmeldungCreate : empfängt
+AnmeldungRouter ..> AnmeldungResponse : sendet
+@enduml

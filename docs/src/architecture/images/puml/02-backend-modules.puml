@@ -1,0 +1,27 @@
+@startuml
+!include <C4/C4_Component>
+
+LAYOUT_TOP_DOWN()
+
+Container_Boundary(backend, "Backend API") {
+    Component(stammdaten, "Stammdaten", "Modul", "Vereine, Teams, Kinder, Offizielle")
+    Component(saisonplanung, "Saisonplanung", "Modul", "Saison, Figuren, Wettkämpfe, Schwimmbäder")
+    Component(anmeldung, "Anmeldung", "Modul", "Wettkampfanmeldungen, Startnummernvergabe")
+    Component(wettkampf, "Wettkampf", "Modul", "Stationen, Gruppen, Durchgänge")
+    Component(bewertung, "Bewertung", "Modul", "Punkteerfassung, Bewertungsberechnung")
+    Component(auswertung, "Auswertung", "Modul", "Ranglisten, Preisvergabe, Export")
+}
+
+Rel(anmeldung, stammdaten, "Liest Kinder, Teams", "API")
+Rel(anmeldung, saisonplanung, "Liest Wettkämpfe, Figuren", "API")
+
+Rel(wettkampf, anmeldung, "Liest Anmeldungen", "API")
+Rel(wettkampf, stammdaten, "Liest Offizielle", "API")
+
+Rel(bewertung, wettkampf, "Liest Durchgänge, Gruppen", "API")
+Rel(bewertung, saisonplanung, "Liest Schwierigkeitsfaktoren", "API")
+
+Rel(auswertung, bewertung, "Liest Bewertungen", "API")
+Rel(auswertung, wettkampf, "Liest Wettkampfstruktur", "API")
+
+@enduml
