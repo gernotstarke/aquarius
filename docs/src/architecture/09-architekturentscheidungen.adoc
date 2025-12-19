@@ -15,35 +15,35 @@ Alle ADRs befinden sich in: `docs/src/adrs/`
 | ADR | Titel | Status
 
 | ADR-001
-| link:../adrs/ADR-001-vite-build-tool.md[Vite Build Tool]
+| link:../adrs/ADR-001-vite-build-tool.html[Vite Build Tool]
 | Akzeptiert
 
 | ADR-002
-| link:../adrs/ADR-002-react-router.md[React Router]
+| link:../adrs/ADR-002-react-router.html[React Router]
 | Akzeptiert
 
 | ADR-003
-| link:../adrs/ADR-003-tanstack-query.md[TanStack Query für Server State]
+| link:../adrs/ADR-003-tanstack-query.html[TanStack Query für Server State]
 | Akzeptiert
 
 | ADR-004
-| link:../adrs/ADR-004-zustand-state-management.md[Zustand für lokales State Management]
+| link:../adrs/ADR-004-zustand-state-management.html[Zustand für lokales State Management]
 | Akzeptiert
 
 | ADR-005
-| link:../adrs/ADR-005-pydantic-validation.md[Pydantic für Datenvalidierung]
+| link:../adrs/ADR-005-pydantic-validation.html[Pydantic für Datenvalidierung]
 | Akzeptiert
 
 | ADR-006
-| link:../adrs/ADR-006-sqlalchemy-orm.md[SQLAlchemy ORM]
+| link:../adrs/ADR-006-sqlalchemy-orm.html[SQLAlchemy ORM]
 | Akzeptiert
 
 | ADR-007
-| link:../adrs/ADR-007-alembic-migrations.md[Alembic für Datenbank-Migrationen]
+| link:../adrs/ADR-007-alembic-migrations.html[Alembic für Datenbank-Migrationen]
 | Akzeptiert
 
 | ADR-008
-| link:../adrs/ADR-008-monorepo-structure.md[Monorepo-Struktur]
+| link:../adrs/ADR-008-monorepo-structure.html[Monorepo-Struktur]
 | Akzeptiert
 |===
 
@@ -54,19 +54,19 @@ Alle ADRs befinden sich in: `docs/src/adrs/`
 | ADR | Titel | Status
 
 | ADR-009
-| link:../adrs/ADR-009-testkonzept.md[Testkonzept]
+| link:../adrs/ADR-009-testkonzept.html[Testkonzept]
 | Akzeptiert
 
 | ADR-010
-| link:../adrs/ADR-010-makefile-build-interface.md[Makefile als Build-Interface]
+| link:../adrs/ADR-010-makefile-build-interface.html[Makefile als Build-Interface]
 | Akzeptiert
 
 | ADR-011
-| link:../adrs/ADR-011-docker-development.md[Docker für Entwicklung]
+| link:../adrs/ADR-011-docker-development.html[Docker für Entwicklung]
 | Akzeptiert
 
 | ADR-012
-| link:../adrs/ADR-012-act-local-ci.md[Act für lokale GitHub Actions]
+| link:../adrs/ADR-012-act-local-ci.html[Act für lokale GitHub Actions]
 | Akzeptiert
 |===
 
@@ -77,27 +77,27 @@ Alle ADRs befinden sich in: `docs/src/adrs/`
 | ADR | Titel | Status
 
 | ADR-013
-| link:../adrs/ADR-013-react-typescript-frontend.md[React + TypeScript Frontend]
+| link:../adrs/ADR-013-react-typescript-frontend.html[React + TypeScript Frontend]
 | Akzeptiert
 
 | ADR-014
-| link:../adrs/ADR-014-python-fastapi-backend.md[Python + FastAPI Backend]
+| link:../adrs/ADR-014-python-fastapi-backend.html[Python + FastAPI Backend]
 | Akzeptiert
 
 | ADR-015
-| link:../adrs/ADR-015-turso-database.md[Turso (libSQL) Datenbank]
+| link:../adrs/ADR-015-turso-database.html[Turso (libSQL) Datenbank]
 | Akzeptiert
 
 | ADR-016
-| link:../adrs/ADR-016-pwa-architecture.md[Progressive Web App Architektur]
+| link:../adrs/ADR-016-pwa-architecture.html[Progressive Web App Architektur]
 | Akzeptiert
 
 | ADR-017
-| link:../adrs/ADR-017-tailwindcss-styling.md[TailwindCSS für Styling]
+| link:../adrs/ADR-017-tailwindcss-styling.html[TailwindCSS für Styling]
 | Akzeptiert
 
 | ADR-018
-| link:../adrs/ADR-018-domain-driven-design.md[Domain-Driven Design mit Bounded Contexts]
+| link:../adrs/ADR-018-domain-driven-design.html[Domain-Driven Design mit Bounded Contexts]
 | Akzeptiert
 |===
 

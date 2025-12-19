@@ -56,27 +56,27 @@ Die detaillierten Architecture Decision Records befinden sich in: `docs/src/adrs
 
 **Grundlegende Technologie-Entscheidungen:**
 
-* link:adrs/ADR-001-vite-build-tool.md[ADR-001: Vite Build Tool]
-* link:adrs/ADR-002-react-router.md[ADR-002: React Router]
-* link:adrs/ADR-003-tanstack-query.md[ADR-003: TanStack Query für Server State]
-* link:adrs/ADR-004-zustand-state-management.md[ADR-004: Zustand für lokales State Management]
-* link:adrs/ADR-005-pydantic-validation.md[ADR-005: Pydantic für Datenvalidierung]
-* link:adrs/ADR-006-sqlalchemy-orm.md[ADR-006: SQLAlchemy ORM]
-* link:adrs/ADR-007-alembic-migrations.md[ADR-007: Alembic für Datenbank-Migrationen]
-* link:adrs/ADR-008-monorepo-structure.md[ADR-008: Monorepo-Struktur]
+* link:adrs/ADR-001-vite-build-tool.html[ADR-001: Vite Build Tool]
+* link:adrs/ADR-002-react-router.html[ADR-002: React Router]
+* link:adrs/ADR-003-tanstack-query.html[ADR-003: TanStack Query für Server State]
+* link:adrs/ADR-004-zustand-state-management.html[ADR-004: Zustand für lokales State Management]
+* link:adrs/ADR-005-pydantic-validation.html[ADR-005: Pydantic für Datenvalidierung]
+* link:adrs/ADR-006-sqlalchemy-orm.html[ADR-006: SQLAlchemy ORM]
+* link:adrs/ADR-007-alembic-migrations.html[ADR-007: Alembic für Datenbank-Migrationen]
+* link:adrs/ADR-008-monorepo-structure.html[ADR-008: Monorepo-Struktur]
 
 **Entwicklungs- und Test-Prozesse:**
 
-* link:adrs/ADR-009-testkonzept.md[ADR-009: Testkonzept]
-* link:adrs/ADR-010-makefile-build-interface.md[ADR-010: Makefile als Build-Interface]
-* link:adrs/ADR-011-docker-development.md[ADR-011: Docker für Entwicklung]
-* link:adrs/ADR-012-act-local-ci.md[ADR-012: Act für lokale GitHub Actions]
+* link:adrs/ADR-009-testkonzept.html[ADR-009: Testkonzept]
+* link:adrs/ADR-010-makefile-build-interface.html[ADR-010: Makefile als Build-Interface]
+* link:adrs/ADR-011-docker-development.html[ADR-011: Docker für Entwicklung]
+* link:adrs/ADR-012-act-local-ci.html[ADR-012: Act für lokale GitHub Actions]
 
 **Architektur-Entscheidungen:**
 
-* link:adrs/ADR-013-react-typescript-frontend.md[ADR-013: React + TypeScript Frontend]
-* link:adrs/ADR-014-python-fastapi-backend.md[ADR-014: Python + FastAPI Backend]
-* link:adrs/ADR-015-turso-database.md[ADR-015: Turso (libSQL) Datenbank]
-* link:adrs/ADR-016-pwa-architecture.md[ADR-016: Progressive Web App Architektur]
-* link:adrs/ADR-017-tailwindcss-styling.md[ADR-017: TailwindCSS für Styling]
-* link:adrs/ADR-018-domain-driven-design.md[ADR-018: Domain-Driven Design mit Bounded Contexts]
+* link:adrs/ADR-013-react-typescript-frontend.html[ADR-013: React + TypeScript Frontend]
+* link:adrs/ADR-014-python-fastapi-backend.html[ADR-014: Python + FastAPI Backend]
+* link:adrs/ADR-015-turso-database.html[ADR-015: Turso (libSQL) Datenbank]
+* link:adrs/ADR-016-pwa-architecture.html[ADR-016: Progressive Web App Architektur]
+* link:adrs/ADR-017-tailwindcss-styling.html[ADR-017: TailwindCSS für Styling]
+* link:adrs/ADR-018-domain-driven-design.html[ADR-018: Domain-Driven Design mit Bounded Contexts]

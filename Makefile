@@ -1,4 +1,4 @@
-.PHONY: help docs docs-diagrams docs-html docs-pdf docs-watch docs-serve docs-build-image clean test
+.PHONY: help docs docs-diagrams docs-adrs docs-html docs-pdf docs-watch docs-serve docs-build-image clean test
 
 # Docker configuration
 DOCKER_IMAGE := arqua42-docs:latest
@@ -25,10 +25,11 @@ docs-build-image: ## Build the Docker image for documentation generation
 
 ##@ Documentation
 
-docs: docs-diagrams docs-html ## Generate all documentation (diagrams + HTML) - Docker-based
+docs: docs-diagrams docs-adrs docs-html ## Generate all documentation (diagrams + HTML) - Docker-based
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	@echo "✓ Documentation generated successfully"
 	@echo "  📄 HTML: docs/build/arqua42-architecture.html"
+  📋 ADRs: docs/build/adrs/
 	@echo "  📊 Diagrams: docs/build/images/"
 	@echo "  View with: make docs-serve"
 
@@ -196,3 +197,55 @@ clean: ## Remove generated files (safely removes entire build directory)
 	@echo "Cleaning generated files..."
 	@rm -rf $(DOCS_BUILD)
 	@echo "✓ Cleanup complete (removed $(DOCS_BUILD)/)"
+
+docs-adrs: ## Convert ADRs from Markdown to HTML (Docker-based)
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "📋 Converting ADRs to HTML..."
+	@if docker images -q $(DOCKER_IMAGE) 2>/dev/null | grep -q .; then \
+		echo "🐳 Using Docker image: $(DOCKER_IMAGE)"; \
+		mkdir -p $(DOCS_BUILD)/adrs; \
+		for adr in $(DOCS_SRC)/adrs/ADR-*.md; do \
+			filename=$$(basename "$$adr" .md); \
+			echo "   - $$filename.md → $$filename.html"; \
+			$(DOCKER_RUN) pandoc "src/adrs/$$filename.md" \
+				-o "build/adrs/$$filename.html" \
+				--standalone \
+				--toc \
+				--toc-depth=2 \
+				--metadata title="$$filename" \
+				--css=../../style.css; \
+		done; \
+		echo "✓ ADRs converted to HTML in $(DOCS_BUILD)/adrs/ (via Docker)"; \
+	elif command -v docker >/dev/null 2>&1; then \
+		echo "⚠ Docker image not found. Building it now..."; \
+		$(MAKE) docs-build-image; \
+		mkdir -p $(DOCS_BUILD)/adrs; \
+		for adr in $(DOCS_SRC)/adrs/ADR-*.md; do \
+			filename=$$(basename "$$adr" .md); \
+			echo "   - $$filename.md → $$filename.html"; \
+			$(DOCKER_RUN) pandoc "src/adrs/$$filename.md" \
+				-o "build/adrs/$$filename.html" \
+				--standalone \
+				--toc \
+				--toc-depth=2 \
+				--metadata title="$$filename"; \
+		done; \
+		echo "✓ ADRs converted to HTML (via Docker)"; \
+	elif command -v pandoc >/dev/null 2>&1; then \
+		echo "⚠ Docker not available, using local pandoc..."; \
+		mkdir -p $(DOCS_BUILD)/adrs; \
+		for adr in $(DOCS_SRC)/adrs/ADR-*.md; do \
+			filename=$$(basename "$$adr" .md); \
+			echo "   - $$filename"; \
+			pandoc "$$adr" -o "$(DOCS_BUILD)/adrs/$$filename.html" \
+				--standalone --toc --toc-depth=2 \
+				--metadata title="$$filename"; \
+		done; \
+		echo "✓ ADRs converted (local mode)"; \
+	else \
+		echo "❌ Neither Docker nor pandoc available."; \
+		echo "  Copying markdown files as fallback..."; \
+		mkdir -p $(DOCS_BUILD)/adrs; \
+		cp $(DOCS_SRC)/adrs/ADR-*.md $(DOCS_BUILD)/adrs/; \
+		echo "⚠ ADRs copied as .md files (install Docker or pandoc for HTML conversion)"; \
+	fi
