@@ -1,9 +1,11 @@
 @startuml
+skinparam packageStyle rectangle
+
 package "Bewertung Modul" {
-    [BewertungRouter] <<REST>>
-    [BewertungService] <<Business Logic>>
-    [BewertungRepository] <<Data Access>>
-    [StartRepository] <<Data Access>>
+    rectangle "BewertungRouter" <<REST>> as BewertungRouter
+    rectangle "BewertungService" <<Business Logic>> as BewertungService
+    rectangle "BewertungRepository" <<Data Access>> as BewertungRepository
+    rectangle "StartRepository" <<Data Access>> as StartRepository
 
     package "Domain" {
         class Start {
@@ -40,20 +42,20 @@ package "Bewertung Modul" {
 
 ' Externe Abhängigkeiten
 package "Wettkampf Modul" {
-    [DurchgangService]
+    rectangle "DurchgangService" as DurchgangService
 }
 
 package "Saisonplanung Modul" {
-    [FigurService]
+    rectangle "FigurService" as FigurService
 }
 
 ' Beziehungen
-[BewertungRouter] --> [BewertungService]
-[BewertungService] --> [BewertungRepository]
-[BewertungService] --> [StartRepository]
-[BewertungService] --> [DurchgangService] : liest Durchgang
-[BewertungService] --> [FigurService] : liest Schwierigkeitsfaktor
+BewertungRouter --> BewertungService
+BewertungService --> BewertungRepository
+BewertungService --> StartRepository
+BewertungService --> DurchgangService : liest Durchgang
+BewertungService --> FigurService : liest Schwierigkeitsfaktor
 
-[BewertungRepository] --> Bewertung
-[StartRepository] --> Start
+BewertungRepository --> Bewertung
+StartRepository --> Start
 @enduml
