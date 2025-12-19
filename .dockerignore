@@ -1,0 +1,19 @@
+# Ignore documentation source files
+*.adoc
+*.md
+*.puml
+
+# But include generated documentation
+!*.html
+!*.pdf
+!*.png
+
+# Ignore everything in docs except what we want to serve
+docs/*
+!docs/architecture.html
+!docs/architecture.pdf
+!docs/architecture/
+docs/architecture/*
+!docs/architecture/images/
+docs/architecture/images/*
+!docs/architecture/images/generated/
