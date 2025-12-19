@@ -119,17 +119,21 @@ Then use the same `make` commands - they'll automatically use local tools.
 ```
 aquarius/
 ├── docs/                          # Documentation
-│   ├── architecture.adoc          # Main architecture document (AsciiDoc)
-│   ├── architecture/              # Modular architecture chapters
-│   │   ├── 05-bausteinsicht.adoc
-│   │   ├── 08-querschnittliche-konzepte.adoc
-│   │   ├── adr/                   # Architecture Decision Records
-│   │   └── images/
-│   │       ├── puml/              # PlantUML source files
-│   │       ├── generated/         # Generated PNG diagrams
-│   │       └── screenshots/       # Screenshots and mockups
-│   ├── architecture.html          # Generated HTML (via make docs)
-│   └── architecture.pdf           # Generated PDF (via make docs-pdf)
+│   ├── src/                       # Documentation source files
+│   │   ├── architecture.adoc      # Main architecture document (AsciiDoc)
+│   │   ├── architecture/          # Modular architecture chapters
+│   │   │   ├── 05-bausteinsicht.adoc
+│   │   │   ├── 08-querschnittliche-konzepte.adoc
+│   │   │   ├── adr/               # Architecture Decision Records
+│   │   │   └── images/
+│   │   │       ├── puml/          # PlantUML source files
+│   │   │       └── screenshots/   # Screenshots and mockups
+│   │   ├── requirements/          # Requirements documentation
+│   │   └── domain-model.md        # Domain model documentation
+│   └── build/                     # Generated documentation (git-ignored)
+│       ├── architecture.html      # Generated HTML (via make docs)
+│       ├── architecture.pdf       # Generated PDF (via make docs-pdf)
+│       └── images/                # Generated PNG diagrams
 ├── backend/                       # FastAPI backend (to be implemented)
 ├── frontend/                      # React frontend (to be implemented)
 ├── Dockerfile.docs                # Docker image for documentation build

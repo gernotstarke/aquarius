@@ -19,9 +19,9 @@ services:
     working_dir: /docs
     command: >
       bash -c "
-      mkdir -p architecture/images/generated &&
-      plantuml -tpng -o ../generated architecture/images/puml/*.puml &&
-      echo '✓ Diagrams generated'
+      mkdir -p build/images &&
+      plantuml -tpng -o ../../../build/images src/architecture/images/puml/*.puml &&
+      echo '✓ Diagrams generated in build/images/'
       "
 
   # Service for generating HTML
@@ -31,13 +31,18 @@ services:
       - ./docs:/docs
     working_dir: /docs
     command: >
-      asciidoctor architecture.adoc
-      -o architecture.html
+      bash -c "
+      mkdir -p build &&
+      asciidoctor src/architecture.adoc
+      -o build/architecture.html
       -a toc=left
       -a toclevels=3
       -a sectnums
       -a icons=font
-      -r asciidoctor-diagram
+      -a imagesdir=images
+      -r asciidoctor-diagram &&
+      echo '✓ HTML generated in build/architecture.html'
+      "
 
   # Service for generating PDF
   docs-pdf:
@@ -46,10 +51,15 @@ services:
       - ./docs:/docs
     working_dir: /docs
     command: >
-      asciidoctor-pdf architecture.adoc
-      -o architecture.pdf
+      bash -c "
+      mkdir -p build &&
+      asciidoctor-pdf src/architecture.adoc
+      -o build/architecture.pdf
       -a sectnums
-      -r asciidoctor-diagram
+      -a imagesdir=images
+      -r asciidoctor-diagram &&
+      echo '✓ PDF generated in build/architecture.pdf'
+      "
 
   # Service for watching and rebuilding
   docs-watch:
@@ -59,10 +69,18 @@ services:
     working_dir: /docs
     command: >
       bash -c "
-      echo 'Watching for changes...' &&
+      echo 'Watching for changes in src/...' &&
       while true; do
-        inotifywait -r -e modify,create,delete architecture/ 2>/dev/null &&
+        inotifywait -r -e modify,create,delete src/ 2>/dev/null &&
         echo 'Change detected, rebuilding...' &&
-        asciidoctor architecture.adoc -o architecture.html -a toc=left -a toclevels=3
+        mkdir -p build &&
+        asciidoctor src/architecture.adoc
+        -o build/architecture.html
+        -a toc=left
+        -a toclevels=3
+        -a sectnums
+        -a icons=font
+        -a imagesdir=images
+        -r asciidoctor-diagram
       done
       "
