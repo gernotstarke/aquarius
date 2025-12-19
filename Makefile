@@ -29,18 +29,18 @@ docs-diagrams: ## Generate PNG diagrams from PlantUML sources (Docker-based)
 	@echo "Generating diagrams from PlantUML..."
 	@if docker images -q $(DOCKER_IMAGE) 2>/dev/null | grep -q .; then \
 		mkdir -p $(DOCS_BUILD)/images; \
-		$(DOCKER_RUN) plantuml -tpng -o ../../../build/images src/architecture/images/puml/*.puml; \
+		$(DOCKER_RUN) plantuml -tpng -o ../../../../build/images src/architecture/images/puml/*.puml; \
 		echo "✓ Diagrams generated in $(DOCS_BUILD)/images/"; \
 	elif command -v docker >/dev/null 2>&1; then \
 		echo "⚠ Docker image not found. Building it now..."; \
 		$(MAKE) docs-build-image; \
 		mkdir -p $(DOCS_BUILD)/images; \
-		$(DOCKER_RUN) plantuml -tpng -o ../../../build/images src/architecture/images/puml/*.puml; \
+		$(DOCKER_RUN) plantuml -tpng -o ../../../../build/images src/architecture/images/puml/*.puml; \
 		echo "✓ Diagrams generated in $(DOCS_BUILD)/images/"; \
 	elif command -v plantuml >/dev/null 2>&1; then \
 		echo "⚠ Docker not available, using local plantuml..."; \
 		mkdir -p $(DOCS_BUILD)/images; \
-		plantuml -tpng -o ../../../build/images $(DOCS_SRC)/architecture/images/puml/*.puml; \
+		plantuml -tpng -o ../../../../build/images $(DOCS_SRC)/architecture/images/puml/*.puml; \
 		echo "✓ Diagrams generated (local mode)"; \
 	else \
 		echo "❌ Neither Docker nor local plantuml available."; \

@@ -20,7 +20,7 @@ services:
     command: >
       bash -c "
       mkdir -p build/images &&
-      plantuml -tpng -o ../../../build/images src/architecture/images/puml/*.puml &&
+      plantuml -tpng -o ../../../../build/images src/architecture/images/puml/*.puml &&
       echo '✓ Diagrams generated in build/images/'
       "
 

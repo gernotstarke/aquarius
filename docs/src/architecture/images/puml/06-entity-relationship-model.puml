@@ -1,109 +1,106 @@
 @startuml
-!define ENTITY class
-!define PK <u>
-!define FK
 
 ' Stammdaten
-ENTITY Club {
-  PK id
+class Club {
+  <u>id</u>
   name
 }
 
-ENTITY Team {
-  PK id
+class Team {
+  <u>id</u>
   name
-  FK club_id
+  club_id
 }
 
-ENTITY Child {
-  PK id
+class Child {
+  <u>id</u>
   name
   first_name
   birth_date
   address
-  FK team_id
+  team_id
 }
 
-ENTITY Official {
-  PK id
+class Official {
+  <u>id</u>
   name
   phone
 }
 
 ' Saisonplanung
-ENTITY Season {
-  PK id
+class Season {
+  <u>id</u>
   name
   from_date
   to_date
 }
 
-ENTITY Pool {
-  PK id
+class Pool {
+  <u>id</u>
   phone_no
   manager
 }
 
-ENTITY Competition {
-  PK id
+class Competition {
+  <u>id</u>
   date
   location
   max_participants
-  FK season_id
-  FK pool_id
+  season_id
+  pool_id
 }
 
-ENTITY Figure {
-  PK id
+class Figure {
+  <u>id</u>
   difficulty
 }
 
 ' Anmeldung
-ENTITY Enrollment {
-  PK id
+class Enrollment {
+  <u>id</u>
   starting_no
   preliminary
   enrol_time
-  FK child_id
-  FK competition_id
+  child_id
+  competition_id
 }
 
 ' Wettkampf (Competition Organization)
-ENTITY Station {
-  PK id
+class Station {
+  <u>id</u>
   name
   location
 }
 
-ENTITY StationChief {
-  PK id
-  FK official_id
-  FK station_id
+class StationChief {
+  <u>id</u>
+  official_id
+  station_id
 }
 
-ENTITY Round {
-  PK id
+class Round {
+  <u>id</u>
   starttime
-  FK station_id
-  FK group_id
+  station_id
+  group_id
 }
 
-ENTITY Group {
-  PK id
+class Group {
+  <u>id</u>
 }
 
 ' Bewertung
-ENTITY ScoringJudge {
-  PK id
-  FK official_id
+class ScoringJudge {
+  <u>id</u>
+  official_id
 }
 
-ENTITY Performance {
-  PK id
+class Performance {
+  <u>id</u>
   score
   prelim_score
-  FK round_id
-  FK enrollment_id
+  round_id
+  enrollment_id
 }
 
 ' Relationships
