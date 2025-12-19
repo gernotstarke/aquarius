@@ -1,7 +1,7 @@
 .PHONY: help docs docs-diagrams docs-html docs-pdf docs-watch docs-serve docs-build-image clean test
 
 # Docker configuration
-DOCKER_IMAGE := aquarius-docs:latest
+DOCKER_IMAGE := arqua42-docs:latest
 DOCKER_RUN := docker run --rm -v $(CURDIR)/docs:/docs -w /docs $(DOCKER_IMAGE)
 
 # Documentation paths
@@ -28,7 +28,7 @@ docs-build-image: ## Build the Docker image for documentation generation
 docs: docs-diagrams docs-html ## Generate all documentation (diagrams + HTML) - Docker-based
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	@echo "✓ Documentation generated successfully"
-	@echo "  📄 HTML: docs/build/architecture.html"
+	@echo "  📄 HTML: docs/build/arqua42-architecture.html"
 	@echo "  📊 Diagrams: docs/build/images/"
 	@echo "  View with: make docs-serve"
 
@@ -66,45 +66,45 @@ docs-html: ## Generate HTML documentation from AsciiDoc (Docker-based)
 	@if docker images -q $(DOCKER_IMAGE) 2>/dev/null | grep -q .; then \
 		echo "🐳 Using Docker image: $(DOCKER_IMAGE)"; \
 		mkdir -p $(DOCS_BUILD); \
-		echo "   Running: asciidoctor src/architecture.adoc -o build/architecture.html ..."; \
-		$(DOCKER_RUN) asciidoctor src/architecture.adoc \
-			-o build/architecture.html \
+		echo "   Running: asciidoctor src/arqua42-architecture.adoc -o build/arqua42-architecture.html ..."; \
+		$(DOCKER_RUN) asciidoctor src/arqua42-architecture.adoc \
+			-o build/arqua42-architecture.html \
 			-a toc=left \
 			-a toclevels=3 \
 			-a sectnums \
 			-a icons=font \
 			-a imagesdir=images \
 			-r asciidoctor-diagram; \
-		echo "✓ HTML documentation generated: $(DOCS_BUILD)/architecture.html (via Docker)"; \
+		echo "✓ HTML documentation generated: $(DOCS_BUILD)/arqua42-architecture.html (via Docker)"; \
 		echo "  View with: make docs-serve"; \
 	elif command -v docker >/dev/null 2>&1; then \
 		echo "⚠ Docker image not found. Building it now..."; \
 		$(MAKE) docs-build-image; \
 		echo "🐳 Using Docker image: $(DOCKER_IMAGE)"; \
 		mkdir -p $(DOCS_BUILD); \
-		echo "   Running: asciidoctor src/architecture.adoc -o build/architecture.html ..."; \
-		$(DOCKER_RUN) asciidoctor src/architecture.adoc \
-			-o build/architecture.html \
+		echo "   Running: asciidoctor src/arqua42-architecture.adoc -o build/arqua42-architecture.html ..."; \
+		$(DOCKER_RUN) asciidoctor src/arqua42-architecture.adoc \
+			-o build/arqua42-architecture.html \
 			-a toc=left \
 			-a toclevels=3 \
 			-a sectnums \
 			-a icons=font \
 			-a imagesdir=images \
 			-r asciidoctor-diagram; \
-		echo "✓ HTML documentation generated: $(DOCS_BUILD)/architecture.html (via Docker)"; \
+		echo "✓ HTML documentation generated: $(DOCS_BUILD)/arqua42-architecture.html (via Docker)"; \
 	elif command -v asciidoctor >/dev/null 2>&1; then \
 		echo "⚠ Docker not available, using local asciidoctor..."; \
 		mkdir -p $(DOCS_BUILD); \
-		asciidoctor $(DOCS_SRC)/architecture.adoc \
-			-o $(DOCS_BUILD)/architecture.html \
+		asciidoctor $(DOCS_SRC)/arqua42-architecture.adoc \
+			-o $(DOCS_BUILD)/arqua42-architecture.html \
 			-a toc=left \
 			-a toclevels=3 \
 			-a sectnums \
 			-a icons=font \
 			-a imagesdir=images \
 			-r asciidoctor-diagram 2>/dev/null || \
-		asciidoctor $(DOCS_SRC)/architecture.adoc \
-			-o $(DOCS_BUILD)/architecture.html \
+		asciidoctor $(DOCS_SRC)/arqua42-architecture.adoc \
+			-o $(DOCS_BUILD)/arqua42-architecture.html \
 			-a toc=left \
 			-a toclevels=3 \
 			-a sectnums \
@@ -123,35 +123,35 @@ docs-pdf: ## Generate PDF documentation (Docker-based)
 	@if docker images -q $(DOCKER_IMAGE) 2>/dev/null | grep -q .; then \
 		echo "🐳 Using Docker image: $(DOCKER_IMAGE)"; \
 		mkdir -p $(DOCS_BUILD); \
-		echo "   Running: asciidoctor-pdf src/architecture.adoc -o build/architecture.pdf ..."; \
-		$(DOCKER_RUN) asciidoctor-pdf src/architecture.adoc \
-			-o build/architecture.pdf \
+		echo "   Running: asciidoctor-pdf src/arqua42-architecture.adoc -o build/arqua42-architecture.pdf ..."; \
+		$(DOCKER_RUN) asciidoctor-pdf src/arqua42-architecture.adoc \
+			-o build/arqua42-architecture.pdf \
 			-a sectnums \
 			-a imagesdir=images \
 			-r asciidoctor-diagram; \
-		echo "✓ PDF documentation generated: $(DOCS_BUILD)/architecture.pdf (via Docker)"; \
+		echo "✓ PDF documentation generated: $(DOCS_BUILD)/arqua42-architecture.pdf (via Docker)"; \
 	elif command -v docker >/dev/null 2>&1; then \
 		echo "⚠ Docker image not found. Building it now..."; \
 		$(MAKE) docs-build-image; \
 		echo "🐳 Using Docker image: $(DOCKER_IMAGE)"; \
 		mkdir -p $(DOCS_BUILD); \
-		echo "   Running: asciidoctor-pdf src/architecture.adoc -o build/architecture.pdf ..."; \
-		$(DOCKER_RUN) asciidoctor-pdf src/architecture.adoc \
-			-o build/architecture.pdf \
+		echo "   Running: asciidoctor-pdf src/arqua42-architecture.adoc -o build/arqua42-architecture.pdf ..."; \
+		$(DOCKER_RUN) asciidoctor-pdf src/arqua42-architecture.adoc \
+			-o build/arqua42-architecture.pdf \
 			-a sectnums \
 			-a imagesdir=images \
 			-r asciidoctor-diagram; \
-		echo "✓ PDF documentation generated: $(DOCS_BUILD)/architecture.pdf (via Docker)"; \
+		echo "✓ PDF documentation generated: $(DOCS_BUILD)/arqua42-architecture.pdf (via Docker)"; \
 	elif command -v asciidoctor-pdf >/dev/null 2>&1; then \
 		echo "⚠ Docker not available, using local asciidoctor-pdf..."; \
 		mkdir -p $(DOCS_BUILD); \
-		asciidoctor-pdf $(DOCS_SRC)/architecture.adoc \
-			-o $(DOCS_BUILD)/architecture.pdf \
+		asciidoctor-pdf $(DOCS_SRC)/arqua42-architecture.adoc \
+			-o $(DOCS_BUILD)/arqua42-architecture.pdf \
 			-a sectnums \
 			-a imagesdir=images \
 			-r asciidoctor-diagram 2>/dev/null || \
-		asciidoctor-pdf $(DOCS_SRC)/architecture.adoc \
-			-o $(DOCS_BUILD)/architecture.pdf \
+		asciidoctor-pdf $(DOCS_SRC)/arqua42-architecture.adoc \
+			-o $(DOCS_BUILD)/arqua42-architecture.pdf \
 			-a sectnums \
 			-a imagesdir=images; \
 		echo "✓ PDF documentation generated (local mode)"; \
@@ -172,7 +172,7 @@ docs-watch: ## Watch documentation files for changes and rebuild (requires docke
 
 docs-serve: ## Serve documentation on http://localhost:8000
 	@echo "Serving documentation on http://localhost:8000"
-	@echo "Open http://localhost:8000/build/architecture.html in your browser"
+	@echo "Open http://localhost:8000/build/arqua42-architecture.html in your browser"
 	@echo "Press Ctrl+C to stop"
 	@python3 -m http.server 8000 -d docs/
 

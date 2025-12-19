@@ -1,10 +1,10 @@
-# Aquarius
+# Arqua42
 
 A swimming competition rating system for children's competitions, optimized for offline-first operation and touch-friendly interfaces.
 
 ## Overview
 
-Aquarius is a Progressive Web Application (PWA) designed to manage swimming competitions for children. It consists of two main applications:
+Arqua42 is a Progressive Web Application (PWA) designed to manage swimming competitions for children. It consists of two main applications:
 
 - **Planning Application**: Desktop-optimized interface for organizing competitions, managing participants, and configuring events
 - **Execution Application**: Mobile/tablet-optimized interface for real-time scoring during competitions with offline capability
@@ -117,7 +117,7 @@ Then use the same `make` commands - they'll automatically use local tools.
 ## Project Structure
 
 ```
-aquarius/
+arqua42/
 ├── docs/                          # Documentation
 │   ├── src/                       # Documentation source files
 │   │   ├── architecture.adoc      # Main architecture document (AsciiDoc)
@@ -156,7 +156,7 @@ aquarius/
 ```bash
 # Clone repository
 git clone <repository-url>
-cd aquarius
+cd arqua42
 
 # Generate documentation
 make docs

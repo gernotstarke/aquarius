@@ -1,0 +1,68 @@
+[[section-architecture-constraints]]
+== Randbedingungen
+
+[[_technische_randbedingungen]]
+=== Technische Randbedingungen
+
+[cols="2,4",options="header"]
+|===
+| Randbedingung | Erläuterung
+
+| Web-Anwendung
+| Keine Installation, Zugriff über Browser
+
+| Mobile-First
+| Primär für Tablets im Schwimmbad optimiert
+
+| Progressive Web App
+| Installierbar, Offline-fähig, App-ähnliches Erlebnis
+
+| Cloud-Datenbank
+| Turso (libSQL) mit automatischer Synchronisation
+
+| Moderne Browser
+| Chrome, Firefox, Safari, Edge (jeweils aktuelle Versionen)
+|===
+
+[[_organisatorische_randbedingungen]]
+=== Organisatorische Randbedingungen
+
+[cols="2,4",options="header"]
+|===
+| Randbedingung | Erläuterung
+
+| Zwei Betriebsmodi
+| *Planung* (Büro, Online) und *Durchführung* (Schwimmbad, Offline)
+
+| Zentral gehostet
+| Cloud-Hosting, keine lokale Serverinfrastruktur erforderlich
+
+| Ehrenamtliche Betreiber
+| Kein IT-Personal, einfache Wartung
+
+| Open Source
+| Transparenz, Anpassbarkeit, keine Lizenzkosten
+|===
+
+[[_konventionen]]
+=== Konventionen
+
+[cols="2,4",options="header"]
+|===
+| Konvention | Erläuterung
+
+| Fachsprache
+| Deutsche Domänenbegriffe im Code (Verein, Kind, Wettkampf)
+
+| REST API
+| Standardisierte HTTP-Methoden und Status-Codes
+
+| Responsive Design
+| Mobile-First mit TailwindCSS
+
+| Git Workflow
+| Feature-Branches, Pull Requests, Code Reviews
+
+| arc42-Template
+| Version 8.2 für Architekturdokumentation
+|===
