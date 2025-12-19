@@ -1,4 +1,5 @@
 @startuml
+allowmixing
 skinparam packageStyle rectangle
 
 package "Anmeldung Modul" {
