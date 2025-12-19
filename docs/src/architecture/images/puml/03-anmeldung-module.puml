@@ -1,8 +1,10 @@
 @startuml
+skinparam packageStyle rectangle
+
 package "Anmeldung Modul" {
-    [AnmeldungRouter] <<REST>>
-    [AnmeldungService] <<Business Logic>>
-    [AnmeldungRepository] <<Data Access>>
+    rectangle "AnmeldungRouter" <<REST>> as AnmeldungRouter
+    rectangle "AnmeldungService" <<Business Logic>> as AnmeldungService
+    rectangle "AnmeldungRepository" <<Data Access>> as AnmeldungRepository
 
     package "Domain" {
         class Anmeldung {
@@ -30,22 +32,22 @@ package "Anmeldung Modul" {
 
 ' Externe Abhängigkeiten
 package "Stammdaten Modul" {
-    [KindService]
+    rectangle "KindService" as KindService
 }
 
 package "Saisonplanung Modul" {
-    [WettkampfService]
-    [FigurService]
+    rectangle "WettkampfService" as WettkampfService
+    rectangle "FigurService" as FigurService
 }
 
 ' Beziehungen
-[AnmeldungRouter] --> [AnmeldungService] : verwendet
-[AnmeldungService] --> [AnmeldungRepository] : verwendet
-[AnmeldungService] --> [KindService] : validiert Kind
-[AnmeldungService] --> [WettkampfService] : prüft Verfügbarkeit
-[AnmeldungService] --> [FigurService] : validiert Figuren
-[AnmeldungRepository] --> Anmeldung : CRUD
+AnmeldungRouter --> AnmeldungService : verwendet
+AnmeldungService --> AnmeldungRepository : verwendet
+AnmeldungService --> KindService : validiert Kind
+AnmeldungService --> WettkampfService : prüft Verfügbarkeit
+AnmeldungService --> FigurService : validiert Figuren
+AnmeldungRepository --> Anmeldung : CRUD
 
-[AnmeldungRouter] ..> AnmeldungCreate : empfängt
-[AnmeldungRouter] ..> AnmeldungResponse : sendet
+AnmeldungRouter ..> AnmeldungCreate : empfängt
+AnmeldungRouter ..> AnmeldungResponse : sendet
 @enduml
