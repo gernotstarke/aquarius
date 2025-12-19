@@ -13,17 +13,27 @@ aquarius/
 ├── backend/                  # Python FastAPI backend
 │   ├── app/
 │   │   ├── __init__.py
+│   │   ├── main.py          # FastAPI application entry point
 │   │   └── database.py      # Database configuration with Turso (libSQL)
 │   ├── .env.example         # Environment variables template
+│   ├── Dockerfile           # Backend container definition
 │   └── requirements.txt     # Python dependencies
-├── docs/                    # Documentation
+├── docs/                    # GENERATED documentation (do not edit)
+│   ├── *.html              # Generated HTML files
+│   ├── *.pdf               # Generated PDF files  
+│   └── images/             # Generated PNG diagrams from PlantUML
+├── docs/src/                # Documentation SOURCES (edit these)
 │   ├── adrs/               # Architecture Decision Records
-│   ├── architecture/       # Architecture documentation (AsciiDoc)
+│   ├── architecture/       # Architecture documentation modules
+│   │   ├── images/puml/    # PlantUML diagram sources
+│   │   └── *.adoc          # AsciiDoc chapter files
 │   ├── requirements/       # Requirements documentation
 │   ├── architecture.adoc   # Main architecture document
 │   └── domain-model.md     # Domain model documentation
 ├── logo/                    # Logo assets
-├── Makefile                 # Build automation
+├── docker-compose.yml       # Service orchestration
+├── Dockerfile.docs         # Documentation builder image  
+├── Makefile                # Build automation
 ├── LICENSE
 └── README.md
 ```
@@ -56,27 +66,26 @@ aquarius/
 ### Documentation Commands
 
 ```bash
-# Generate all documentation (diagrams + HTML)
+# Generate all documentation (diagrams + HTML) using Docker
 make docs
 
 # Generate HTML documentation from AsciiDoc
 make docs-html
 
-# Generate PNG diagrams from PlantUML sources
-make docs-diagrams
-
 # Generate PDF documentation (requires asciidoctor-pdf)
 make docs-pdf
 
-# Watch documentation files for changes and rebuild
-make docs-watch
-
-# Serve documentation on http://localhost:8000
+# Serve documentation on http://localhost:8080
 make docs-serve
 
-# Clean generated files
+# Clean generated documentation files
 make clean
 ```
+
+**Important**: 
+- Documentation sources are in `docs/src/` - edit these files
+- Generated documentation goes to `docs/` - do not edit these files
+- PlantUML diagrams in `docs/src/architecture/images/puml/` are converted to PNG in `docs/images/`
 
 ### Development Commands (Planned/Not Yet Implemented)
 
@@ -206,11 +215,19 @@ Currently, test infrastructure is planned but not yet implemented. The Makefile 
 
 ## Documentation System
 
-The project uses:
-- **AsciiDoc** for architecture documentation
-- **PlantUML** for diagrams (in `docs/architecture/images/puml/`)
-- **Markdown** for ADRs and domain model
-- Generated documentation served via Python's HTTP server
+The project uses a source/generated separation:
+
+**Source Files** (`docs/src/`):
+- **AsciiDoc** (`.adoc`) for architecture documentation  
+- **PlantUML** (`.puml`) for diagrams in `docs/src/architecture/images/puml/`
+- **Markdown** (`.md`) for ADRs and domain model
+
+**Generated Files** (`docs/`):
+- HTML files from AsciiDoc
+- PDF files from AsciiDoc
+- PNG diagrams from PlantUML in `docs/images/`
+
+Docker-based build ensures consistent rendering across all development environments.
 
 ## Environment Requirements
 

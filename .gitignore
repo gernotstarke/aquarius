@@ -65,9 +65,9 @@ Thumbs.db
 Desktop.ini
 
 # Documentation generated files
-docs/architecture.html
-docs/architecture.pdf
-docs/architecture/images/generated/
+docs/*.html
+docs/*.pdf
+docs/images/
 
 # Docker
 .dockerignore

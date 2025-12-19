@@ -1,0 +1,48 @@
+@startuml aquarius-components
+title Aquarius - Komponentenübersicht
+
+package "Frontend Apps" {
+  component [Planungs-App] as planning #lightblue {
+    component [Saison-Verwaltung]
+    component [Team-Management]
+    component [Anmeldungen]
+    component [Figuren-Katalog]
+  }
+  
+  component [Durchführungs-App] as execution #lightgreen {
+    component [Wettkampf-Durchführung]
+    component [Bewertungs-Eingabe]
+    component [Stations-Verwaltung]
+    component [Offline-Sync]
+  }
+}
+
+package "Backend Services" {
+  component [API Gateway] as api #yellow
+  component [Business Logic] as logic #yellow {
+    component [Bewertungs-Service]
+    component [Wettkampf-Service]
+    component [Verwaltungs-Service]
+  }
+  component [Data Access Layer] as dal #orange
+}
+
+database "Turso Database" as db {
+  collections [Vereine]
+  collections [Wettkämpfe]
+  collections [Bewertungen]
+  collections [Figuren]
+}
+
+planning --> api : REST/JSON
+execution --> api : REST/JSON
+api --> logic
+logic --> dal
+dal --> db : libSQL
+
+note bottom of execution
+  PWA mit Service Worker
+  für Offline-Fähigkeit
+end note
+
+@enduml

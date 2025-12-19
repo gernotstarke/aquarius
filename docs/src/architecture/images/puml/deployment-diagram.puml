@@ -1,0 +1,48 @@
+@startuml aquarius-deployment
+title Aquarius - Deployment-Sicht
+
+node "Developer Machine" {
+  component [Docker Desktop] as docker
+  
+  package "Docker Containers" {
+    component [docs-builder] as docs #lightgray
+    component [backend-dev] as backendDev #yellow
+    component [frontend-dev] as frontendDev #lightblue
+  }
+}
+
+node "Production Environment" {
+  cloud "Turso Cloud" {
+    database [Primary DB] as primaryDB
+    database [Edge Replicas] as edgeDB
+  }
+  
+  cloud "Hosting Provider" {
+    component [Backend API\n(FastAPI)] as prodAPI
+    component [Static Files\n(React Apps)] as staticFiles
+  }
+}
+
+node "Client Devices" {
+  component [Browser\n(Desktop)] as desktop
+  component [Browser\n(Tablet)] as tablet
+  
+  tablet ..> [Local Storage] : PWA Cache
+}
+
+docker --> docs : make docs
+docker --> backendDev : make dev
+docker --> frontendDev : npm start
+
+prodAPI --> primaryDB : libSQL Protocol
+tablet --> edgeDB : Sync when online
+desktop --> staticFiles : HTTPS
+tablet --> staticFiles : HTTPS
+staticFiles --> prodAPI : API Calls
+
+note right of edgeDB
+  Embedded replicas
+  for offline work
+end note
+
+@enduml
