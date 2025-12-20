@@ -1,4 +1,4 @@
-"""Database configuration with Turso (libSQL) support."""
+"""Database configuration with SQLite for CRUD prototype."""
 import os
 from sqlalchemy import create_engine, event
 from sqlalchemy.ext.declarative import declarative_base
@@ -7,31 +7,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Database URL from environment
-TURSO_DATABASE_URL = os.getenv("TURSO_DATABASE_URL", "file:./aquarius.db")
-TURSO_AUTH_TOKEN = os.getenv("TURSO_AUTH_TOKEN", "")
+# Database URL - defaults to local SQLite for prototype
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./arqua42.db")
 
-# Create engine with libSQL/Turso support
-if TURSO_DATABASE_URL.startswith("libsql://"):
-    # Turso cloud database
-    connect_args = {"check_same_thread": False}
-    if TURSO_AUTH_TOKEN:
-        # For Turso, use the experimental libsql driver
-        engine = create_engine(
-            TURSO_DATABASE_URL,
-            connect_args={"authToken": TURSO_AUTH_TOKEN},
-            echo=True
-        )
-    else:
-        engine = create_engine(TURSO_DATABASE_URL, connect_args=connect_args, echo=True)
-else:
-    # Local SQLite for development
-    connect_args = {"check_same_thread": False}
-    engine = create_engine(
-        TURSO_DATABASE_URL,
-        connect_args=connect_args,
-        echo=True
-    )
+# Create engine
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {},
+    echo=False  # Set to True for debugging
+)
 
 # Enable foreign keys for SQLite
 @event.listens_for(engine, "connect")

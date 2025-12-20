@@ -1,0 +1,96 @@
+[[section-system-scope-and-context]]
+== Kontextabgrenzung
+
+[[_fachlicher_kontext]]
+=== Fachlicher Kontext
+
+.System-Kontext Arqua42
+[plantuml, context-diagram, svg]
+----
+include::images/puml/context-diagram.puml[]
+----
+
+*Kommunikationsbeziehungen:*
+
+[cols="2,3,3",options="header"]
+|===
+| Partner | Eingabe | Ausgabe
+
+| Präsident
+| Saisonplan, Wettkämpfe, Figurenkatalog
+| Auswertungen, Statistiken
+
+| Schwimmverband
+| Figurenkatalog-Updates, Regeländerungen
+| -
+
+| Verein
+| Kinderdaten, Teamzugehörigkeiten, Anmeldungen
+| Wettkampfbestätigungen
+
+| Kind
+| Wettkampfanmeldung, Figurenauswahl
+| Startnummer, Ergebnisse
+
+| Punktrichter
+| Stationszuweisung, Wettkampfstart
+| Berechnete Endpunkte, Ranglisten
+
+| Kampfrichter
+| Vorläufige Punktzahlen
+| Übersicht aller Bewertungen
+|===
+
+[[_technischer_kontext]]
+=== Technischer Kontext
+
+.Technische Architektur
+[plantuml, deployment-diagram, svg]
+----
+include::images/puml/deployment-diagram.puml[]
+----
+
+*Technische Schnittstellen:*
+
+[cols="2,2,2",options="header"]
+|===
+| Schnittstelle | Technologie | Format
+
+| Frontend ↔ Backend
+| REST API via HTTPS
+| JSON
+
+| Backend ↔ Datenbank
+| SQL (SQLAlchemy ORM)
+| libSQL/SQLite
+
+| Client ↔ Cache
+| Service Worker API
+| IndexedDB
+
+| Sync
+| Turso Cloud Sync
+| Proprietär
+|===
+
+[[_externe_schnittstellen]]
+=== Externe Schnittstellen
+
+==== REST API
+
+Die REST API folgt RESTful-Prinzipien:
+
+* `GET /api/v1/wettkampf` - Liste aller Wettkämpfe
+* `POST /api/v1/anmeldung` - Neue Anmeldung erstellen
+* `PUT /api/v1/bewertung/{id}` - Bewertung aktualisieren
+* `GET /api/v1/rangliste/{wettkampf_id}` - Rangliste abrufen
+
+Vollständige API-Dokumentation: `/api/docs` (Swagger UI)
+
+==== Service Worker
+
+Progressive Web App mit Offline-Fähigkeit:
+
+* **Cache-First**: Statische Assets (CSS, JS, Bilder)
+* **Network-First**: API-Requests mit Fallback
+* **Background Sync**: Daten-Synchronisation bei Netzwerk-Verfügbarkeit

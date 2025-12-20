@@ -1,0 +1,114 @@
+[[section-solution-strategy]]
+== Lösungsstrategie
+
+[[_architekturansatz]]
+=== Architekturansatz
+
+*Progressive Web App (PWA)* mit klarer *Trennung von Planungs- und Durchführungskontext*
+
+[cols="3,4",options="header"]
+|===
+| Entscheidung | Begründung
+
+| *Monorepo mit zwei Frontend-Modulen*
+| Gemeinsame Datenbasis, unterschiedliche UIs für Büro und Schwimmbad
+
+| *React SPA*
+| Moderne, komponentenbasierte UI, große Community, gute Mobile-Unterstützung
+
+| *FastAPI Backend*
+| Schnell, typsicher (Pydantic), automatische API-Dokumentation
+
+| *Turso (libSQL)*
+| SQLite-kompatibel, Cloud-Sync, hybride Online/Offline-Nutzung
+
+| *Service Worker*
+| Offline-Fähigkeit, App-ähnliches Erlebnis, schnelle Ladezeiten
+|===
+
+[[_technologie_stack]]
+=== Technologie-Stack
+
+==== Frontend
+
+*Siehe ADRs für Details:*
+
+* link:../adrs/ADR-013-react-typescript-frontend.html[React 18 + TypeScript] - Typsicherheit, moderne Hooks
+* link:../adrs/ADR-001-vite-build-tool.html[Vite] - Schneller Build, optimiertes Bundling
+* link:../adrs/ADR-017-tailwindcss-styling.html[TailwindCSS] - Utility-First CSS, responsive Design
+* link:../adrs/ADR-002-react-router.html[React Router] - Client-seitiges Routing
+* link:../adrs/ADR-003-tanstack-query.html[TanStack Query] - Server State Management, Caching
+* link:../adrs/ADR-004-zustand-state-management.html[Zustand] - Lokales State Management
+* link:../adrs/ADR-016-pwa-architecture.html[Workbox] - Service Worker für PWA
+
+==== Backend
+
+*Siehe ADRs für Details:*
+
+* link:../adrs/ADR-014-python-fastapi-backend.html[Python 3.11+ + FastAPI] - Moderne Sprache, Async-fähig
+* link:../adrs/ADR-005-pydantic-validation.html[Pydantic] - Datenvalidierung und Serialisierung
+* link:../adrs/ADR-006-sqlalchemy-orm.html[SQLAlchemy 2.0] - ORM mit Typsicherheit
+* link:../adrs/ADR-007-alembic-migrations.html[Alembic] - Datenbank-Migrationen
+
+==== Datenbank & Infrastruktur
+
+* link:../adrs/ADR-015-turso-database.html[Turso (libSQL)] - Edge-Database mit Sync
+* SQLite - Lokal für Entwicklung und Offline-Betrieb
+* link:../adrs/ADR-011-docker-development.html[Docker] - Containerisierung für Deployment
+* Nginx - Reverse Proxy, Static File Serving
+
+[[_zentrale_architekturentscheidungen]]
+=== Zentrale Architekturentscheidungen
+
+==== Trennung Planung vs. Durchführung
+
+*Kontext:* Unterschiedliche Nutzungskontexte (Büro vs. Schwimmbad)
+
+*Entscheidung:* Zwei separate Frontend-Module mit gemeinsamer Datenbasis
+
+*Begründung:*
+
+* Büro: Desktop-optimiert, komplexe Formulare, viele Daten
+* Schwimmbad: Touch-optimiert, große Buttons, fokussierte Workflows
+* Code-Sharing für gemeinsame Komponenten (Buttons, Forms)
+* Unterschiedliche Routing-Strukturen
+* Getrennte Service Worker Strategien
+
+Siehe auch: link:../adrs/ADR-008-monorepo-structure.html[ADR-008: Monorepo-Struktur]
+
+==== Progressive Web App statt Native App
+
+*Kontext:* Mobile Nutzung im Schwimmbad erforderlich
+
+*Entscheidung:* PWA mit Service Worker
+
+*Begründung:*
+
+* ✅ Kein App-Store-Prozess
+* ✅ Plattform-unabhängig (iOS, Android, Desktop)
+* ✅ Automatische Updates
+* ✅ Offline-Fähigkeit über Service Worker
+* ✅ Keine separate Codebasis für Mobile
+* ❌ Eingeschränkte iOS-Unterstützung (akzeptabel)
+
+Siehe auch: link:../adrs/ADR-016-pwa-architecture.html[ADR-016: PWA-Architektur]
+
+==== Domain-Driven Design
+
+*Kontext:* Komplexe fachliche Domäne mit unterschiedlichen Kontexten
+
+*Entscheidung:* 6 Bounded Contexts
+
+Siehe: link:../adrs/ADR-018-domain-driven-design.html[ADR-018: Domain-Driven Design]
+
+==== 3-Schichten-Architektur
+
+*Entscheidung:* Router → Service → Repository
+
+*Begründung:*
+
+* Klare Verantwortlichkeiten
+* Testbarkeit durch Dependency Injection
+* Wiederverwendbare Business-Logic
+
+Siehe auch: <<_8_1_2_3_schichten_architektur,3-Schichten-Architektur>>

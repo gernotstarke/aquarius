@@ -11,7 +11,8 @@ RUN apk add --no-cache \
     openjdk11-jre \
     bash \
     make \
-    git
+    git \
+    pandoc
 
 # Install PlantUML
 ENV PLANTUML_VERSION=1.2024.7

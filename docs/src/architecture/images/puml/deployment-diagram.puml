@@ -1,48 +1,23 @@
-@startuml aquarius-deployment
-title Aquarius - Deployment-Sicht
+@startuml
+!include <C4/C4_Deployment>
 
-node "Developer Machine" {
-  component [Docker Desktop] as docker
-  
-  package "Docker Containers" {
-    component [docs-builder] as docs #lightgray
-    component [backend-dev] as backendDev #yellow
-    component [frontend-dev] as frontendDev #lightblue
-  }
+Deployment_Node(client, "Client Device", "Browser") {
+    Container(planning, "Planungs-App", "React PWA", "Desktop-optimiert")
+    Container(execution, "Durchführungs-App", "React PWA", "Touch-optimiert")
 }
 
-node "Production Environment" {
-  cloud "Turso Cloud" {
-    database [Primary DB] as primaryDB
-    database [Edge Replicas] as edgeDB
-  }
-  
-  cloud "Hosting Provider" {
-    component [Backend API\n(FastAPI)] as prodAPI
-    component [Static Files\n(React Apps)] as staticFiles
-  }
+Deployment_Node(cloud, "Cloud Infrastructure") {
+    Deployment_Node(app_server, "Application Server", "Docker Container") {
+        Container(api, "Backend API", "FastAPI", "REST API, Business Logic")
+    }
+
+    Deployment_Node(db_server, "Database Server", "Turso Edge") {
+        ContainerDb(database, "Database", "libSQL", "Wettkampf-Daten")
+    }
 }
 
-node "Client Devices" {
-  component [Browser\n(Desktop)] as desktop
-  component [Browser\n(Tablet)] as tablet
-  
-  tablet ..> [Local Storage] : PWA Cache
-}
-
-docker --> docs : make docs
-docker --> backendDev : make dev
-docker --> frontendDev : npm start
-
-prodAPI --> primaryDB : libSQL Protocol
-tablet --> edgeDB : Sync when online
-desktop --> staticFiles : HTTPS
-tablet --> staticFiles : HTTPS
-staticFiles --> prodAPI : API Calls
-
-note right of edgeDB
-  Embedded replicas
-  for offline work
-end note
+Rel(planning, api, "API Calls", "HTTPS/JSON")
+Rel(execution, api, "API Calls + Sync", "HTTPS/JSON")
+Rel(api, database, "SQL Queries", "libSQL Protocol")
 
 @enduml
