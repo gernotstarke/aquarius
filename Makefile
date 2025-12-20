@@ -1,4 +1,4 @@
-.PHONY: help docs docs-diagrams docs-adrs docs-html docs-pdf docs-watch docs-serve docs-build-image clean test
+.PHONY: help docs docs-diagrams docs-adrs docs-html docs-pdf docs-watch docs-serve docs-build-image clean test dev dev-down db-reset db-seed
 
 # Docker configuration
 DOCKER_IMAGE := arqua42-docs:latest
@@ -179,9 +179,30 @@ docs-serve: ## Serve documentation on http://localhost:8000
 
 ##@ Development
 
-dev: ## Start development environment
-	@echo "Starting development environment..."
-	@echo "⚠ Development targets not yet implemented"
+dev: ## Start development environment with Docker Compose
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "🚀 Starting Arqua42 CRUD Prototype..."
+	@echo "   Backend:  http://localhost:8000"
+	@echo "   Frontend: http://localhost:5173"
+	@echo "   API Docs: http://localhost:8000/docs"
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@docker-compose up --build
+
+dev-down: ## Stop development environment
+	@echo "Stopping development environment..."
+	@docker-compose down
+
+db-reset: ## Reset database (drop all tables and recreate)
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "🗑️  Resetting database..."
+	@docker-compose exec backend python seed_db.py
+	@echo "✓ Database reset complete"
+
+db-seed: ## Seed database with sample data
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "📋 Seeding database..."
+	@docker-compose exec backend python seed_db.py
+	@echo "✓ Database seeded with sample data"
 
 lint: ## Run linters
 	@echo "Running linters..."
