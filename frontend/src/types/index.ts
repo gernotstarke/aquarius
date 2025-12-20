@@ -59,3 +59,42 @@ export interface KindCreate {
   geschlecht?: string;
   verein?: string;
 }
+
+export interface Figur {
+  id: number;
+  name: string;
+  beschreibung?: string;
+  schwierigkeitsgrad?: number;
+  kategorie?: string;
+  min_alter?: number;
+  bild?: string;
+}
+
+export interface FigurCreate {
+  name: string;
+  beschreibung?: string;
+  schwierigkeitsgrad?: number;
+  kategorie?: string;
+  min_alter?: number;
+  bild?: string;
+}
+
+export interface Anmeldung {
+  id: number;
+  kind_id: number;
+  wettkampf_id: number;
+  anmeldedatum: string;
+  status: string;
+  figuren: Figur[];
+}
+
+export interface AnmeldungCreate {
+  kind_id: number;
+  wettkampf_id: number;
+  figur_ids: number[];
+}
+
+export interface WettkampfWithDetails extends Wettkampf {
+  figuren: Figur[];
+  anmeldungen: Anmeldung[];
+}
