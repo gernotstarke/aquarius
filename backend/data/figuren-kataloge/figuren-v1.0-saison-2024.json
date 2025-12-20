@@ -1,0 +1,216 @@
+{
+  "version": "1.0",
+  "saison": "2024/2025",
+  "erstellt_am": "2024-12-20",
+  "beschreibung": "Offizieller Figurenkatalog für die Saison 2024/2025",
+  "figuren": [
+    {
+      "name": "Ballettbein",
+      "kategorie": "Ballettbein",
+      "beschreibung": "Ein Bein senkrecht gestreckt aus dem Wasser, Körper stabil",
+      "schwierigkeitsgrad": 12,
+      "min_alter": 8,
+      "bild": "figuren/ballettbein.png"
+    },
+    {
+      "name": "Ballettbein beidbeinig",
+      "kategorie": "Ballettbein",
+      "beschreibung": "Beide Beine senkrecht gestreckt",
+      "schwierigkeitsgrad": 15,
+      "min_alter": 10,
+      "bild": "figuren/ballettbein-beidbeinig.png"
+    },
+    {
+      "name": "Ballettbein angewinkelt",
+      "kategorie": "Ballettbein",
+      "beschreibung": "Ein Bein gestreckt, ein Bein angewinkelt",
+      "schwierigkeitsgrad": 13,
+      "min_alter": 9,
+      "bild": "figuren/ballettbein-angewinkelt.png"
+    },
+    {
+      "name": "Ballettbein gestreckt",
+      "kategorie": "Ballettbein",
+      "beschreibung": "Fokus auf maximale Streckung und Höhe",
+      "schwierigkeitsgrad": 14,
+      "min_alter": 10,
+      "bild": "figuren/ballettbein-gestreckt.png"
+    },
+    {
+      "name": "Vertikale",
+      "kategorie": "Vertikale",
+      "beschreibung": "Beide Beine senkrecht gestreckt, Kopf nach unten",
+      "schwierigkeitsgrad": 16,
+      "min_alter": 9,
+      "bild": "figuren/vertikale.png"
+    },
+    {
+      "name": "Vertikale angewinkelt",
+      "kategorie": "Vertikale",
+      "beschreibung": "Vertikale mit angewinkeltem Bein",
+      "schwierigkeitsgrad": 17,
+      "min_alter": 10,
+      "bild": "figuren/vertikale-angewinkelt.png"
+    },
+    {
+      "name": "Vertikale im Spagat",
+      "kategorie": "Vertikale",
+      "beschreibung": "Vertikale mit gespreizten Beinen",
+      "schwierigkeitsgrad": 19,
+      "min_alter": 11,
+      "bild": "figuren/vertikale-spagat.png"
+    },
+    {
+      "name": "Vertikale beidbeinig",
+      "kategorie": "Vertikale",
+      "beschreibung": "Klassische doppelte Beinführung",
+      "schwierigkeitsgrad": 16,
+      "min_alter": 9,
+      "bild": "figuren/vertikale-beidbeinig.png"
+    },
+    {
+      "name": "Flamingo",
+      "kategorie": "Flamingo",
+      "beschreibung": "Ein Bein angewinkelt, ein Bein gestreckt",
+      "schwierigkeitsgrad": 11,
+      "min_alter": 8,
+      "bild": "figuren/flamingo.png"
+    },
+    {
+      "name": "Flamingo angewinkelt",
+      "kategorie": "Flamingo",
+      "beschreibung": "Variante mit stärkerer Beugung",
+      "schwierigkeitsgrad": 12,
+      "min_alter": 8,
+      "bild": "figuren/flamingo-angewinkelt.png"
+    },
+    {
+      "name": "Flamingo zur Vertikalen",
+      "kategorie": "Flamingo",
+      "beschreibung": "Übergang von Flamingo in Vertikale",
+      "schwierigkeitsgrad": 16,
+      "min_alter": 10,
+      "bild": "figuren/flamingo-vertikale.png"
+    },
+    {
+      "name": "Ritter",
+      "kategorie": "Ritter",
+      "beschreibung": "Ein Bein senkrecht, ein Bein horizontal",
+      "schwierigkeitsgrad": 13,
+      "min_alter": 9,
+      "bild": "figuren/ritter.png"
+    },
+    {
+      "name": "Ritter angewinkelt",
+      "kategorie": "Ritter",
+      "beschreibung": "Variante mit angewinkeltem Bein",
+      "schwierigkeitsgrad": 14,
+      "min_alter": 9,
+      "bild": "figuren/ritter-angewinkelt.png"
+    },
+    {
+      "name": "Ritter zur Vertikalen",
+      "kategorie": "Ritter",
+      "beschreibung": "Übergang von Ritter in Vertikale",
+      "schwierigkeitsgrad": 17,
+      "min_alter": 10,
+      "bild": "figuren/ritter-vertikale.png"
+    },
+    {
+      "name": "Spagat",
+      "kategorie": "Spagat",
+      "beschreibung": "Beine im 180°-Winkel gespreizt",
+      "schwierigkeitsgrad": 14,
+      "min_alter": 9,
+      "bild": "figuren/spagat.png"
+    },
+    {
+      "name": "Spagat angewinkelt",
+      "kategorie": "Spagat",
+      "beschreibung": "Spagat mit angewinkeltem Bein",
+      "schwierigkeitsgrad": 15,
+      "min_alter": 10,
+      "bild": "figuren/spagat-angewinkelt.png"
+    },
+    {
+      "name": "Spagat zur Vertikalen",
+      "kategorie": "Spagat",
+      "beschreibung": "Übergang vom Spagat in Vertikale",
+      "schwierigkeitsgrad": 18,
+      "min_alter": 11,
+      "bild": "figuren/spagat-vertikale.png"
+    },
+    {
+      "name": "Hocke",
+      "kategorie": "Grundposition",
+      "beschreibung": "Knie zur Brust gezogen, kompakte Position",
+      "schwierigkeitsgrad": 10,
+      "min_alter": 8,
+      "bild": "figuren/hocke.png"
+    },
+    {
+      "name": "Pike",
+      "kategorie": "Grundposition",
+      "beschreibung": "Gestreckte Beine, Oberkörper nach unten",
+      "schwierigkeitsgrad": 12,
+      "min_alter": 9,
+      "bild": "figuren/pike.png"
+    },
+    {
+      "name": "Strecklage",
+      "kategorie": "Grundposition",
+      "beschreibung": "Körper vollständig gestreckt an der Wasseroberfläche",
+      "schwierigkeitsgrad": 11,
+      "min_alter": 8,
+      "bild": "figuren/strecklage.png"
+    },
+    {
+      "name": "Umgekehrte Pike",
+      "kategorie": "Grundposition",
+      "beschreibung": "Pike-Position mit Kopf nach unten",
+      "schwierigkeitsgrad": 15,
+      "min_alter": 10,
+      "bild": "figuren/pike-umgekehrt.png"
+    },
+    {
+      "name": "Ballettbein zur Vertikalen",
+      "kategorie": "Kombination",
+      "beschreibung": "Übergang vom Ballettbein in Vertikale",
+      "schwierigkeitsgrad": 17,
+      "min_alter": 10,
+      "bild": "figuren/ballettbein-vertikale.png"
+    },
+    {
+      "name": "Spagat zur Vertikalen",
+      "kategorie": "Kombination",
+      "beschreibung": "Übergang vom Spagat in Vertikale",
+      "schwierigkeitsgrad": 18,
+      "min_alter": 11,
+      "bild": "figuren/spagat-vertikale-kombi.png"
+    },
+    {
+      "name": "Ritter zur Vertikalen",
+      "kategorie": "Kombination",
+      "beschreibung": "Übergang vom Ritter in Vertikale",
+      "schwierigkeitsgrad": 17,
+      "min_alter": 10,
+      "bild": "figuren/ritter-vertikale-kombi.png"
+    },
+    {
+      "name": "Flamingo zur Vertikalen",
+      "kategorie": "Kombination",
+      "beschreibung": "Übergang vom Flamingo in Vertikale",
+      "schwierigkeitsgrad": 16,
+      "min_alter": 10,
+      "bild": "figuren/flamingo-vertikale-kombi.png"
+    },
+    {
+      "name": "Umgekehrte Pike zur Vertikalen",
+      "kategorie": "Kombination",
+      "beschreibung": "Übergang von umgekehrter Pike in Vertikale",
+      "schwierigkeitsgrad": 19,
+      "min_alter": 11,
+      "bild": "figuren/pike-umgekehrt-vertikale.png"
+    }
+  ]
+}

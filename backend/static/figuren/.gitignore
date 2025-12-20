@@ -1,0 +1,10 @@
+# Bilder sind optional - nur README und .gitignore werden versioniert
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+
+# Aber behalte dieses Verzeichnis
+!.gitignore
+!README.md

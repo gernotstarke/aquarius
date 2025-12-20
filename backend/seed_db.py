@@ -2,9 +2,15 @@
 Database seeding script for Arqua42 CRUD prototype.
 Populates the database with sample data for testing.
 """
+import json
+import os
 from datetime import date, timedelta
+from pathlib import Path
 from app.database import SessionLocal, engine, Base
 from app.models import Saison, Schwimmbad, Wettkampf, Kind, Figur, Anmeldung
+
+# Pfad zum Figurenkatalog
+FIGUREN_KATALOG = "data/figuren-kataloge/figuren-v1.0-saison-2024.json"
 
 def reset_database():
     """Drop all tables and recreate them."""
@@ -150,52 +156,48 @@ def seed_data():
         print(f"   ✓ Created: {kind5.vorname} {kind5.nachname}")
         print(f"   ✓ Created: {kind6.vorname} {kind6.nachname}")
 
-        # Create Figuren (Kunstschwimm-Figuren)
-        print("\n🎯 Creating figuren...")
-        figuren_data = [
-            ("Ballettbein", "Ballettbein", "Ein Bein senkrecht gestreckt aus dem Wasser, Körper stabil", 12, 8),
-            ("Ballettbein beidbeinig", "Ballettbein", "Beide Beine senkrecht gestreckt", 15, 10),
-            ("Ballettbein angewinkelt", "Ballettbein", "Ein Bein gestreckt, ein Bein angewinkelt", 13, 9),
-            ("Ballettbein gestreckt", "Ballettbein", "Fokus auf maximale Streckung und Höhe", 14, 10),
-            ("Vertikale", "Vertikale", "Beide Beine senkrecht gestreckt, Kopf nach unten", 16, 9),
-            ("Vertikale angewinkelt", "Vertikale", "Vertikale mit angewinkeltem Bein", 17, 10),
-            ("Vertikale im Spagat", "Vertikale", "Vertikale mit gespreizten Beinen", 19, 11),
-            ("Vertikale beidbeinig", "Vertikale", "Klassische doppelte Beinführung", 16, 9),
-            ("Flamingo", "Flamingo", "Ein Bein angewinkelt, ein Bein gestreckt", 11, 8),
-            ("Flamingo angewinkelt", "Flamingo", "Variante mit stärkerer Beugung", 12, 8),
-            ("Flamingo zur Vertikalen", "Flamingo", "Übergang von Flamingo in Vertikale", 16, 10),
-            ("Ritter", "Ritter", "Ein Bein senkrecht, ein Bein horizontal", 13, 9),
-            ("Ritter angewinkelt", "Ritter", "Variante mit angewinkeltem Bein", 14, 9),
-            ("Ritter zur Vertikalen", "Ritter", "Übergang von Ritter in Vertikale", 17, 10),
-            ("Spagat", "Spagat", "Beine im 180°-Winkel gespreizt", 14, 9),
-            ("Spagat angewinkelt", "Spagat", "Spagat mit angewinkeltem Bein", 15, 10),
-            ("Spagat zur Vertikalen", "Spagat", "Übergang vom Spagat in Vertikale", 18, 11),
-            ("Hocke", "Grundposition", "Knie zur Brust gezogen, kompakte Position", 10, 8),
-            ("Pike", "Grundposition", "Gestreckte Beine, Oberkörper nach unten", 12, 9),
-            ("Strecklage", "Grundposition", "Körper vollständig gestreckt an der Wasseroberfläche", 11, 8),
-            ("Umgekehrte Pike", "Grundposition", "Pike-Position mit Kopf nach unten", 15, 10),
-            ("Ballettbein zur Vertikalen", "Kombination", "Übergang vom Ballettbein in Vertikale", 17, 10),
-            ("Spagat zur Vertikalen", "Kombination", "Übergang vom Spagat in Vertikale", 18, 11),
-            ("Ritter zur Vertikalen", "Kombination", "Übergang vom Ritter in Vertikale", 17, 10),
-            ("Flamingo zur Vertikalen", "Kombination", "Übergang vom Flamingo in Vertikale", 16, 10),
-            ("Umgekehrte Pike zur Vertikalen", "Kombination", "Übergang von umgekehrter Pike in Vertikale", 19, 11),
-        ]
+        # Create Figuren (Kunstschwimm-Figuren) from JSON catalog
+        print("\n🎯 Creating figuren from JSON catalog...")
+
+        # Load figuren from JSON catalog
+        katalog_path = Path(__file__).parent / FIGUREN_KATALOG
+        if not katalog_path.exists():
+            print(f"   ⚠️  Katalog nicht gefunden: {katalog_path}")
+            print("   ℹ️  Verwende leere Figurenliste")
+            figuren_data = []
+        else:
+            with open(katalog_path, 'r', encoding='utf-8') as f:
+                katalog = json.load(f)
+                figuren_data = katalog.get('figuren', [])
+                print(f"   ℹ️  Katalog geladen: Version {katalog.get('version')}, Saison {katalog.get('saison')}")
 
         figuren = []
-        for name, kategorie, beschreibung, schwierigkeitsgrad, min_alter in figuren_data:
+        bilder_gefunden = 0
+        for figur_data in figuren_data:
+            # Check if image file exists
+            bild_pfad = figur_data.get('bild')
+            if bild_pfad:
+                vollstaendiger_pfad = Path(__file__).parent / 'static' / bild_pfad
+                if not vollstaendiger_pfad.exists():
+                    print(f"   ⚠️  Bild nicht gefunden: {bild_pfad}")
+                    bild_pfad = None  # Set to None if file doesn't exist
+                else:
+                    bilder_gefunden += 1
+
             figur = Figur(
-                name=name,
-                kategorie=kategorie,
-                beschreibung=beschreibung,
-                schwierigkeitsgrad=schwierigkeitsgrad,
-                min_alter=min_alter,
-                bild=None  # Wird später nachgepflegt
+                name=figur_data['name'],
+                kategorie=figur_data.get('kategorie'),
+                beschreibung=figur_data.get('beschreibung'),
+                schwierigkeitsgrad=figur_data.get('schwierigkeitsgrad'),
+                min_alter=figur_data.get('min_alter'),
+                bild=bild_pfad
             )
             figuren.append(figur)
             db.add(figur)
 
         db.commit()
         print(f"   ✓ Created {len(figuren)} Figuren")
+        print(f"   ✓ {bilder_gefunden} Bilder gefunden, {len(figuren) - bilder_gefunden} fehlen noch")
 
         # Assign some figures to competitions
         print("\n🔗 Assigning figuren to wettkämpfe...")
