@@ -217,45 +217,50 @@ def seed_data():
 
         # Create some sample registrations
         print("\n📝 Creating anmeldungen...")
-        # Anna meldet sich für Herbstcup an
-        anmeldung1 = Anmeldung(
-            kind_id=kind1.id,
-            wettkampf_id=wettkampf1.id,
-            startnummer=1,
-            anmeldedatum=date(2024, 9, 15),
-            vorlaeufig=0,
-            status="aktiv"
-        )
-        # Wähle 3 Figuren für Anna
-        anmeldung1.figuren.extend([figuren[0], figuren[8], figuren[17]])  # Ballettbein, Flamingo, Hocke
-        db.add(anmeldung1)
 
-        # Max für Winterpokal
-        anmeldung2 = Anmeldung(
-            kind_id=kind2.id,
-            wettkampf_id=wettkampf2.id,
-            startnummer=1,
-            anmeldedatum=date(2024, 10, 1),
-            vorlaeufig=0,
-            status="aktiv"
-        )
-        anmeldung2.figuren.extend([figuren[4], figuren[11], figuren[18]])  # Vertikale, Ritter, Pike
-        db.add(anmeldung2)
+        # Only create sample registrations if we have enough figures
+        if len(figuren) >= 23:
+            # Anna meldet sich für Herbstcup an
+            anmeldung1 = Anmeldung(
+                kind_id=kind1.id,
+                wettkampf_id=wettkampf1.id,
+                startnummer=1,
+                anmeldedatum=date(2024, 9, 15),
+                vorlaeufig=0,
+                status="aktiv"
+            )
+            # Wähle 3 Figuren für Anna
+            anmeldung1.figuren.extend([figuren[0], figuren[8], figuren[17]])  # Ballettbein, Flamingo, Hocke
+            db.add(anmeldung1)
 
-        # Sophie für Frühjahrsmeeting
-        anmeldung3 = Anmeldung(
-            kind_id=kind3.id,
-            wettkampf_id=wettkampf3.id,
-            startnummer=1,
-            anmeldedatum=date(2025, 2, 10),
-            vorlaeufig=0,
-            status="aktiv"
-        )
-        anmeldung3.figuren.extend([figuren[6], figuren[16], figuren[22]])  # Vertikale im Spagat, Spagat zur Vertikalen, Spagat zur Vertikalen
-        db.add(anmeldung3)
+            # Max für Winterpokal
+            anmeldung2 = Anmeldung(
+                kind_id=kind2.id,
+                wettkampf_id=wettkampf2.id,
+                startnummer=1,
+                anmeldedatum=date(2024, 10, 1),
+                vorlaeufig=0,
+                status="aktiv"
+            )
+            anmeldung2.figuren.extend([figuren[4], figuren[11], figuren[18]])  # Vertikale, Ritter, Pike
+            db.add(anmeldung2)
 
-        db.commit()
-        print(f"   ✓ Created 3 Anmeldungen")
+            # Sophie für Frühjahrsmeeting
+            anmeldung3 = Anmeldung(
+                kind_id=kind3.id,
+                wettkampf_id=wettkampf3.id,
+                startnummer=1,
+                anmeldedatum=date(2025, 2, 10),
+                vorlaeufig=0,
+                status="aktiv"
+            )
+            anmeldung3.figuren.extend([figuren[6], figuren[16], figuren[22]])  # Vertikale im Spagat, Spagat zur Vertikalen, Spagat zur Vertikalen
+            db.add(anmeldung3)
+
+            db.commit()
+            print(f"   ✓ Created 3 Anmeldungen")
+        else:
+            print(f"   ⚠️  Skipping sample registrations (need at least 23 figures, have {len(figuren)})")
 
         print("\n✨ Database seeding complete!")
         print(f"\n📊 Summary:")
