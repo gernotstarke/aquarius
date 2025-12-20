@@ -89,9 +89,9 @@ class Figur(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False, index=True)  # Removed unique constraint - same figure can be in multiple categories
     beschreibung = Column(Text)
-    schwierigkeitsgrad = Column(Integer)  # 1-5 (stored as int, e.g. 12 for 1.2)
+    schwierigkeitsgrad = Column(Integer)  # Stored as int (e.g. 12 for 1.2, 15 for 1.5)
     kategorie = Column(String)  # z.B. "Ballettbein", "Vertikale", "Flamingo"
-    min_alter = Column(Integer)  # Mindestalter für diese Figur
+    altersklasse = Column(String)  # Empfohlene Altersklasse (z.B. "U8–U10", "U10–U12")
     bild = Column(String)  # Pfad zum Bild (optional)
 
     # Relationships

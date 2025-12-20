@@ -66,7 +66,7 @@ export interface Figur {
   beschreibung?: string;
   schwierigkeitsgrad?: number;
   kategorie?: string;
-  min_alter?: number;
+  altersklasse?: string;
   bild?: string;
 }
 
@@ -75,7 +75,7 @@ export interface FigurCreate {
   beschreibung?: string;
   schwierigkeitsgrad?: number;
   kategorie?: string;
-  min_alter?: number;
+  altersklasse?: string;
   bild?: string;
 }
 

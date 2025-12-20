@@ -103,7 +103,7 @@ class FigurBase(BaseModel):
     beschreibung: str | None = None
     schwierigkeitsgrad: int | None = None  # stored as int (e.g. 12 for difficulty 1.2)
     kategorie: str | None = None
-    min_alter: int | None = None
+    altersklasse: str | None = None  # Recommended age group (e.g. "U8–U10", "U10–U12")
     bild: str | None = None  # Image path/URL
 
 

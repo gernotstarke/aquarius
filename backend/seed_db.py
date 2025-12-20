@@ -189,7 +189,7 @@ def seed_data():
                 kategorie=figur_data.get('kategorie'),
                 beschreibung=figur_data.get('beschreibung'),
                 schwierigkeitsgrad=figur_data.get('schwierigkeitsgrad'),
-                min_alter=figur_data.get('min_alter'),
+                altersklasse=figur_data.get('altersklasse'),
                 bild=bild_pfad
             )
             figuren.append(figur)
