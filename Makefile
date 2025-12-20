@@ -162,12 +162,12 @@ docs-pdf: ## Generate PDF documentation (Docker-based)
 		exit 1; \
 	fi
 
-docs-watch: ## Watch documentation files for changes and rebuild (requires docker-compose)
+docs-watch: ## Watch documentation files for changes and rebuild (requires docker compose)
 	@echo "Watching documentation for changes..."
-	@if command -v docker-compose >/dev/null 2>&1; then \
-		docker-compose -f docker-compose.docs.yml run --rm docs-watch; \
+	@if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then \
+		docker compose -f docker-compose.docs.yml run --rm docs-watch; \
 	else \
-		echo "❌ docker-compose not found. Install docker-compose for watch mode."; \
+		echo "❌ docker compose not found. Install docker compose for watch mode."; \
 		exit 1; \
 	fi
 
@@ -186,22 +186,22 @@ dev: ## Start development environment with Docker Compose
 	@echo "   Frontend: http://localhost:5173"
 	@echo "   API Docs: http://localhost:8000/docs"
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-	@docker-compose up --build
+	@docker compose up --build
 
 dev-down: ## Stop development environment
 	@echo "Stopping development environment..."
-	@docker-compose down
+	@docker compose down
 
 db-reset: ## Reset database (drop all tables and recreate)
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	@echo "🗑️  Resetting database..."
-	@docker-compose exec backend python seed_db.py
+	@docker compose exec backend python seed_db.py
 	@echo "✓ Database reset complete"
 
 db-seed: ## Seed database with sample data
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	@echo "📋 Seeding database..."
-	@docker-compose exec backend python seed_db.py
+	@docker compose exec backend python seed_db.py
 	@echo "✓ Database seeded with sample data"
 
 lint: ## Run linters
