@@ -1,9 +1,25 @@
 """
 SQLAlchemy models for Arqua42 CRUD prototype.
 """
-from sqlalchemy import Column, Integer, String, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, Table, Text
 from sqlalchemy.orm import relationship
 from app.database import Base
+
+# Association table for Wettkampf <-> Figuren (many-to-many)
+wettkampf_figuren = Table(
+    'wettkampf_figuren',
+    Base.metadata,
+    Column('wettkampf_id', Integer, ForeignKey('wettkampf.id'), primary_key=True),
+    Column('figur_id', Integer, ForeignKey('figur.id'), primary_key=True)
+)
+
+# Association table for Anmeldung <-> Figuren (many-to-many)
+anmeldung_figuren = Table(
+    'anmeldung_figuren',
+    Base.metadata,
+    Column('anmeldung_id', Integer, ForeignKey('anmeldung.id'), primary_key=True),
+    Column('figur_id', Integer, ForeignKey('figur.id'), primary_key=True)
+)
 
 
 class Saison(Base):
@@ -47,6 +63,8 @@ class Wettkampf(Base):
     # Relationships
     saison = relationship("Saison", back_populates="wettkämpfe")
     schwimmbad = relationship("Schwimmbad", back_populates="wettkämpfe")
+    figuren = relationship("Figur", secondary=wettkampf_figuren, back_populates="wettkämpfe")
+    anmeldungen = relationship("Anmeldung", back_populates="wettkampf")
 
 
 class Kind(Base):
@@ -59,3 +77,37 @@ class Kind(Base):
     geburtsdatum = Column(Date, nullable=False)
     geschlecht = Column(String(1))  # M, W, D
     verein = Column(String)
+
+    # Relationships
+    anmeldungen = relationship("Anmeldung", back_populates="kind")
+
+
+class Figur(Base):
+    """Swimming figure/trick model."""
+    __tablename__ = "figur"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False, index=True, unique=True)
+    beschreibung = Column(Text)
+    schwierigkeitsgrad = Column(Integer)  # 1-5
+    kategorie = Column(String)  # z.B. "Anfänger", "Fortgeschritten", "Expert"
+    min_alter = Column(Integer)  # Mindestalter für diese Figur
+
+    # Relationships
+    wettkämpfe = relationship("Wettkampf", secondary=wettkampf_figuren, back_populates="figuren")
+
+
+class Anmeldung(Base):
+    """Registration model - links Kind to Wettkampf with selected Figuren."""
+    __tablename__ = "anmeldung"
+
+    id = Column(Integer, primary_key=True, index=True)
+    kind_id = Column(Integer, ForeignKey("kind.id"), nullable=False)
+    wettkampf_id = Column(Integer, ForeignKey("wettkampf.id"), nullable=False)
+    anmeldedatum = Column(Date, nullable=False)
+    status = Column(String, default="aktiv")  # aktiv, storniert
+
+    # Relationships
+    kind = relationship("Kind", back_populates="anmeldungen")
+    wettkampf = relationship("Wettkampf", back_populates="anmeldungen")
+    figuren = relationship("Figur", secondary=anmeldung_figuren)

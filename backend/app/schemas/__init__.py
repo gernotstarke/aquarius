@@ -1,5 +1,6 @@
 """Pydantic schemas for request/response validation."""
 from datetime import date
+from typing import List
 from pydantic import BaseModel
 
 
@@ -91,6 +92,75 @@ class KindUpdate(KindBase):
 
 class Kind(KindBase):
     id: int
+
+    class Config:
+        from_attributes = True
+
+
+# Figur Schemas
+class FigurBase(BaseModel):
+    name: str
+    beschreibung: str | None = None
+    schwierigkeitsgrad: int | None = None
+    kategorie: str | None = None
+    min_alter: int | None = None
+
+
+class FigurCreate(FigurBase):
+    pass
+
+
+class FigurUpdate(FigurBase):
+    pass
+
+
+class Figur(FigurBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+# Anmeldung Schemas
+class AnmeldungBase(BaseModel):
+    kind_id: int
+    wettkampf_id: int
+    anmeldedatum: date
+    status: str = "aktiv"
+
+
+class AnmeldungCreate(BaseModel):
+    kind_id: int
+    wettkampf_id: int
+    figur_ids: List[int]  # List of figure IDs the child will perform
+
+
+class AnmeldungUpdate(BaseModel):
+    status: str | None = None
+    figur_ids: List[int] | None = None
+
+
+class Anmeldung(AnmeldungBase):
+    id: int
+    figuren: List[Figur] = []
+
+    class Config:
+        from_attributes = True
+
+
+# Extended schemas with relationships
+class WettkampfWithDetails(Wettkampf):
+    """Wettkampf with related data."""
+    figuren: List[Figur] = []
+    anmeldungen: List[Anmeldung] = []
+
+    class Config:
+        from_attributes = True
+
+
+class KindWithAnmeldungen(Kind):
+    """Kind with their registrations."""
+    anmeldungen: List[Anmeldung] = []
 
     class Config:
         from_attributes = True
