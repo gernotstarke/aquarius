@@ -87,7 +87,7 @@ class Figur(Base):
     __tablename__ = "figur"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False, index=True, unique=True)
+    name = Column(String, nullable=False, index=True)  # Removed unique constraint - same figure can be in multiple categories
     beschreibung = Column(Text)
     schwierigkeitsgrad = Column(Integer)  # 1-5 (stored as int, e.g. 12 for 1.2)
     kategorie = Column(String)  # z.B. "Ballettbein", "Vertikale", "Flamingo"
