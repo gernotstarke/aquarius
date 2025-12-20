@@ -159,6 +159,16 @@ const AnmeldungForm: React.FC = () => {
                 Figuren auswählen ({selectedFigurIds.length} ausgewählt)
               </label>
 
+              {/* Info box for preliminary registration */}
+              {selectedFigurIds.length === 0 && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <p className="text-sm text-yellow-800">
+                    <strong>Hinweis:</strong> Wenn keine Figuren ausgewählt werden, wird eine <strong>vorläufige Anmeldung</strong> erstellt.
+                    Die Figuren können später noch ausgewählt werden.
+                  </p>
+                </div>
+              )}
+
               {availableFiguren.length === 0 ? (
                 <p className="text-neutral-500 py-4">
                   Für diesen Wettkampf sind noch keine Figuren zugelassen.
@@ -195,7 +205,7 @@ const AnmeldungForm: React.FC = () => {
           )}
 
           <div className="flex gap-4 pt-4">
-            <Button type="submit" size="lg" disabled={selectedFigurIds.length === 0}>
+            <Button type="submit" size="lg">
               {isEdit ? 'Speichern' : 'Anmelden'}
             </Button>
             <Button

@@ -126,19 +126,22 @@ class Figur(FigurBase):
 class AnmeldungBase(BaseModel):
     kind_id: int
     wettkampf_id: int
+    startnummer: int
     anmeldedatum: date
     status: str = "aktiv"
+    vorlaeufig: int = 0
 
 
 class AnmeldungCreate(BaseModel):
     kind_id: int
     wettkampf_id: int
-    figur_ids: List[int]  # List of figure IDs the child will perform
+    figur_ids: List[int] = []  # List of figure IDs - can be empty for preliminary registration
 
 
 class AnmeldungUpdate(BaseModel):
     status: str | None = None
     figur_ids: List[int] | None = None
+    vorlaeufig: int | None = None
 
 
 class Anmeldung(AnmeldungBase):

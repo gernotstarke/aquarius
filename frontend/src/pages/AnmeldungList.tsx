@@ -69,18 +69,27 @@ const AnmeldungList: React.FC = () => {
             <div className="flex items-start justify-between">
               <div className="space-y-3 flex-1">
                 <div className="flex items-center gap-3">
+                  <span className="px-3 py-1 bg-primary-600 text-white rounded-full text-sm font-semibold">
+                    #{anmeldung.startnummer}
+                  </span>
                   <h3 className="text-h3 font-semibold text-neutral-900">
                     {getKindName(anmeldung.kind_id)}
                   </h3>
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm ${
-                      anmeldung.status === 'aktiv'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-neutral-200 text-neutral-700'
-                    }`}
-                  >
-                    {anmeldung.status}
-                  </span>
+                  {anmeldung.vorlaeufig === 1 && (
+                    <span className="px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-700">
+                      vorläufig
+                    </span>
+                  )}
+                  {anmeldung.vorlaeufig === 0 && anmeldung.status === 'aktiv' && (
+                    <span className="px-3 py-1 rounded-full text-sm bg-green-100 text-green-700">
+                      aktiv
+                    </span>
+                  )}
+                  {anmeldung.status === 'storniert' && (
+                    <span className="px-3 py-1 rounded-full text-sm bg-red-100 text-red-700">
+                      storniert
+                    </span>
+                  )}
                 </div>
                 <p className="text-body text-neutral-600">
                   {getWettkampfName(anmeldung.wettkampf_id)}

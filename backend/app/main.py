@@ -335,38 +335,102 @@ def get_anmeldung(anmeldung_id: int, db: Session = Depends(get_db)):
 
 @app.post("/api/anmeldung", response_model=schemas.Anmeldung, status_code=201)
 def create_anmeldung(anmeldung: schemas.AnmeldungCreate, db: Session = Depends(get_db)):
-    """Create a new registration with selected figures."""
-    from datetime import date
+    """
+    Create a new registration with automatic startnummer assignment.
 
-    # Create anmeldung
+    - Startnummer is assigned atomically (next available number for the competition)
+    - Registration is marked as 'vorläufig' (preliminary) if:
+      1. No figures are selected yet, OR
+      2. Maximum participants for the competition is reached
+    """
+    from datetime import date
+    from sqlalchemy import func
+
+    # Get wettkampf to check max_teilnehmer
+    wettkampf = db.query(models.Wettkampf).filter(
+        models.Wettkampf.id == anmeldung.wettkampf_id
+    ).first()
+    if not wettkampf:
+        raise HTTPException(status_code=404, detail="Wettkampf not found")
+
+    # Count current final (non-vorläufig) registrations
+    final_count = db.query(models.Anmeldung).filter(
+        models.Anmeldung.wettkampf_id == anmeldung.wettkampf_id,
+        models.Anmeldung.vorlaeufig == 0,
+        models.Anmeldung.status == "aktiv"
+    ).count()
+
+    # Determine if registration should be preliminary
+    is_vorlaeufig = 0
+    reasons = []
+
+    if len(anmeldung.figur_ids) == 0:
+        is_vorlaeufig = 1
+        reasons.append("keine Figuren ausgewählt")
+
+    if wettkampf.max_teilnehmer and final_count >= wettkampf.max_teilnehmer:
+        is_vorlaeufig = 1
+        reasons.append("maximale Teilnehmerzahl erreicht")
+
+    # Atomically get next startnummer for this competition
+    # Using database-level MAX to avoid race conditions
+    max_startnummer = db.query(func.max(models.Anmeldung.startnummer)).filter(
+        models.Anmeldung.wettkampf_id == anmeldung.wettkampf_id
+    ).scalar()
+
+    next_startnummer = (max_startnummer or 0) + 1
+
+    # Create anmeldung with startnummer
     db_anmeldung = models.Anmeldung(
         kind_id=anmeldung.kind_id,
         wettkampf_id=anmeldung.wettkampf_id,
-        anmeldedatum=date.today()
+        startnummer=next_startnummer,
+        anmeldedatum=date.today(),
+        vorlaeufig=is_vorlaeufig,
+        status="vorläufig" if is_vorlaeufig else "aktiv"
     )
     db.add(db_anmeldung)
     db.flush()  # Get the ID without committing
 
-    # Add selected figures
+    # Add selected figures (if any)
     for figur_id in anmeldung.figur_ids:
         figur = db.query(models.Figur).filter(models.Figur.id == figur_id).first()
         if figur:
             db_anmeldung.figuren.append(figur)
 
-    db.commit()
-    db.refresh(db_anmeldung)
-    return db_anmeldung
+    try:
+        db.commit()
+        db.refresh(db_anmeldung)
+
+        # Log preliminary registration reasons
+        if is_vorlaeufig:
+            print(f"ℹ️  Vorläufige Anmeldung #{next_startnummer}: {', '.join(reasons)}")
+
+        return db_anmeldung
+    except Exception as e:
+        db.rollback()
+        # If unique constraint fails (race condition), retry would happen here
+        # For now, just raise the error
+        raise HTTPException(status_code=409, detail=f"Startnummer conflict: {str(e)}")
 
 
 @app.put("/api/anmeldung/{anmeldung_id}", response_model=schemas.Anmeldung)
 def update_anmeldung(anmeldung_id: int, anmeldung: schemas.AnmeldungUpdate, db: Session = Depends(get_db)):
-    """Update a registration."""
+    """
+    Update a registration.
+
+    - Automatically updates 'vorläufig' status based on figure selection
+    - If figures are added to a preliminary registration, it may become final
+    """
     db_anmeldung = db.query(models.Anmeldung).filter(models.Anmeldung.id == anmeldung_id).first()
     if not db_anmeldung:
         raise HTTPException(status_code=404, detail="Anmeldung not found")
 
     if anmeldung.status:
         db_anmeldung.status = anmeldung.status
+
+    if anmeldung.vorlaeufig is not None:
+        db_anmeldung.vorlaeufig = anmeldung.vorlaeufig
 
     if anmeldung.figur_ids is not None:
         # Clear existing figures
@@ -376,6 +440,31 @@ def update_anmeldung(anmeldung_id: int, anmeldung: schemas.AnmeldungUpdate, db: 
             figur = db.query(models.Figur).filter(models.Figur.id == figur_id).first()
             if figur:
                 db_anmeldung.figuren.append(figur)
+
+        # Auto-update vorläufig status based on figures
+        if len(anmeldung.figur_ids) > 0 and db_anmeldung.vorlaeufig == 1:
+            # Check if max_teilnehmer is still a blocker
+            wettkampf = db.query(models.Wettkampf).filter(
+                models.Wettkampf.id == db_anmeldung.wettkampf_id
+            ).first()
+
+            final_count = db.query(models.Anmeldung).filter(
+                models.Anmeldung.wettkampf_id == db_anmeldung.wettkampf_id,
+                models.Anmeldung.vorlaeufig == 0,
+                models.Anmeldung.status == "aktiv",
+                models.Anmeldung.id != anmeldung_id  # Exclude current registration
+            ).count()
+
+            # If max not reached and figures are selected, make it final
+            if not wettkampf.max_teilnehmer or final_count < wettkampf.max_teilnehmer:
+                db_anmeldung.vorlaeufig = 0
+                db_anmeldung.status = "aktiv"
+                print(f"✓ Anmeldung #{db_anmeldung.startnummer} ist jetzt final (Figuren hinzugefügt)")
+
+        elif len(anmeldung.figur_ids) == 0:
+            # No figures selected - must be preliminary
+            db_anmeldung.vorlaeufig = 1
+            db_anmeldung.status = "vorläufig"
 
     db.commit()
     db.refresh(db_anmeldung)

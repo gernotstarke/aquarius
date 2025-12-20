@@ -1,7 +1,7 @@
 """
 SQLAlchemy models for Arqua42 CRUD prototype.
 """
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, Table, Text
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, Table, Text, Index
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -101,12 +101,18 @@ class Figur(Base):
 class Anmeldung(Base):
     """Registration model - links Kind to Wettkampf with selected Figuren."""
     __tablename__ = "anmeldung"
+    __table_args__ = (
+        # Ensure startnummer is unique per competition
+        Index('idx_wettkampf_startnummer', 'wettkampf_id', 'startnummer', unique=True),
+    )
 
     id = Column(Integer, primary_key=True, index=True)
     kind_id = Column(Integer, ForeignKey("kind.id"), nullable=False)
     wettkampf_id = Column(Integer, ForeignKey("wettkampf.id"), nullable=False)
+    startnummer = Column(Integer, nullable=False)  # Unique per competition
     anmeldedatum = Column(Date, nullable=False)
-    status = Column(String, default="aktiv")  # aktiv, storniert
+    status = Column(String, default="aktiv")  # aktiv, storniert, vorläufig
+    vorlaeufig = Column(Integer, default=0)  # 0=final, 1=preliminary (no figures yet or competition full)
 
     # Relationships
     kind = relationship("Kind", back_populates="anmeldungen")

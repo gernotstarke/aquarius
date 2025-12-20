@@ -219,7 +219,10 @@ def seed_data():
         anmeldung1 = Anmeldung(
             kind_id=kind1.id,
             wettkampf_id=wettkampf1.id,
-            anmeldedatum=date(2024, 9, 15)
+            startnummer=1,
+            anmeldedatum=date(2024, 9, 15),
+            vorlaeufig=0,
+            status="aktiv"
         )
         # Wähle 3 Figuren für Anna
         anmeldung1.figuren.extend([figuren[0], figuren[8], figuren[17]])  # Ballettbein, Flamingo, Hocke
@@ -229,7 +232,10 @@ def seed_data():
         anmeldung2 = Anmeldung(
             kind_id=kind2.id,
             wettkampf_id=wettkampf2.id,
-            anmeldedatum=date(2024, 10, 1)
+            startnummer=1,
+            anmeldedatum=date(2024, 10, 1),
+            vorlaeufig=0,
+            status="aktiv"
         )
         anmeldung2.figuren.extend([figuren[4], figuren[11], figuren[18]])  # Vertikale, Ritter, Pike
         db.add(anmeldung2)
@@ -238,7 +244,10 @@ def seed_data():
         anmeldung3 = Anmeldung(
             kind_id=kind3.id,
             wettkampf_id=wettkampf3.id,
-            anmeldedatum=date(2025, 2, 10)
+            startnummer=1,
+            anmeldedatum=date(2025, 2, 10),
+            vorlaeufig=0,
+            status="aktiv"
         )
         anmeldung3.figuren.extend([figuren[6], figuren[16], figuren[22]])  # Vertikale im Spagat, Spagat zur Vertikalen, Spagat zur Vertikalen
         db.add(anmeldung3)

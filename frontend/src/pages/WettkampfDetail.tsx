@@ -214,23 +214,36 @@ const WettkampfDetail: React.FC = () => {
                   className="p-6 bg-neutral-50 rounded-lg"
                 >
                   <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <p className="font-medium text-body-lg">
-                        Anmeldung #{anmeldung.id}
-                      </p>
-                      <p className="text-sm text-neutral-600">
-                        Kind-ID: {anmeldung.kind_id} • {anmeldung.anmeldedatum}
-                      </p>
+                    <div className="flex items-center gap-3">
+                      <span className="px-3 py-1 bg-primary-600 text-white rounded-full text-sm font-semibold">
+                        #{anmeldung.startnummer}
+                      </span>
+                      <div>
+                        <p className="font-medium text-body-lg">
+                          Kind-ID: {anmeldung.kind_id}
+                        </p>
+                        <p className="text-sm text-neutral-600">
+                          {anmeldung.anmeldedatum}
+                        </p>
+                      </div>
                     </div>
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm ${
-                        anmeldung.status === 'aktiv'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-neutral-200 text-neutral-700'
-                      }`}
-                    >
-                      {anmeldung.status}
-                    </span>
+                    <div className="flex gap-2">
+                      {anmeldung.vorlaeufig === 1 && (
+                        <span className="px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-700">
+                          vorläufig
+                        </span>
+                      )}
+                      {anmeldung.vorlaeufig === 0 && anmeldung.status === 'aktiv' && (
+                        <span className="px-3 py-1 rounded-full text-sm bg-green-100 text-green-700">
+                          aktiv
+                        </span>
+                      )}
+                      {anmeldung.status === 'storniert' && (
+                        <span className="px-3 py-1 rounded-full text-sm bg-red-100 text-red-700">
+                          storniert
+                        </span>
+                      )}
+                    </div>
                   </div>
                   {anmeldung.figuren.length > 0 && (
                     <div>

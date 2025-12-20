@@ -83,8 +83,10 @@ export interface Anmeldung {
   id: number;
   kind_id: number;
   wettkampf_id: number;
+  startnummer: number;
   anmeldedatum: string;
   status: string;
+  vorlaeufig: number;
   figuren: Figur[];
 }
 
