@@ -4,7 +4,7 @@ Populates the database with sample data for testing.
 """
 from datetime import date, timedelta
 from app.database import SessionLocal, engine, Base
-from app.models import Saison, Schwimmbad, Wettkampf, Kind
+from app.models import Saison, Schwimmbad, Wettkampf, Kind, Figur, Anmeldung
 
 def reset_database():
     """Drop all tables and recreate them."""
@@ -150,12 +150,110 @@ def seed_data():
         print(f"   ✓ Created: {kind5.vorname} {kind5.nachname}")
         print(f"   ✓ Created: {kind6.vorname} {kind6.nachname}")
 
+        # Create Figuren (Kunstschwimm-Figuren)
+        print("\n🎯 Creating figuren...")
+        figuren_data = [
+            ("Ballettbein", "Ballettbein", "Ein Bein senkrecht gestreckt aus dem Wasser, Körper stabil", 12, 8),
+            ("Ballettbein beidbeinig", "Ballettbein", "Beide Beine senkrecht gestreckt", 15, 10),
+            ("Ballettbein angewinkelt", "Ballettbein", "Ein Bein gestreckt, ein Bein angewinkelt", 13, 9),
+            ("Ballettbein gestreckt", "Ballettbein", "Fokus auf maximale Streckung und Höhe", 14, 10),
+            ("Vertikale", "Vertikale", "Beide Beine senkrecht gestreckt, Kopf nach unten", 16, 9),
+            ("Vertikale angewinkelt", "Vertikale", "Vertikale mit angewinkeltem Bein", 17, 10),
+            ("Vertikale im Spagat", "Vertikale", "Vertikale mit gespreizten Beinen", 19, 11),
+            ("Vertikale beidbeinig", "Vertikale", "Klassische doppelte Beinführung", 16, 9),
+            ("Flamingo", "Flamingo", "Ein Bein angewinkelt, ein Bein gestreckt", 11, 8),
+            ("Flamingo angewinkelt", "Flamingo", "Variante mit stärkerer Beugung", 12, 8),
+            ("Flamingo zur Vertikalen", "Flamingo", "Übergang von Flamingo in Vertikale", 16, 10),
+            ("Ritter", "Ritter", "Ein Bein senkrecht, ein Bein horizontal", 13, 9),
+            ("Ritter angewinkelt", "Ritter", "Variante mit angewinkeltem Bein", 14, 9),
+            ("Ritter zur Vertikalen", "Ritter", "Übergang von Ritter in Vertikale", 17, 10),
+            ("Spagat", "Spagat", "Beine im 180°-Winkel gespreizt", 14, 9),
+            ("Spagat angewinkelt", "Spagat", "Spagat mit angewinkeltem Bein", 15, 10),
+            ("Spagat zur Vertikalen", "Spagat", "Übergang vom Spagat in Vertikale", 18, 11),
+            ("Hocke", "Grundposition", "Knie zur Brust gezogen, kompakte Position", 10, 8),
+            ("Pike", "Grundposition", "Gestreckte Beine, Oberkörper nach unten", 12, 9),
+            ("Strecklage", "Grundposition", "Körper vollständig gestreckt an der Wasseroberfläche", 11, 8),
+            ("Umgekehrte Pike", "Grundposition", "Pike-Position mit Kopf nach unten", 15, 10),
+            ("Ballettbein zur Vertikalen", "Kombination", "Übergang vom Ballettbein in Vertikale", 17, 10),
+            ("Spagat zur Vertikalen", "Kombination", "Übergang vom Spagat in Vertikale", 18, 11),
+            ("Ritter zur Vertikalen", "Kombination", "Übergang vom Ritter in Vertikale", 17, 10),
+            ("Flamingo zur Vertikalen", "Kombination", "Übergang vom Flamingo in Vertikale", 16, 10),
+            ("Umgekehrte Pike zur Vertikalen", "Kombination", "Übergang von umgekehrter Pike in Vertikale", 19, 11),
+        ]
+
+        figuren = []
+        for name, kategorie, beschreibung, schwierigkeitsgrad, min_alter in figuren_data:
+            figur = Figur(
+                name=name,
+                kategorie=kategorie,
+                beschreibung=beschreibung,
+                schwierigkeitsgrad=schwierigkeitsgrad,
+                min_alter=min_alter,
+                bild=None  # Wird später nachgepflegt
+            )
+            figuren.append(figur)
+            db.add(figur)
+
+        db.commit()
+        print(f"   ✓ Created {len(figuren)} Figuren")
+
+        # Assign some figures to competitions
+        print("\n🔗 Assigning figuren to wettkämpfe...")
+        # Herbstcup: Einfache Figuren für Anfänger
+        wettkampf1.figuren.extend([f for f in figuren if f.schwierigkeitsgrad <= 13])
+        # Winterpokal: Mittelschwere Figuren
+        wettkampf2.figuren.extend([f for f in figuren if 12 <= f.schwierigkeitsgrad <= 16])
+        # Frühjahrsmeeting: Fortgeschrittene
+        wettkampf3.figuren.extend([f for f in figuren if f.schwierigkeitsgrad >= 14])
+        # Sommerfest: Alle Figuren
+        wettkampf4.figuren.extend(figuren)
+        db.commit()
+        print(f"   ✓ Herbstcup: {len(wettkampf1.figuren)} Figuren")
+        print(f"   ✓ Winterpokal: {len(wettkampf2.figuren)} Figuren")
+        print(f"   ✓ Frühjahrsmeeting: {len(wettkampf3.figuren)} Figuren")
+        print(f"   ✓ Sommerfest: {len(wettkampf4.figuren)} Figuren")
+
+        # Create some sample registrations
+        print("\n📝 Creating anmeldungen...")
+        # Anna meldet sich für Herbstcup an
+        anmeldung1 = Anmeldung(
+            kind_id=kind1.id,
+            wettkampf_id=wettkampf1.id,
+            anmeldedatum=date(2024, 9, 15)
+        )
+        # Wähle 3 Figuren für Anna
+        anmeldung1.figuren.extend([figuren[0], figuren[8], figuren[17]])  # Ballettbein, Flamingo, Hocke
+        db.add(anmeldung1)
+
+        # Max für Winterpokal
+        anmeldung2 = Anmeldung(
+            kind_id=kind2.id,
+            wettkampf_id=wettkampf2.id,
+            anmeldedatum=date(2024, 10, 1)
+        )
+        anmeldung2.figuren.extend([figuren[4], figuren[11], figuren[18]])  # Vertikale, Ritter, Pike
+        db.add(anmeldung2)
+
+        # Sophie für Frühjahrsmeeting
+        anmeldung3 = Anmeldung(
+            kind_id=kind3.id,
+            wettkampf_id=wettkampf3.id,
+            anmeldedatum=date(2025, 2, 10)
+        )
+        anmeldung3.figuren.extend([figuren[6], figuren[16], figuren[22]])  # Vertikale im Spagat, Spagat zur Vertikalen, Spagat zur Vertikalen
+        db.add(anmeldung3)
+
+        db.commit()
+        print(f"   ✓ Created 3 Anmeldungen")
+
         print("\n✨ Database seeding complete!")
         print(f"\n📊 Summary:")
         print(f"   • {db.query(Saison).count()} Saisons")
         print(f"   • {db.query(Schwimmbad).count()} Schwimmbäder")
         print(f"   • {db.query(Wettkampf).count()} Wettkämpfe")
         print(f"   • {db.query(Kind).count()} Kinder")
+        print(f"   • {db.query(Figur).count()} Figuren")
+        print(f"   • {db.query(Anmeldung).count()} Anmeldungen")
 
     except Exception as e:
         print(f"\n❌ Error seeding database: {e}")

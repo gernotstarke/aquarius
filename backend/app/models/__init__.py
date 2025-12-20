@@ -89,9 +89,10 @@ class Figur(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False, index=True, unique=True)
     beschreibung = Column(Text)
-    schwierigkeitsgrad = Column(Integer)  # 1-5
-    kategorie = Column(String)  # z.B. "Anfänger", "Fortgeschritten", "Expert"
+    schwierigkeitsgrad = Column(Integer)  # 1-5 (stored as int, e.g. 12 for 1.2)
+    kategorie = Column(String)  # z.B. "Ballettbein", "Vertikale", "Flamingo"
     min_alter = Column(Integer)  # Mindestalter für diese Figur
+    bild = Column(String)  # Pfad zum Bild (optional)
 
     # Relationships
     wettkämpfe = relationship("Wettkampf", secondary=wettkampf_figuren, back_populates="figuren")

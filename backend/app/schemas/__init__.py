@@ -101,9 +101,10 @@ class Kind(KindBase):
 class FigurBase(BaseModel):
     name: str
     beschreibung: str | None = None
-    schwierigkeitsgrad: int | None = None
+    schwierigkeitsgrad: int | None = None  # stored as int (e.g. 12 for difficulty 1.2)
     kategorie: str | None = None
     min_alter: int | None = None
+    bild: str | None = None  # Image path/URL
 
 
 class FigurCreate(FigurBase):
