@@ -38,7 +38,7 @@
       "beschreibung": "Fokus auf maximale Streckung und Höhe",
       "schwierigkeitsgrad": 14,
       "altersklasse": "U10–U12",
-      "bild": "figuren/images/ballettbein-gestreckt.png"
+      "bild": "images/ballettbein-gestreckt.png"
     },
     {
       "id": "F05",
@@ -65,7 +65,7 @@
       "beschreibung": "Vertikale mit gespreizten Beinen",
       "schwierigkeitsgrad": 19,
       "altersklasse": "U11–U13",
-      "bild": "figuren/images/vertikale-spagat.png"
+      "bild": "images/vertikale-spagat.png"
     },
     {
       "id": "F08",
@@ -74,7 +74,7 @@
       "beschreibung": "Klassische doppelte Beinführung",
       "schwierigkeitsgrad": 16,
       "altersklasse": "U9–U12",
-      "bild": "figuren/images/vertikale-beidbeinig.png"
+      "bild": "images/vertikale-beidbeinig.png"
     },
     {
       "id": "F09",
@@ -83,7 +83,7 @@
       "beschreibung": "Ein Bein angewinkelt, ein Bein gestreckt",
       "schwierigkeitsgrad": 11,
       "altersklasse": "U8–U10",
-      "bild": "figuren/images/flamingo.png"
+      "bild": "images/flamingo.png"
     },
     {
       "id": "F10",
@@ -92,7 +92,7 @@
       "beschreibung": "Variante mit stärkerer Beugung",
       "schwierigkeitsgrad": 12,
       "altersklasse": "U8–U10",
-      "bild": "figuren/images/flamingo-angewinkelt.png"
+      "bild": "images/flamingo-angewinkelt.png"
     },
     {
       "id": "F11",
@@ -110,7 +110,7 @@
       "beschreibung": "Ein Bein senkrecht, ein Bein horizontal",
       "schwierigkeitsgrad": 13,
       "altersklasse": "U9–U11",
-      "bild": "figuren/images/ritter.png"
+      "bild": "images/ritter.png"
     },
     {
       "id": "F13",
@@ -119,7 +119,7 @@
       "beschreibung": "Variante mit angewinkeltem Bein",
       "schwierigkeitsgrad": 14,
       "altersklasse": "U9–U11",
-      "bild": "figuren/images/ritter-angewinkelt.png"
+      "bild": "images/ritter-angewinkelt.png"
     },
     {
       "id": "F14",
@@ -128,7 +128,7 @@
       "beschreibung": "Übergang von Ritter in Vertikale",
       "schwierigkeitsgrad": 17,
       "altersklasse": "U10–U12",
-      "bild": "figuren/images/ritter-vertikale.png"
+      "bild": "images/ritter-vertikale.png"
     },
     {
       "id": "F15",
@@ -137,7 +137,7 @@
       "beschreibung": "Beine im 180°-Winkel gespreizt",
       "schwierigkeitsgrad": 14,
       "altersklasse": "U9–U11",
-      "bild": "figuren/images/spagat.png"
+      "bild": "images/spagat.png"
     },
     {
       "id": "F16",
@@ -146,7 +146,7 @@
       "beschreibung": "Spagat mit angewinkeltem Bein",
       "schwierigkeitsgrad": 15,
       "altersklasse": "U10–U12",
-      "bild": "figuren/images/spagat-angewinkelt.png"
+      "bild": "images/spagat-angewinkelt.png"
     },
     {
       "id": "F17",
@@ -155,7 +155,7 @@
       "beschreibung": "Übergang vom Spagat in Vertikale",
       "schwierigkeitsgrad": 18,
       "altersklasse": "U11–U13",
-      "bild": "figuren/images/spagat-vertikale.png"
+      "bild": "images/spagat-vertikale.png"
     },
     {
       "id": "F18",
@@ -164,7 +164,7 @@
       "beschreibung": "Knie zur Brust gezogen, kompakte Position",
       "schwierigkeitsgrad": 10,
       "altersklasse": "U8–U10",
-      "bild": "figuren/images/hocke.png"
+      "bild": "images/hocke.png"
     },
     {
       "id": "F19",
@@ -173,7 +173,7 @@
       "beschreibung": "Gestreckte Beine, Oberkörper nach unten",
       "schwierigkeitsgrad": 12,
       "altersklasse": "U9–U11",
-      "bild": "figuren/images/pike.png"
+      "bild": "images/pike.png"
     },
     {
       "id": "F20",
@@ -182,7 +182,7 @@
       "beschreibung": "Körper vollständig gestreckt an der Wasseroberfläche",
       "schwierigkeitsgrad": 11,
       "altersklasse": "U8–U10",
-      "bild": "figuren/images/strecklage.png"
+      "bild": "images/strecklage.png"
     },
     {
       "id": "F21",
@@ -191,7 +191,7 @@
       "beschreibung": "Pike-Position mit Kopf nach unten",
       "schwierigkeitsgrad": 15,
       "altersklasse": "U10–U12",
-      "bild": "figuren/images/pike-umgekehrt.png"
+      "bild": "images/pike-umgekehrt.png"
     },
     {
       "id": "F22",
@@ -200,7 +200,7 @@
       "beschreibung": "Übergang vom Ballettbein in Vertikale",
       "schwierigkeitsgrad": 17,
       "altersklasse": "U10–U12",
-      "bild": "figuren/images/ballettbein-vertikale.png"
+      "bild": "images/ballettbein-vertikale.png"
     },
     {
       "id": "F23",
@@ -209,7 +209,7 @@
       "beschreibung": "Übergang vom Spagat in Vertikale",
       "schwierigkeitsgrad": 18,
       "altersklasse": "U11–U13",
-      "bild": "figuren/images/spagat-vertikale-kombi.png"
+      "bild": "images/spagat-vertikale-kombi.png"
     },
     {
       "id": "F24",
@@ -218,7 +218,7 @@
       "beschreibung": "Übergang vom Ritter in Vertikale",
       "schwierigkeitsgrad": 17,
       "altersklasse": "U10–U12",
-      "bild": "figuren/images/ritter-vertikale-kombi.png"
+      "bild": "images/ritter-vertikale-kombi.png"
     },
     {
       "id": "F25",
@@ -227,7 +227,7 @@
       "beschreibung": "Übergang vom Flamingo in Vertikale",
       "schwierigkeitsgrad": 16,
       "altersklasse": "U10–U12",
-      "bild": "figuren/images/flamingo-vertikale-kombi.png"
+      "bild": "images/flamingo-vertikale-kombi.png"
     },
     {
       "id": "F26",
@@ -236,7 +236,7 @@
       "beschreibung": "Übergang von umgekehrter Pike in Vertikale",
       "schwierigkeitsgrad": 19,
       "altersklasse": "U11–U13",
-      "bild": "figuren/images/pike-umgekehrt-vertikale.png"
+      "bild": "images/pike-umgekehrt-vertikale.png"
     }
   ]
 }
