@@ -53,11 +53,15 @@ const FigurenList: React.FC = () => {
               <Card key={figur.id}>
                 <div className="flex items-center justify-between">
                   <div className="space-y-2 flex-1">
-                    <h4 className="text-h3 font-semibold text-neutral-900">{figur.name}</h4>
+                    <Link to={`/stammdaten/figuren/${figur.id}/detail`}>
+                      <h4 className="text-h3 font-semibold text-neutral-900 hover:text-primary-600 cursor-pointer">
+                        {figur.name}
+                      </h4>
+                    </Link>
                     <p className="text-body text-neutral-600">{figur.beschreibung}</p>
                     <div className="flex gap-4 text-sm text-neutral-500">
                       <span>Schwierigkeit: {(figur.schwierigkeitsgrad || 0) / 10}</span>
-                      {figur.min_alter && <span>Ab {figur.min_alter} Jahre</span>}
+                      {figur.altersklasse && <span>{figur.altersklasse}</span>}
                     </div>
                   </div>
                   <div className="flex gap-4">

@@ -14,6 +14,7 @@ import KindList from './pages/KindList';
 import KindForm from './pages/KindForm';
 import FigurenList from './pages/FigurenList';
 import FigurenForm from './pages/FigurenForm';
+import FigurDetail from './pages/FigurDetail';
 import AnmeldungList from './pages/AnmeldungList';
 import AnmeldungForm from './pages/AnmeldungForm';
 
@@ -46,6 +47,7 @@ const App: React.FC = () => {
 
             <Route path="/stammdaten/figuren" element={<FigurenList />} />
             <Route path="/stammdaten/figuren/new" element={<FigurenForm />} />
+            <Route path="/stammdaten/figuren/:id/detail" element={<FigurDetail />} />
             <Route path="/stammdaten/figuren/:id" element={<FigurenForm />} />
 
             {/* Kinder */}
