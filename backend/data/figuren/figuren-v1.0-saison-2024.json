@@ -37,8 +37,7 @@
       "kategorie": "Ballettbein",
       "beschreibung": "Fokus auf maximale Streckung und Höhe",
       "schwierigkeitsgrad": 14,
-      "altersklasse": "U10–U12",
-      "bild": "images/ballettbein-gestreckt.png"
+      "altersklasse": "U10–U12"
     },
     {
       "id": "F05",
@@ -64,8 +63,7 @@
       "kategorie": "Vertikale",
       "beschreibung": "Vertikale mit gespreizten Beinen",
       "schwierigkeitsgrad": 19,
-      "altersklasse": "U11–U13",
-      "bild": "images/vertikale-spagat.png"
+      "altersklasse": "U11–U13"
     },
     {
       "id": "F08",
@@ -73,8 +71,7 @@
       "kategorie": "Vertikale",
       "beschreibung": "Klassische doppelte Beinführung",
       "schwierigkeitsgrad": 16,
-      "altersklasse": "U9–U12",
-      "bild": "images/vertikale-beidbeinig.png"
+      "altersklasse": "U9–U12"
     },
     {
       "id": "F09",
@@ -82,8 +79,7 @@
       "kategorie": "Flamingo",
       "beschreibung": "Ein Bein angewinkelt, ein Bein gestreckt",
       "schwierigkeitsgrad": 11,
-      "altersklasse": "U8–U10",
-      "bild": "images/flamingo.png"
+      "altersklasse": "U8–U10"
     },
     {
       "id": "F10",
@@ -91,8 +87,7 @@
       "kategorie": "Flamingo",
       "beschreibung": "Variante mit stärkerer Beugung",
       "schwierigkeitsgrad": 12,
-      "altersklasse": "U8–U10",
-      "bild": "images/flamingo-angewinkelt.png"
+      "altersklasse": "U8–U10"
     },
     {
       "id": "F11",
@@ -100,8 +95,7 @@
       "kategorie": "Flamingo",
       "beschreibung": "Übergang von Flamingo in Vertikale",
       "schwierigkeitsgrad": 16,
-      "altersklasse": "U10–U12",
-      "bild": "images/flamingo-vertikale.png"
+      "altersklasse": "U10–U12"
     },
     {
       "id": "F12",
@@ -109,8 +103,7 @@
       "kategorie": "Ritter",
       "beschreibung": "Ein Bein senkrecht, ein Bein horizontal",
       "schwierigkeitsgrad": 13,
-      "altersklasse": "U9–U11",
-      "bild": "images/ritter.png"
+      "altersklasse": "U9–U11"
     },
     {
       "id": "F13",
@@ -118,8 +111,7 @@
       "kategorie": "Ritter",
       "beschreibung": "Variante mit angewinkeltem Bein",
       "schwierigkeitsgrad": 14,
-      "altersklasse": "U9–U11",
-      "bild": "images/ritter-angewinkelt.png"
+      "altersklasse": "U9–U11"
     },
     {
       "id": "F14",
@@ -127,8 +119,7 @@
       "kategorie": "Ritter",
       "beschreibung": "Übergang von Ritter in Vertikale",
       "schwierigkeitsgrad": 17,
-      "altersklasse": "U10–U12",
-      "bild": "images/ritter-vertikale.png"
+      "altersklasse": "U10–U12"
     },
     {
       "id": "F15",
@@ -136,8 +127,7 @@
       "kategorie": "Spagat",
       "beschreibung": "Beine im 180°-Winkel gespreizt",
       "schwierigkeitsgrad": 14,
-      "altersklasse": "U9–U11",
-      "bild": "images/spagat.png"
+      "altersklasse": "U9–U11"
     },
     {
       "id": "F16",
@@ -145,8 +135,7 @@
       "kategorie": "Spagat",
       "beschreibung": "Spagat mit angewinkeltem Bein",
       "schwierigkeitsgrad": 15,
-      "altersklasse": "U10–U12",
-      "bild": "images/spagat-angewinkelt.png"
+      "altersklasse": "U10–U12"
     },
     {
       "id": "F17",
@@ -154,8 +143,7 @@
       "kategorie": "Spagat",
       "beschreibung": "Übergang vom Spagat in Vertikale",
       "schwierigkeitsgrad": 18,
-      "altersklasse": "U11–U13",
-      "bild": "images/spagat-vertikale.png"
+      "altersklasse": "U11–U13"
     },
     {
       "id": "F18",
@@ -163,8 +151,7 @@
       "kategorie": "Grundposition",
       "beschreibung": "Knie zur Brust gezogen, kompakte Position",
       "schwierigkeitsgrad": 10,
-      "altersklasse": "U8–U10",
-      "bild": "images/hocke.png"
+      "altersklasse": "U8–U10"
     },
     {
       "id": "F19",
@@ -172,8 +159,7 @@
       "kategorie": "Grundposition",
       "beschreibung": "Gestreckte Beine, Oberkörper nach unten",
       "schwierigkeitsgrad": 12,
-      "altersklasse": "U9–U11",
-      "bild": "images/pike.png"
+      "altersklasse": "U9–U11"
     },
     {
       "id": "F20",
@@ -181,8 +167,7 @@
       "kategorie": "Grundposition",
       "beschreibung": "Körper vollständig gestreckt an der Wasseroberfläche",
       "schwierigkeitsgrad": 11,
-      "altersklasse": "U8–U10",
-      "bild": "images/strecklage.png"
+      "altersklasse": "U8–U10"
     },
     {
       "id": "F21",
@@ -190,8 +175,7 @@
       "kategorie": "Grundposition",
       "beschreibung": "Pike-Position mit Kopf nach unten",
       "schwierigkeitsgrad": 15,
-      "altersklasse": "U10–U12",
-      "bild": "images/pike-umgekehrt.png"
+      "altersklasse": "U10–U12"
     },
     {
       "id": "F22",
@@ -199,8 +183,7 @@
       "kategorie": "Kombination",
       "beschreibung": "Übergang vom Ballettbein in Vertikale",
       "schwierigkeitsgrad": 17,
-      "altersklasse": "U10–U12",
-      "bild": "images/ballettbein-vertikale.png"
+      "altersklasse": "U10–U12"
     },
     {
       "id": "F23",
@@ -208,8 +191,7 @@
       "kategorie": "Kombination",
       "beschreibung": "Übergang vom Spagat in Vertikale",
       "schwierigkeitsgrad": 18,
-      "altersklasse": "U11–U13",
-      "bild": "images/spagat-vertikale-kombi.png"
+      "altersklasse": "U11–U13"
     },
     {
       "id": "F24",
@@ -217,8 +199,7 @@
       "kategorie": "Kombination",
       "beschreibung": "Übergang vom Ritter in Vertikale",
       "schwierigkeitsgrad": 17,
-      "altersklasse": "U10–U12",
-      "bild": "images/ritter-vertikale-kombi.png"
+      "altersklasse": "U10–U12"
     },
     {
       "id": "F25",
@@ -226,8 +207,7 @@
       "kategorie": "Kombination",
       "beschreibung": "Übergang vom Flamingo in Vertikale",
       "schwierigkeitsgrad": 16,
-      "altersklasse": "U10–U12",
-      "bild": "images/flamingo-vertikale-kombi.png"
+      "altersklasse": "U10–U12"
     },
     {
       "id": "F26",
@@ -235,8 +215,7 @@
       "kategorie": "Kombination",
       "beschreibung": "Übergang von umgekehrter Pike in Vertikale",
       "schwierigkeitsgrad": 19,
-      "altersklasse": "U11–U13",
-      "bild": "images/pike-umgekehrt-vertikale.png"
+      "altersklasse": "U11–U13"
     }
   ]
 }
