@@ -11,7 +11,7 @@
       "beschreibung": "Ein Bein senkrecht gestreckt aus dem Wasser, Körper stabil",
       "schwierigkeitsgrad": 12,
       "altersklasse": "U8–U10",
-      "bild": "images/f01-ballettbein.png"
+      "bild": "images/f01-balletbein.png"
     },
     {
       "id": "F02",
@@ -20,7 +20,7 @@
       "beschreibung": "Beide Beine senkrecht gestreckt",
       "schwierigkeitsgrad": 15,
       "altersklasse": "U10–U12",
-      "bild": "images/f02-ballettbein-beidbeinig.png"
+      "bild": "images/f02-balletbein-beidbeinig.png"
     },
     {
       "id": "F03",
