@@ -9,9 +9,9 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
-      - sqlite-data:/app/data
+      - sqlite-data:/app/database
     environment:
-      - DATABASE_URL=sqlite:///./data/arqua42.db
+      - DATABASE_URL=sqlite:///./database/arqua42.db
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     networks:
       - arqua42-network
