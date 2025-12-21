@@ -62,6 +62,7 @@ Run `make help` to see all available targets. Key targets include:
 - `make dev-down` - Stop development environment
 - `make db-reset` - Reset database (drop all tables and recreate)
 - `make db-seed` - Seed database with sample data from JSON catalog
+- `make db-import-figures FILE=<path>` - Import figures from JSON catalog (updates existing, adds new)
 - `make test` - Run tests (not yet implemented)
 - `make lint` - Run linters (not yet implemented)
 
@@ -213,26 +214,45 @@ make db-seed
 
 # Or reset and seed from scratch
 make db-reset
+
+# Import/update figures from a specific JSON catalog
+make db-import-figures FILE=data/figuren-kataloge/figuren-v1.0-saison-2024.json
 ```
 
-The seeding process:
-- Loads figures from `backend/data/figuren-kataloge/figuren-v1.0-saison-2024.json`
+**Seeding vs. Importing:**
+
+- `make db-seed` - **Full seeding**: Drops all tables, recreates them, and populates with sample data (seasons, pools, competitions, children, registrations, figures)
+- `make db-import-figures` - **Figures only**: Updates existing figures or adds new ones from a JSON catalog without affecting other data
+
+**Importing Figures:**
+
+```bash
+# Import the default catalog
+make db-import-figures FILE=data/figuren-kataloge/figuren-v1.0-saison-2024.json
+
+# Import a different version
+make db-import-figures FILE=data/figuren-kataloge/figuren-v2.0-saison-2025.json
+```
+
+The import process:
+- Loads figures from the specified JSON catalog
+- Updates existing figures (matched by name)
+- Creates new figures that don't exist yet
 - Checks for figure images in `backend/static/figuren/`
-- Creates sample data (seasons, pools, competitions, children, registrations)
-- Assigns start numbers and preliminary registration status
+- Reports statistics (created, updated, images found/missing)
 
 **Adding Figure Images:**
 
 1. Place your PNG/JPG images in `backend/static/figuren/`
-2. Run `make db-seed` to update the database
+2. Run `make db-import-figures FILE=<path-to-catalog>` to update the database
 3. See `BILDER_UND_KATALOG.md` for detailed instructions
 
 **Editing the Figure Catalog:**
 
 The JSON catalog can be manually edited:
 - File: `backend/data/figuren-kataloge/figuren-v1.0-saison-2024.json`
-- Contains all 26 swimming figures with difficulty, age requirements, and image paths
-- After editing, run `make db-seed` to apply changes
+- Contains all 26 swimming figures with IDs, difficulty, age groups, and image paths
+- After editing, run `make db-import-figures FILE=<path>` to apply changes
 - See `backend/data/figuren-kataloge/README.md` for schema documentation
 
 ## Architecture

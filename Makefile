@@ -1,4 +1,4 @@
-.PHONY: help docs docs-diagrams docs-adrs docs-html docs-pdf docs-watch docs-serve docs-build-image clean test dev dev-down db-reset db-seed
+.PHONY: help docs docs-diagrams docs-adrs docs-html docs-pdf docs-watch docs-serve docs-build-image clean test dev dev-down db-reset db-seed db-import-figures
 
 # Docker configuration
 DOCKER_IMAGE := arqua42-docs:latest
@@ -203,6 +203,21 @@ db-seed: ## Seed database with sample data
 	@echo "📋 Seeding database..."
 	@docker compose exec backend python seed_db.py
 	@echo "✓ Database seeded with sample data"
+
+db-import-figures: ## Import figures from JSON catalog (usage: make db-import-figures FILE=path/to/catalog.json)
+	@if [ -z "$(FILE)" ]; then \
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; \
+		echo "❌ Error: FILE parameter is required"; \
+		echo ""; \
+		echo "Usage:"; \
+		echo "  make db-import-figures FILE=data/figuren-kataloge/figuren-v1.0-saison-2024.json"; \
+		echo ""; \
+		echo "Available catalogs:"; \
+		docker compose exec backend find data/figuren-kataloge -name "*.json" -type f 2>/dev/null || true; \
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; \
+		exit 1; \
+	fi
+	@docker compose exec backend python import_figures.py "$(FILE)"
 
 lint: ## Run linters
 	@echo "Running linters..."
