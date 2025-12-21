@@ -21,12 +21,13 @@ Beispiel: `figuren-v1.0-saison-2024.json`
   "beschreibung": "...",      // Beschreibung des Katalogs
   "figuren": [
     {
+      "id": "F01",                              // Figuren-ID (z.B. F01-F26)
       "name": "Ballettbein",                    // Figurenname
-      "kategorie": "Ballettbein",                // Kategorie
-      "beschreibung": "...",                     // Beschreibung der Figur
-      "schwierigkeitsgrad": 12,                  // 10-20 (wird als 1.0-2.0 angezeigt)
-      "min_alter": 8,                            // Mindestalter in Jahren
-      "bild": "figuren/ballettbein.png"         // Relativer Pfad zum Bild
+      "kategorie": "Ballettbein",               // Kategorie
+      "beschreibung": "...",                    // Beschreibung der Figur
+      "schwierigkeitsgrad": 12,                 // 10-20 (wird als 1.0-2.0 angezeigt)
+      "altersklasse": "U8–U10",                 // Altersklasse (z.B. U8–U10)
+      "bild": "images/ballettbein.png"         // Bildpfad relativ zur JSON-Datei
     }
   ]
 }
@@ -34,11 +35,14 @@ Beispiel: `figuren-v1.0-saison-2024.json`
 
 ## Bildpfade
 
-Die Bildpfade in `bild` sind relativ zu `backend/static/`.
+Die Bildpfade in `bild` sind **relativ zur JSON-Datei**.
 
 Beispiel:
-- JSON: `"bild": "figuren/ballettbein.png"`
-- Tatsächlicher Pfad: `backend/static/figuren/ballettbein.png`
+- JSON liegt in: `backend/data/figuren/figuren-v1.0-saison-2024.json`
+- JSON enthält: `"bild": "images/ballettbein.png"`
+- Bild liegt in: `backend/data/figuren/images/ballettbein.png`
+
+Beim Import werden die Bilder automatisch nach `backend/static/figuren/images/` kopiert.
 
 ## Neue Version erstellen
 
@@ -54,5 +58,7 @@ Die Datei wird von `seed_db.py` beim Database-Seeding verwendet.
 
 Um eine bestimmte Version zu verwenden, passen Sie in `seed_db.py` den Pfad an:
 ```python
-FIGUREN_KATALOG = "data/figuren-kataloge/figuren-v1.0-saison-2024.json"
+FIGUREN_KATALOG = "data/figuren/figuren-v1.0-saison-2024.json"
 ```
+
+Die Bilder müssen im Unterverzeichnis `images/` neben der JSON-Datei liegen.

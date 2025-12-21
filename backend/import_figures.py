@@ -4,6 +4,7 @@ Usage: python import_figures.py <path-to-json-file>
 """
 import sys
 import json
+import shutil
 from pathlib import Path
 from app.database import SessionLocal, engine
 from app.models import Figur
@@ -51,14 +52,30 @@ def import_figures_from_json(json_path: str):
             figur_id = figur_data.get('id')
             figur_name = figur_data['name']
 
-            # Check if image file exists
+            # Handle image: find relative to JSON file, copy to static/figuren/
             bild_pfad = figur_data.get('bild')
             if bild_pfad:
-                vollstaendiger_pfad = Path(__file__).parent / 'static' / bild_pfad
-                if not vollstaendiger_pfad.exists():
-                    bild_pfad = None
-                else:
+                # Source: relative to JSON file (e.g., data/figuren/images/ballettbein.png)
+                source_bild = catalog_path.parent / bild_pfad
+
+                if source_bild.exists():
+                    # Destination: static/figuren/<bild_pfad> (e.g., static/figuren/images/ballettbein.png)
+                    dest_bild = Path(__file__).parent / 'static' / 'figuren' / bild_pfad
+
+                    # Create destination directory if needed
+                    dest_bild.parent.mkdir(parents=True, exist_ok=True)
+
+                    # Copy image file
+                    shutil.copy2(source_bild, dest_bild)
+
+                    # Store relative path in DB: figuren/<bild_pfad>
+                    bild_pfad = f"figuren/{bild_pfad}"
                     bilder_gefunden += 1
+                else:
+                    print(f"   ⚠️  Image not found: {source_bild}")
+                    bild_pfad = None
+            else:
+                bild_pfad = None
 
             # Check if figure already exists (by name)
             existing_figur = db.query(Figur).filter(Figur.name == figur_name).first()

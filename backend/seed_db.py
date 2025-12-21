@@ -4,13 +4,14 @@ Populates the database with sample data for testing.
 """
 import json
 import os
+import shutil
 from datetime import date, timedelta
 from pathlib import Path
 from app.database import SessionLocal, engine, Base
 from app.models import Saison, Schwimmbad, Wettkampf, Kind, Figur, Anmeldung
 
 # Pfad zum Figurenkatalog
-FIGUREN_KATALOG = "data/figuren-kataloge/figuren-v1.0-saison-2024.json"
+FIGUREN_KATALOG = "data/figuren/figuren-v1.0-saison-2024.json"
 
 def reset_database():
     """Drop all tables and recreate them."""
@@ -174,15 +175,30 @@ def seed_data():
         figuren = []
         bilder_gefunden = 0
         for figur_data in figuren_data:
-            # Check if image file exists
+            # Handle image: find relative to JSON file, copy to static/figuren/
             bild_pfad = figur_data.get('bild')
             if bild_pfad:
-                vollstaendiger_pfad = Path(__file__).parent / 'static' / bild_pfad
-                if not vollstaendiger_pfad.exists():
-                    print(f"   ⚠️  Bild nicht gefunden: {bild_pfad}")
-                    bild_pfad = None  # Set to None if file doesn't exist
-                else:
+                # Source: relative to JSON file (e.g., data/figuren/images/ballettbein.png)
+                source_bild = katalog_path.parent / bild_pfad
+
+                if source_bild.exists():
+                    # Destination: static/figuren/<bild_pfad> (e.g., static/figuren/images/ballettbein.png)
+                    dest_bild = Path(__file__).parent / 'static' / 'figuren' / bild_pfad
+
+                    # Create destination directory if needed
+                    dest_bild.parent.mkdir(parents=True, exist_ok=True)
+
+                    # Copy image file
+                    shutil.copy2(source_bild, dest_bild)
+
+                    # Store relative path in DB: figuren/<bild_pfad>
+                    bild_pfad = f"figuren/{bild_pfad}"
                     bilder_gefunden += 1
+                else:
+                    print(f"   ⚠️  Bild nicht gefunden: {source_bild}")
+                    bild_pfad = None
+            else:
+                bild_pfad = None
 
             figur = Figur(
                 name=figur_data['name'],
