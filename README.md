@@ -63,7 +63,7 @@ Run `make help` to see all available targets. Key targets include:
 - `make db-reset` - Reset database (drop all tables and recreate)
 - `make db-seed` - Seed database with sample data from JSON catalog
 - `make db-import-figures FILE=<path>` - Import figures from JSON catalog (updates existing, adds new)
-- `make test` - Run tests (not yet implemented)
+- `make test` - Run all tests
 - `make lint` - Run linters (not yet implemented)
 
 **Cleanup:**
