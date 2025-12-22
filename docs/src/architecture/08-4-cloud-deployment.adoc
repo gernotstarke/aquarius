@@ -1,0 +1,793 @@
+=== 8.4 Cloud Deployment
+
+==== 8.4.1 Überblick
+
+Das Aquarius-System wird als Cloud-Native-Anwendung auf **fly.io** bereitgestellt. Dies ermöglicht eine kostengünstige, skalierbare und wartungsarme Infrastruktur für Kunstschwimm-Wettkämpfe.
+
+*Deployment-Zielarchitektur:*
+
+----
+┌─────────────────────────────────────────────────────────┐
+│                  arqua42.arc42.org                       │
+│                    (Custom Domain)                       │
+└────────────────────┬────────────────────────────────────┘
+                     │ HTTPS
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│                    fly.io Platform                       │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│  ┌────────────────────────────────────────┐             │
+│  │      Aquarius App Container            │             │
+│  │  (Frontend + Backend + Static Files)   │             │
+│  │                                         │             │
+│  │  Port 8080:                             │             │
+│  │  • FastAPI Backend (/)                  │             │
+│  │  • React Frontend (static build)        │             │
+│  │  • Static Assets (/static)              │             │
+│  └──────────┬─────────────────────────────┘             │
+│             │                                            │
+│             │ libSQL Protocol                            │
+│             │ (over HTTP/WebSocket)                      │
+│             ▼                                            │
+│  ┌────────────────────────────────────────┐             │
+│  │         Turso Database                 │             │
+│  │         (libSQL Cloud)                 │             │
+│  │                                         │             │
+│  │  • Managed SQLite Database              │             │
+│  │  • Edge Replication (optional)          │             │
+│  │  • Automatic Backups                    │             │
+│  └────────────────────────────────────────┘             │
+│                                                          │
+└─────────────────────────────────────────────────────────┘
+----
+
+==== 8.4.2 Technologie-Stack für Cloud Deployment
+
+[cols="1,2,2"]
+|===
+|Komponente |Technologie |Begründung
+
+|Container-Platform
+|**fly.io**
+|• Einfaches Deployment mit `flyctl`
+• Automatisches HTTPS/TLS
+• Integriertes Load Balancing
+• Globale Edge-Locations
+• Kostenlose Tier für kleine Apps
+
+|Datenbank
+|**Turso (libSQL)**
+|• Managed SQLite-as-a-Service
+• SQLAlchemy-kompatibel über libSQL-Treiber
+• Edge-Replication für niedrige Latenz
+• Automatische Backups
+• Kostenlose Tier (500 MB, 1 Mrd. Row Reads/Monat)
+
+|Application Server
+|**uvicorn**
+|• ASGI-Server für FastAPI
+• Hohe Performance
+• WebSocket-Support
+
+|Static File Serving
+|**FastAPI StaticFiles**
+|• Direkt aus Container
+• Alternative: fly.io Volumes für größere Mengen
+
+|Domain & SSL
+|**Custom Domain + fly.io SSL**
+|• arqua42.arc42.org
+• Automatische TLS-Zertifikate (Let's Encrypt)
+|===
+
+==== 8.4.3 Deployment-Architektur
+
+===== Single-Region Deployment (Initial)
+
+*Deployment-Region:* Frankfurt (fra) oder Amsterdam (ams) für niedrige Latenz in Deutschland/Europa
+
+----
+┌──────────────────────────────────────────┐
+│          fly.io Region: fra              │
+├──────────────────────────────────────────┤
+│                                           │
+│  ┌────────────────────────────┐          │
+│  │   Aquarius Instance        │          │
+│  │   • 1 VM (shared-cpu-1x)   │          │
+│  │   • 256 MB RAM             │          │
+│  │   • 1 GB Disk              │          │
+│  └────────────────────────────┘          │
+│                 │                         │
+│                 │ libSQL/HTTP             │
+│                 ▼                         │
+│  ┌────────────────────────────┐          │
+│  │   Turso Database           │          │
+│  │   • Primary Location: fra  │          │
+│  │   • 500 MB Storage         │          │
+│  └────────────────────────────┘          │
+│                                           │
+└──────────────────────────────────────────┘
+----
+
+[NOTE]
+====
+*Skalierung für spätere Phasen:*
+
+* **Multi-Region Deployment:** Replicas in mehreren Regionen
+* **Database Replication:** Turso Edge-Replicas für globale Verfügbarkeit
+* **Auto-Scaling:** Fly.io Autoscaling basierend auf Traffic
+====
+
+==== 8.4.4 Container-Strategie
+
+===== Dockerfile-Architektur
+
+*Multi-Stage Build für optimale Image-Größe:*
+
+[source,dockerfile]
+----
+# Stage 1: Frontend Build
+FROM node:20-alpine AS frontend-builder
+WORKDIR /app/frontend
+COPY frontend/package*.json ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
+
+# Stage 2: Python Dependencies
+FROM python:3.11-slim AS backend-builder
+WORKDIR /app
+COPY backend/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Stage 3: Production Image
+FROM python:3.11-slim
+WORKDIR /app
+
+# Copy Python dependencies
+COPY --from=backend-builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=backend-builder /usr/local/bin /usr/local/bin
+
+# Copy backend code
+COPY backend/ ./backend/
+
+# Copy built frontend
+COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
+
+# Expose port
+EXPOSE 8080
+
+# Start application
+CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+----
+
+===== Static File Serving
+
+Frontend wird als **statische Build-Artefakte** in den Container integriert:
+
+[source,python]
+----
+# backend/app/main.py (Cloud-Konfiguration)
+import os
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
+
+app = FastAPI()
+
+# Serve React Frontend (Cloud)
+if os.getenv("FLY_APP_NAME"):  # Production auf fly.io
+    frontend_dist = Path(__file__).parent.parent.parent / "frontend" / "dist"
+
+    # API routes unter /api
+    app.include_router(router, prefix="/api")
+
+    # Static assets (JS, CSS, Images)
+    app.mount("/assets", StaticFiles(directory=str(frontend_dist / "assets")), name="assets")
+
+    # Figuren-Bilder
+    app.mount("/static", StaticFiles(directory=str(frontend_dist / "static")), name="static")
+
+    # SPA fallback: Alle anderen Routes → index.html
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        return FileResponse(frontend_dist / "index.html")
+----
+
+==== 8.4.5 Datenbank-Migration: SQLite → Turso
+
+===== Turso Connection String
+
+[source,python]
+----
+# backend/app/database.py
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+# Cloud: Turso libSQL
+# Local: SQLite File
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "sqlite:///./database/arqua42.db"  # Fallback für lokale Entwicklung
+)
+
+# Turso Format: libsql://[db-name]-[org].turso.io?authToken=...
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {},
+    echo=False
+)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+----
+
+===== Unterschiede SQLite vs. libSQL (Turso)
+
+[cols="1,2,2"]
+|===
+|Aspekt |SQLite (lokal) |Turso (libSQL Cloud)
+
+|Connection
+|File-basiert
+|HTTP/WebSocket
+
+|Schema Migrations
+|Alembic mit SQLite-Dialekt
+|Alembic mit libSQL-Dialekt (kompatibel)
+
+|Concurrency
+|Write-Locks auf Datei
+|Optimistic Locking in Cloud
+
+|Backups
+|Manuell (File-Copy)
+|Automatisch (Turso)
+
+|Replication
+|Nicht verfügbar
+|Edge-Replicas verfügbar
+|===
+
+[IMPORTANT]
+====
+*Kompatibilität:* libSQL ist ein SQLite-Fork. Die meisten SQLAlchemy-Queries funktionieren ohne Änderung.
+
+*Nicht unterstützt:*
+
+* `PRAGMA` Statements für Konfiguration
+* WAL-Mode (wird von Turso verwaltet)
+====
+
+==== 8.4.6 Umgebungsvariablen und Secrets
+
+===== fly.io Secrets Management
+
+Secrets werden mit `flyctl secrets` verwaltet, **nicht** in `fly.toml`:
+
+[source,bash]
+----
+# Turso Database URL mit Auth-Token
+flyctl secrets set DATABASE_URL="libsql://aquarius-abc123.turso.io?authToken=eyJ..."
+
+# Weitere Secrets (optional)
+flyctl secrets set SECRET_KEY="$(openssl rand -base64 32)"
+flyctl secrets set ADMIN_PASSWORD="..."
+----
+
+===== Umgebungsvariablen in fly.toml
+
+[source,toml]
+----
+# fly.toml
+app = "aquarius-production"
+primary_region = "fra"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  # Öffentliche Konfiguration (keine Secrets!)
+  ENVIRONMENT = "production"
+  LOG_LEVEL = "info"
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256
+----
+
+[WARNING]
+====
+*Niemals Secrets in `fly.toml` committen!*
+
+Verwende immer `flyctl secrets set` für sensible Daten.
+====
+
+==== 8.4.7 Deployment-Workflow
+
+===== Automatisches Deployment (CI/CD)
+
+*GitHub Actions Workflow:*
+
+[source,yaml]
+----
+name: Deploy to fly.io
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to fly.io
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+----
+
+===== Manuelles Deployment
+
+[source,bash]
+----
+# 1. Login bei fly.io
+flyctl auth login
+
+# 2. App erstellen (einmalig)
+flyctl launch --name aquarius-production --region fra
+
+# 3. Secrets konfigurieren (einmalig)
+flyctl secrets set DATABASE_URL="libsql://..."
+
+# 4. Deploy durchführen
+make deploy-to-fly
+
+# 5. Status prüfen
+flyctl status
+flyctl logs
+----
+
+==== 8.4.8 Makefile-Integration
+
+[source,makefile]
+----
+.PHONY: deploy-to-fly
+deploy-to-fly: ## Deploy application to fly.io
+	@echo "🚀 Deploying to fly.io..."
+	@echo ""
+	@echo "Prerequisites:"
+	@echo "  - flyctl installed (brew install flyctl)"
+	@echo "  - Logged in (flyctl auth login)"
+	@echo "  - Secrets configured (flyctl secrets list)"
+	@echo ""
+	@read -p "Continue with deployment? [y/N] " -n 1 -r; \
+	echo; \
+	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
+		flyctl deploy --remote-only; \
+	else \
+		echo "❌ Deployment cancelled"; \
+		exit 1; \
+	fi
+
+.PHONY: deploy-status
+deploy-status: ## Check fly.io deployment status
+	@flyctl status
+	@echo ""
+	@flyctl logs --lines 50
+
+.PHONY: deploy-logs
+deploy-logs: ## Show fly.io application logs
+	flyctl logs
+
+.PHONY: deploy-ssh
+deploy-ssh: ## SSH into fly.io container
+	flyctl ssh console
+----
+
+==== 8.4.9 Custom Domain Konfiguration
+
+===== DNS-Konfiguration für arqua42.arc42.org
+
+[source,bash]
+----
+# 1. Zertifikat für Custom Domain erstellen
+flyctl certs create arqua42.arc42.org
+
+# 2. DNS CNAME-Eintrag bei Domain-Provider
+# Name:   arqua42
+# Type:   CNAME
+# Value:  aquarius-production.fly.dev
+# TTL:    300
+----
+
+*DNS-Propagation prüfen:*
+
+[source,bash]
+----
+dig arqua42.arc42.org
+nslookup arqua42.arc42.org
+----
+
+===== Automatisches HTTPS/TLS
+
+fly.io verwaltet TLS-Zertifikate automatisch via Let's Encrypt:
+
+* Zertifikat wird bei erstem Request ausgestellt
+* Automatische Renewal vor Ablauf
+* HTTP → HTTPS Redirect automatisch aktiv
+
+==== 8.4.10 Monitoring und Logging
+
+===== fly.io Monitoring
+
+*Integrierte Metriken:*
+
+* CPU/Memory Usage
+* Request Count & Latency
+* HTTP Status Codes
+* Health Checks
+
+[source,bash]
+----
+# Metriken anzeigen
+flyctl metrics
+
+# Live-Logs streamen
+flyctl logs -a aquarius-production
+----
+
+===== Health Checks
+
+[source,toml]
+----
+# fly.toml
+[[services.http_checks]]
+  interval = "30s"
+  timeout = "5s"
+  grace_period = "10s"
+  method = "GET"
+  path = "/api/health"
+
+  [services.http_checks.headers]
+    User-Agent = "fly-health-check"
+----
+
+[source,python]
+----
+# backend/app/main.py
+@app.get("/api/health")
+async def health_check():
+    """Health check endpoint für fly.io"""
+    return {
+        "status": "healthy",
+        "version": os.getenv("FLY_APP_VERSION", "unknown"),
+        "database": await check_database_connection()
+    }
+----
+
+===== Turso Database Monitoring
+
+[source,bash]
+----
+# Turso CLI installieren
+brew install tursodatabase/tap/turso
+
+# Database Status
+turso db show aquarius-production
+
+# Query Statistics
+turso db stats aquarius-production
+----
+
+==== 8.4.11 Backup und Disaster Recovery
+
+===== Turso Automatic Backups
+
+* **Point-in-Time Recovery:** Automatisch für letzte 24-48h
+* **Manual Snapshots:** Vor größeren Änderungen
+
+[source,bash]
+----
+# Manual Backup erstellen
+turso db dump aquarius-production --output backup.sql
+
+# Restore aus Backup
+turso db restore aquarius-production --from backup.sql
+----
+
+===== Container Volumes (für Figuren-Bilder)
+
+*Optional: Persistentes Volume für Upload-Bilder:*
+
+[source,toml]
+----
+# fly.toml
+[mounts]
+  source = "aquarius_data"
+  destination = "/app/data"
+----
+
+[source,bash]
+----
+# Volume erstellen
+flyctl volumes create aquarius_data --region fra --size 1
+
+# Backup von Volume
+flyctl ssh sftp get -r /app/data ./local-backup/
+----
+
+==== 8.4.12 Kosten-Kalkulation
+
+===== fly.io Pricing (Stand 2024)
+
+[cols="1,1,2"]
+|===
+|Ressource |Menge |Kosten/Monat
+
+|**Shared CPU VM**
+|1x (256 MB RAM)
+|~$3-5
+
+|**Persistentes Volume**
+|1 GB
+|~$0.15
+
+|**Outbound Traffic**
+|~10 GB
+|Inkludiert
+
+|**Custom Domain + SSL**
+|1 Domain
+|Kostenlos
+|===
+
+*Geschätzte Gesamtkosten:* **$5-10 / Monat** für kleine bis mittlere Nutzung
+
+===== Turso Pricing
+
+[cols="1,1,2"]
+|===
+|Tier |Limits |Kosten
+
+|**Free Tier**
+|• 500 MB Storage
+• 1 Mrd. Row Reads
+• 100 Mio. Row Writes
+|$0
+
+|**Starter**
+|• 5 GB Storage
+• 10 Mrd. Row Reads
+• 1 Mrd. Row Writes
+|~$29
+|===
+
+[NOTE]
+====
+*Für Aquarius-Wettkampfsystem:* Free Tier ist ausreichend für:
+
+* ~20.000 Kinder-Registrierungen
+* ~100 Wettkämpfe/Jahr
+* ~500.000 Bewertungs-Einträge
+
+*Upgrade nötig bei:* >50 Wettkämpfe/Jahr mit >200 Teilnehmern
+====
+
+==== 8.4.13 Sicherheitsaspekte
+
+===== Transport Security
+
+* **TLS 1.3:** Automatisch durch fly.io
+* **HSTS:** Strict-Transport-Security Header
+* **Certificate Pinning:** Optional für Mobile Apps
+
+===== Database Security
+
+* **Encrypted Connections:** libSQL über HTTPS/WSS
+* **Authentication Token:** Turso Auth Token in Secrets
+* **Row-Level Security:** Zukünftig via Turso RLS
+
+[source,python]
+----
+# backend/app/main.py
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+
+if os.getenv("ENVIRONMENT") == "production":
+    # Force HTTPS
+    app.add_middleware(HTTPSRedirectMiddleware)
+
+    # Restrict to trusted hosts
+    app.add_middleware(
+        TrustedHostMiddleware,
+        allowed_hosts=["arqua42.arc42.org", "*.fly.dev"]
+    )
+----
+
+===== Secrets Rotation
+
+[source,bash]
+----
+# Turso Token rotieren
+turso db tokens create aquarius-production
+
+# Neuen Token in fly.io setzen
+flyctl secrets set DATABASE_URL="libsql://...?authToken=NEW_TOKEN"
+
+# Deployment triggern
+flyctl deploy
+----
+
+==== 8.4.14 Migrations-Strategie
+
+===== Schema Migrations mit Alembic
+
+[source,bash]
+----
+# Lokale Migration testen
+cd backend
+alembic upgrade head
+
+# Cloud Migration durchführen (manuell)
+flyctl ssh console
+cd /app/backend
+alembic upgrade head
+----
+
+[IMPORTANT]
+====
+*Zero-Downtime Migrations:*
+
+1. **Backward-Compatible Changes:** Neue Spalten als nullable
+2. **Blue-Green Deployment:** Alte Version läuft während Migration
+3. **Rollback-Plan:** Jede Migration muss `downgrade()` haben
+====
+
+===== Automatische Migrations im Container
+
+[source,dockerfile]
+----
+# Dockerfile (Production)
+CMD ["sh", "-c", "cd backend && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8080"]
+----
+
+[WARNING]
+====
+*Risiko bei Auto-Migrations:*
+
+* Container-Restart kann fehlschlagen bei Migration-Fehler
+* **Empfehlung:** Manuell vor Deployment ausführen
+====
+
+==== 8.4.15 Rollback-Strategie
+
+===== fly.io Release Management
+
+[source,bash]
+----
+# Releases anzeigen
+flyctl releases
+
+# Rollback zur vorherigen Version
+flyctl releases rollback
+
+# Rollback zu spezifischer Version
+flyctl releases rollback --version v123
+----
+
+===== Database Rollback
+
+[source,bash]
+----
+# Alembic Downgrade (lokal testen!)
+alembic downgrade -1
+
+# Im Notfall: Turso Point-in-Time Restore
+turso db restore aquarius-production --timestamp "2024-01-15T10:00:00Z"
+----
+
+==== 8.4.16 Entwicklungs-Workflow
+
+===== Lokale Entwicklung mit Turso
+
+[source,bash]
+----
+# Turso CLI installieren
+brew install tursodatabase/tap/turso
+
+# Turso Auth Token holen
+turso db tokens create aquarius-dev
+
+# In .env setzen
+DATABASE_URL="libsql://aquarius-dev.turso.io?authToken=..."
+
+# App starten
+make dev
+----
+
+===== Staging-Environment
+
+[source,bash]
+----
+# Separate Staging-App auf fly.io
+flyctl launch --name aquarius-staging --region fra
+
+# Staging-Database bei Turso
+turso db create aquarius-staging --location fra
+
+# Deployment nach Staging
+flyctl deploy -a aquarius-staging
+----
+
+*Deployment-Pipeline:*
+
+----
+Local Dev → Staging → Production
+   ↓           ↓          ↓
+SQLite     Turso      Turso
+           (staging)  (production)
+----
+
+==== 8.4.17 Offene Punkte und nächste Schritte
+
+[cols="1,2,1"]
+|===
+|Aufgabe |Beschreibung |Status
+
+|**Dockerfile erstellen**
+|Multi-Stage Build mit Frontend + Backend
+|⏳ TODO
+
+|**fly.toml konfigurieren**
+|App-Config für fly.io
+|⏳ TODO
+
+|**Turso Database einrichten**
+|Production + Staging Datenbanken
+|⏳ TODO
+
+|**Secrets konfigurieren**
+|DATABASE_URL in fly.io Secrets
+|⏳ TODO
+
+|**Makefile-Target**
+|`make deploy-to-fly` implementieren
+|⏳ TODO
+
+|**DNS konfigurieren**
+|CNAME für arqua42.arc42.org
+|⏳ TODO
+
+|**Health Checks**
+|`/api/health` Endpoint implementieren
+|⏳ TODO
+
+|**CI/CD Pipeline**
+|GitHub Actions Workflow
+|⏳ TODO
+|===
+
+[NOTE]
+====
+*Dokumentations-Referenzen:*
+
+* fly.io Docs: https://fly.io/docs/
+* Turso Docs: https://docs.turso.tech/
+* libSQL Python Client: https://github.com/libsql/libsql-client-py
+====
