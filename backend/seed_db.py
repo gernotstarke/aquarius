@@ -8,7 +8,8 @@ import shutil
 from datetime import date, timedelta
 from pathlib import Path
 from app.database import SessionLocal, engine, Base
-from app.models import Saison, Schwimmbad, Wettkampf, Kind, Figur, Anmeldung
+from app.models import Saison, Schwimmbad, Wettkampf, Kind, Figur, Anmeldung, User
+from app.auth import get_password_hash
 
 # Pfad zum Figurenkatalog
 FIGUREN_KATALOG = "data/figuren/figuren-v1.0-saison-2024.json"
@@ -26,6 +27,22 @@ def seed_data():
     db = SessionLocal()
     try:
         print("\n📋 Seeding database with sample data...")
+
+        # Create Admin User
+        print("\n🔑 Creating admin user...")
+        admin_password = os.getenv("INITIAL_ADMIN_PASSWORD", "admin")
+        admin_user = User(
+            username="admin",
+            full_name="System Administrator",
+            hashed_password=get_password_hash(admin_password),
+            role="ROOT",
+            is_active=True
+        )
+        db.add(admin_user)
+        db.commit()
+        print(f"   ✓ Created user: admin (Role: ROOT)")
+        if admin_password == "admin":
+             print("   ⚠️  Using default password 'admin'. Change this in production!")
 
         # Create Saisons
         print("\n📅 Creating saisons...")

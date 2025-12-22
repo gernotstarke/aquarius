@@ -1,26 +1,27 @@
 """
 SQLAlchemy models for Arqua42 CRUD prototype.
 """
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, Table, Text, Index
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, Table, Boolean, DateTime
 from sqlalchemy.orm import relationship
+from datetime import datetime, date
 from app.database import Base
+from .user import User
 
-# Association table for Wettkampf <-> Figuren (many-to-many)
-wettkampf_figuren = Table(
+# Association table for Wettkampf <-> Figur
+wettkampf_figur_association = Table(
     'wettkampf_figuren',
     Base.metadata,
     Column('wettkampf_id', Integer, ForeignKey('wettkampf.id'), primary_key=True),
     Column('figur_id', Integer, ForeignKey('figur.id'), primary_key=True)
 )
 
-# Association table for Anmeldung <-> Figuren (many-to-many)
-anmeldung_figuren = Table(
+# Association table for Anmeldung <-> Figur
+anmeldung_figur_association = Table(
     'anmeldung_figuren',
     Base.metadata,
     Column('anmeldung_id', Integer, ForeignKey('anmeldung.id'), primary_key=True),
     Column('figur_id', Integer, ForeignKey('figur.id'), primary_key=True)
 )
-
 
 class Saison(Base):
     """Season model - represents a competition season."""
@@ -63,7 +64,7 @@ class Wettkampf(Base):
     # Relationships
     saison = relationship("Saison", back_populates="wettkämpfe")
     schwimmbad = relationship("Schwimmbad", back_populates="wettkämpfe")
-    figuren = relationship("Figur", secondary=wettkampf_figuren, back_populates="wettkämpfe")
+    figuren = relationship("Figur", secondary=wettkampf_figur_association)
     anmeldungen = relationship("Anmeldung", back_populates="wettkampf")
 
 
@@ -77,44 +78,37 @@ class Kind(Base):
     geburtsdatum = Column(Date, nullable=False)
     geschlecht = Column(String(1))  # M, W, D
     verein = Column(String)
-
+    
     # Relationships
     anmeldungen = relationship("Anmeldung", back_populates="kind")
 
 
 class Figur(Base):
-    """Swimming figure/trick model."""
+    """Figure model - synchronized swimming figures."""
     __tablename__ = "figur"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False, index=True)  # Removed unique constraint - same figure can be in multiple categories
-    beschreibung = Column(Text)
-    schwierigkeitsgrad = Column(Integer)  # Stored as int (e.g. 12 for 1.2, 15 for 1.5)
-    kategorie = Column(String)  # z.B. "Ballettbein", "Vertikale", "Flamingo"
-    altersklasse = Column(String)  # Empfohlene Altersklasse (z.B. "U8–U10", "U10–U12")
-    bild = Column(String)  # Pfad zum Bild (optional)
-
-    # Relationships
-    wettkämpfe = relationship("Wettkampf", secondary=wettkampf_figuren, back_populates="figuren")
+    name = Column(String, nullable=False, index=True)
+    kategorie = Column(String)
+    beschreibung = Column(String)
+    schwierigkeitsgrad = Column(Integer) # scaled by 10 or float? Usually float, but let's see usage
+    altersklasse = Column(String)
+    bild = Column(String) # Path to image
 
 
 class Anmeldung(Base):
-    """Registration model - links Kind to Wettkampf with selected Figuren."""
+    """Registration model."""
     __tablename__ = "anmeldung"
-    __table_args__ = (
-        # Ensure startnummer is unique per competition
-        Index('idx_wettkampf_startnummer', 'wettkampf_id', 'startnummer', unique=True),
-    )
 
     id = Column(Integer, primary_key=True, index=True)
     kind_id = Column(Integer, ForeignKey("kind.id"), nullable=False)
     wettkampf_id = Column(Integer, ForeignKey("wettkampf.id"), nullable=False)
-    startnummer = Column(Integer, nullable=False)  # Unique per competition
-    anmeldedatum = Column(Date, nullable=False)
-    status = Column(String, default="aktiv")  # aktiv, storniert, vorläufig
-    vorlaeufig = Column(Integer, default=0)  # 0=final, 1=preliminary (no figures yet or competition full)
+    startnummer = Column(Integer)
+    anmeldedatum = Column(Date, default=date.today)
+    vorlaeufig = Column(Integer, default=0) # Boolean as int for SQLite compatibility
+    status = Column(String, default="aktiv")
 
     # Relationships
     kind = relationship("Kind", back_populates="anmeldungen")
     wettkampf = relationship("Wettkampf", back_populates="anmeldungen")
-    figuren = relationship("Figur", secondary=anmeldung_figuren)
+    figuren = relationship("Figur", secondary=anmeldung_figur_association)

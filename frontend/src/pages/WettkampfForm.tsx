@@ -21,6 +21,9 @@ const WettkampfForm: React.FC = () => {
     schwimmbad_id: 0,
   });
 
+  const [maxTeilnehmerError, setMaxTeilnehmerError] = useState<string | null>(null);
+  const [isWobbling, setIsWobbling] = useState(false);
+
   const { data: wettkampf } = useQuery<Wettkampf>({
     queryKey: ['wettkampf', id],
     queryFn: async () => {
@@ -77,6 +80,16 @@ const WettkampfForm: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validation
+    if (formData.max_teilnehmer !== undefined && (formData.max_teilnehmer <= 1)) {
+        setMaxTeilnehmerError('Max. Teilnehmer muss größer als 1 sein');
+        setIsWobbling(true);
+        setTimeout(() => setIsWobbling(false), 500);
+        return;
+    }
+    setMaxTeilnehmerError(null);
+
     if (isEdit) {
       updateMutation.mutate(formData);
     } else {
@@ -147,18 +160,22 @@ const WettkampfForm: React.FC = () => {
             </select>
           </div>
 
-          <Input
-            label="Max. Teilnehmer (optional)"
-            type="number"
-            value={formData.max_teilnehmer || ''}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                max_teilnehmer: e.target.value ? Number(e.target.value) : undefined,
-              })
-            }
-            placeholder="z.B. 150"
-          />
+          <div className={isWobbling ? 'animate-wobble' : ''}>
+            <Input
+                label="Max. Teilnehmer (optional)"
+                type="number"
+                value={formData.max_teilnehmer || ''}
+                onChange={(e) => {
+                    setFormData({
+                        ...formData,
+                        max_teilnehmer: e.target.value ? Number(e.target.value) : undefined,
+                    });
+                    if (maxTeilnehmerError) setMaxTeilnehmerError(null);
+                }}
+                placeholder="z.B. 150"
+                error={maxTeilnehmerError || undefined}
+            />
+          </div>
 
           <div className="flex gap-4 pt-4">
             <Button type="submit" size="lg">

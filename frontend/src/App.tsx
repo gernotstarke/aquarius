@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import NewLayout from './components/NewLayout';
 import Home from './pages/Home';
@@ -18,6 +18,13 @@ import FigurDetail from './pages/FigurDetail';
 import AnmeldungList from './pages/AnmeldungList';
 import AnmeldungForm from './pages/AnmeldungForm';
 
+// Admin imports
+import AdminLayout from './components/AdminLayout';
+import AdminLogin from './pages/admin/Login';
+import AdminDashboard from './pages/admin/Dashboard';
+import UserList from './pages/admin/UserList';
+import SystemHealth from './pages/admin/SystemHealth';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -28,13 +35,23 @@ const queryClient = new QueryClient({
   },
 });
 
+// Simple Auth Guard
+const RequireAuth: React.FC = () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    return <Navigate to="/admin/login" replace />;
+  }
+  return <Outlet />;
+};
+
 const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <NewLayout>
-          <Routes>
-            <Route path="/" element={<Home />} />
+        <Routes>
+          {/* Main Public App */}
+          <Route path="/" element={<NewLayout><Outlet /></NewLayout>}>
+            <Route index element={<Home />} />
 
             {/* Stammdaten */}
             <Route path="/stammdaten/saisons" element={<SaisonList />} />
@@ -68,12 +85,35 @@ const App: React.FC = () => {
             <Route path="/anmeldung/:id" element={<AnmeldungForm />} />
 
             {/* Legacy routes for backwards compatibility */}
+            <Route path="/saison/new" element={<SaisonForm />} />
+            <Route path="/saison/:id" element={<SaisonForm />} />
             <Route path="/saison" element={<SaisonList />} />
+
+            <Route path="/schwimmbad/new" element={<SchwimmbadForm />} />
+            <Route path="/schwimmbad/:id" element={<SchwimmbadForm />} />
             <Route path="/schwimmbad" element={<SchwimmbadList />} />
+
+            <Route path="/wettkampf/new" element={<WettkampfForm />} />
+            <Route path="/wettkampf/:id" element={<WettkampfForm />} />
             <Route path="/wettkampf" element={<WettkampfList />} />
+            
+            <Route path="/kind/new" element={<KindForm />} />
+            <Route path="/kind/:id" element={<KindForm />} />
             <Route path="/kind" element={<KindList />} />
-          </Routes>
-        </NewLayout>
+          </Route>
+
+          {/* Admin App */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          
+          <Route path="/admin" element={<RequireAuth />}>
+            <Route element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="users" element={<UserList />} />
+              <Route path="health" element={<SystemHealth />} />
+            </Route>
+          </Route>
+
+        </Routes>
       </BrowserRouter>
     </QueryClientProvider>
   );

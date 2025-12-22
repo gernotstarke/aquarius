@@ -1,4 +1,4 @@
-.PHONY: help docs docs-diagrams docs-adrs docs-html docs-pdf docs-watch docs-serve docs-build-image clean test dev dev-down db-reset db-seed db-import-figures
+.PHONY: help docs docs-diagrams docs-adrs docs-html docs-pdf docs-watch docs-serve docs-build-image clean test build dev dev-down db-reset db-seed db-import-figures
 
 # Docker configuration
 DOCKER_IMAGE := arqua42-docs:latest
@@ -179,6 +179,12 @@ docs-serve: ## Serve documentation on http://localhost:8000
 
 ##@ Development
 
+build: ## Build all Docker containers
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "🐳 Building Arqua42 Docker containers..."
+	@docker compose build
+	@echo "✓ Build complete"
+
 dev: ## Start development environment with Docker Compose
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	@echo "🚀 Starting Arqua42 CRUD Prototype..."
@@ -223,9 +229,16 @@ lint: ## Run linters
 	@echo "Running linters..."
 	@echo "⚠ Lint targets not yet implemented"
 
-test: ## Run tests
-	@echo "Running tests..."
-	@echo "⚠ Test targets not yet implemented"
+test: ## Run all tests (backend pytest and frontend vitest)
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "🧪 Running Backend Tests (pytest)..."
+	@docker compose exec backend pytest
+	@echo ""
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "🧪 Running Frontend Tests (vitest)..."
+	@docker compose exec frontend npm test
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "✓ All tests completed"
 
 ##@ Cleanup
 

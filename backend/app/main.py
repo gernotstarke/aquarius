@@ -7,10 +7,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from typing import List
-from pathlib import Path
+import os
 
 from app.database import get_db, engine, Base
 from app import models, schemas
+from app.routers import auth, users, health
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -30,11 +31,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files for figure images
-static_dir = Path(__file__).parent.parent / "static"
-if static_dir.exists():
-    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+# Mount static files
+static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
+if not os.path.exists(static_dir):
+    os.makedirs(static_dir)
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
+# Register routers
+app.include_router(auth.router)
+app.include_router(users.router)
+app.include_router(health.router)
 
 @app.get("/")
 def read_root():
