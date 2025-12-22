@@ -589,6 +589,775 @@ flyctl ssh sftp get -r /app/data ./local-backup/
 *Upgrade nötig bei:* >50 Wettkämpfe/Jahr mit >200 Teilnehmern
 ====
 
+==== 8.4.12a Multi-Environment Setup (Staging & Production)
+
+===== Übersicht: Zwei Umgebungen
+
+*Empfohlene Strategie:* Zwei getrennte Umgebungen für sicheres Deployment
+
+----
+┌─────────────────────────────────────────────────────────┐
+│                  GitHub Repository                       │
+│              gernotstarke/aquarius                       │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│  Feature Branches  ──→  Pull Request  ──→  main         │
+│       ↓                                      ↓           │
+│    (lokal)                            Auto-Deploy        │
+│                                              ↓           │
+│                                    ┌──────────────────┐  │
+│                                    │  STAGING         │  │
+│                                    │  Environment     │  │
+│                                    └──────────────────┘  │
+│                                              ↓           │
+│                                    Manual Approval       │
+│                                              ↓           │
+│                                    ┌──────────────────┐  │
+│                                    │  PRODUCTION      │  │
+│                                    │  Environment     │  │
+│                                    └──────────────────┘  │
+└─────────────────────────────────────────────────────────┘
+----
+
+[cols="1,2,2"]
+|===
+|Aspekt |Staging |Production
+
+|**Deployment-Trigger**
+|Automatisch bei Push zu `main`
+|Manuell nach Testing + Approval
+
+|**fly.io App-Name**
+|`aquarius-staging`
+|`aquarius-production`
+
+|**Turso Database**
+|`aquarius-staging`
+|`aquarius-production`
+
+|**Custom Domain**
+|`staging.arqua42.arc42.org`
+|`arqua42.arc42.org`
+
+|**GitHub Environment**
+|`staging`
+|`production`
+
+|**Zweck**
+|Manuelles Testing vor Production
+|Live-System für Endnutzer
+|===
+
+===== Branch-Strategie
+
+*Empfohlene Git-Workflow:*
+
+----
+main Branch (protected)
+  ↓
+  ├─→ Auto-Deploy zu Staging
+  ↓
+  └─→ Manual Deploy zu Production (nach Testing)
+----
+
+[IMPORTANT]
+====
+**Kein separater `production` Branch notwendig!**
+
+Stattdessen:
+
+* `main` = Source of Truth
+* **Staging:** Auto-Deploy bei jedem Push zu `main`
+* **Production:** Manual Trigger via GitHub Actions (Dispatch)
+
+*Vorteil:* Einfacher Workflow, kein Branch-Merging zwischen Environments
+====
+
+Alternative für größere Teams:
+
+----
+feature/* ──→ Pull Request ──→ main ──→ Staging
+                                ↓
+                         Git Tag (v1.0.0)
+                                ↓
+                           Production
+----
+
+===== GitHub Secrets Setup
+
+====== 1. API Tokens erstellen
+
+*fly.io API Token:*
+
+[source,bash]
+----
+# Interaktiv
+flyctl auth token
+
+# Output: FlyV1 fm2_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+----
+
+*Turso Auth Tokens (getrennt für Staging & Production):*
+
+[source,bash]
+----
+# Turso Login
+turso auth login
+
+# Staging Database Token
+turso db tokens create aquarius-staging --expiration none
+# Output: eyJhbGc...
+
+# Production Database Token
+turso db tokens create aquarius-production --expiration none
+# Output: eyJhbGc...
+----
+
+====== 2. GitHub Repository Secrets konfigurieren
+
+*Navigation:* `GitHub → Settings → Secrets and variables → Actions`
+
+**Repository Secrets** (global für alle Environments):
+
+[cols="1,2"]
+|===
+|Secret Name |Value
+
+|`FLY_API_TOKEN`
+|`FlyV1 fm2_XXXXXX...`
+
+|`TURSO_AUTH_TOKEN_STAGING`
+|`eyJhbGc...` (von aquarius-staging)
+
+|`TURSO_AUTH_TOKEN_PRODUCTION`
+|`eyJhbGc...` (von aquarius-production)
+|===
+
+[WARNING]
+====
+**Niemals die gleichen Tokens für Staging und Production verwenden!**
+
+Separate Tokens ermöglichen:
+
+* Independent Secret Rotation
+* Audit Trail per Environment
+* Least-Privilege Access
+====
+
+====== 3. GitHub Environments konfigurieren
+
+*Navigation:* `GitHub → Settings → Environments`
+
+**Staging Environment:**
+
+[source,yaml]
+----
+Name: staging
+Protection Rules:
+  - Required Reviewers: 0 (keine Approval nötig)
+  - Wait Timer: 0 minutes
+  - Deployment Branches: main only
+
+Secrets:
+  - DATABASE_URL: libsql://aquarius-staging-xxx.turso.io?authToken=${{ secrets.TURSO_AUTH_TOKEN_STAGING }}
+  - ENVIRONMENT: staging
+  - FLY_APP_NAME: aquarius-staging
+----
+
+**Production Environment:**
+
+[source,yaml]
+----
+Name: production
+Protection Rules:
+  - Required Reviewers: 1 (mindestens 1 Approval)
+  - Wait Timer: 5 minutes (optional)
+  - Deployment Branches: main only
+
+Secrets:
+  - DATABASE_URL: libsql://aquarius-production-xxx.turso.io?authToken=${{ secrets.TURSO_AUTH_TOKEN_PRODUCTION }}
+  - ENVIRONMENT: production
+  - FLY_APP_NAME: aquarius-production
+----
+
+[IMPORTANT]
+====
+**Production Protection Rules:**
+
+* **Required Reviewers:** Verhindert versehentliches Production Deployment
+* **Wait Timer:** Zeit für letzte Checks (optional)
+* **Deployment Branches:** Nur `main` darf nach Production deployen
+====
+
+===== CI/CD Pipeline (GitHub Actions)
+
+====== Workflow-Datei: `.github/workflows/deploy.yml`
+
+[source,yaml]
+----
+name: Deploy to fly.io
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:  # Manual trigger für Production
+    inputs:
+      environment:
+        description: 'Deployment Environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  # Job 1: Auto-Deploy zu Staging bei Push zu main
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    environment:
+      name: staging
+      url: https://staging.arqua42.arc42.org
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Staging
+        run: |
+          flyctl deploy \
+            --remote-only \
+            --app aquarius-staging \
+            --config fly.staging.toml
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Run Database Migrations
+        run: |
+          flyctl ssh console \
+            --app aquarius-staging \
+            --command "cd /app/backend && alembic upgrade head"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Health Check
+        run: |
+          sleep 10
+          curl -f https://staging.arqua42.arc42.org/api/health || exit 1
+
+      - name: Notify Deployment
+        run: |
+          echo "✅ Staging Deployment erfolgreich!"
+          echo "🔗 URL: https://staging.arqua42.arc42.org"
+
+  # Job 2: Manual Deploy zu Production
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production'
+    environment:
+      name: production
+      url: https://arqua42.arc42.org
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Production
+        run: |
+          flyctl deploy \
+            --remote-only \
+            --app aquarius-production \
+            --config fly.production.toml
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Run Database Migrations
+        run: |
+          flyctl ssh console \
+            --app aquarius-production \
+            --command "cd /app/backend && alembic upgrade head"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Health Check
+        run: |
+          sleep 10
+          curl -f https://arqua42.arc42.org/api/health || exit 1
+
+      - name: Notify Deployment
+        run: |
+          echo "🚀 Production Deployment erfolgreich!"
+          echo "🔗 URL: https://arqua42.arc42.org"
+----
+
+====== Workflow-Übersicht
+
+*Automatisches Staging Deployment:*
+
+1. Push zu `main` Branch
+2. GitHub Actions startet automatisch
+3. Build + Deploy zu `aquarius-staging`
+4. Database Migrations ausführen
+5. Health Check
+6. Benachrichtigung bei Erfolg/Fehler
+
+*Manuelles Production Deployment:*
+
+1. GitHub → Actions → "Deploy to fly.io" → Run workflow
+2. Environment auswählen: `production`
+3. **Protection Rule:** 1 Reviewer muss approven
+4. Nach Approval: Build + Deploy zu `aquarius-production`
+5. Database Migrations ausführen
+6. Health Check
+7. Benachrichtigung
+
+[NOTE]
+====
+**Warum Manual Trigger für Production?**
+
+* Kontrolle über Deployment-Zeitpunkt
+* Testing auf Staging abschließen
+* Deployment außerhalb von Geschäftszeiten vermeiden
+* Bewusste Entscheidung statt Auto-Deploy
+====
+
+===== fly.io App-Konfiguration
+
+====== fly.staging.toml
+
+[source,toml]
+----
+# fly.staging.toml
+app = "aquarius-staging"
+primary_region = "fra"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  ENVIRONMENT = "staging"
+  LOG_LEVEL = "debug"
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0  # Staging darf schlafen
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256
+----
+
+====== fly.production.toml
+
+[source,toml]
+----
+# fly.production.toml
+app = "aquarius-production"
+primary_region = "fra"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  ENVIRONMENT = "production"
+  LOG_LEVEL = "info"
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false  # Production immer wach
+  auto_start_machines = true
+  min_machines_running = 1    # Mindestens 1 Instanz
+
+  # Health Check
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/api/health"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512  # Production: Mehr RAM
+----
+
+[IMPORTANT]
+====
+**Unterschiede Staging vs Production:**
+
+* **Staging:** Auto-Stop erlaubt (Kosten sparen)
+* **Production:** Immer aktiv (min_machines_running = 1)
+* **Production:** Mehr RAM (512 MB vs 256 MB)
+* **Production:** Health Checks aktiviert
+====
+
+===== Turso Database Setup
+
+====== Datenbanken erstellen
+
+[source,bash]
+----
+# Staging Database
+turso db create aquarius-staging --location fra
+turso db show aquarius-staging
+
+# Connection URL kopieren
+# Beispiel: libsql://aquarius-staging-abc123.turso.io
+
+# Production Database
+turso db create aquarius-production --location fra
+turso db show aquarius-production
+
+# Connection URL kopieren
+# Beispiel: libsql://aquarius-production-xyz789.turso.io
+----
+
+====== Secrets in fly.io setzen
+
+[source,bash]
+----
+# Staging
+flyctl secrets set \
+  DATABASE_URL="libsql://aquarius-staging-abc123.turso.io?authToken=eyJhbGc..." \
+  --app aquarius-staging
+
+# Production
+flyctl secrets set \
+  DATABASE_URL="libsql://aquarius-production-xyz789.turso.io?authToken=eyJhbGc..." \
+  --app aquarius-production
+----
+
+====== Daten von Staging → Production kopieren (optional)
+
+[source,bash]
+----
+# Staging Dump erstellen
+turso db dump aquarius-staging --output staging-backup.sql
+
+# In Production importieren (VORSICHT!)
+turso db restore aquarius-production --from staging-backup.sql
+----
+
+[WARNING]
+====
+**Niemals Production-Daten nach Staging kopieren!**
+
+* Datenschutz: Echte Nutzerdaten nicht in Staging
+* Staging darf experimentell sein
+* DSGVO-Konformität
+
+*Empfehlung:* Staging mit synthetischen Testdaten befüllen (via `make db-seed`)
+====
+
+===== Custom Domain Setup
+
+====== DNS-Konfiguration
+
+*Bei Domain-Provider (z.B. IONOS, Namecheap, etc.):*
+
+[source,text]
+----
+# Staging Subdomain
+Name:   staging.arqua42
+Type:   CNAME
+Value:  aquarius-staging.fly.dev
+TTL:    300
+
+# Production Subdomain
+Name:   arqua42
+Type:   CNAME
+Value:  aquarius-production.fly.dev
+TTL:    300
+----
+
+====== fly.io Zertifikate
+
+[source,bash]
+----
+# Staging
+flyctl certs create staging.arqua42.arc42.org --app aquarius-staging
+
+# Production
+flyctl certs create arqua42.arc42.org --app aquarius-production
+
+# Status prüfen
+flyctl certs list --app aquarius-staging
+flyctl certs list --app aquarius-production
+----
+
+===== Deployment-Workflow in der Praxis
+
+====== 1. Feature entwickeln
+
+[source,bash]
+----
+# Neuen Feature Branch
+git checkout -b feature/neue-funktion
+
+# Entwicklung, Tests lokal
+make dev
+make test
+
+# Commit & Push
+git add .
+git commit -m "Add neue Funktion"
+git push origin feature/neue-funktion
+----
+
+====== 2. Pull Request erstellen
+
+* GitHub Pull Request von `feature/neue-funktion` → `main`
+* Code Review durch Team
+* CI Tests laufen (Unit Tests, Linting)
+* Nach Approval: Merge in `main`
+
+====== 3. Automatisches Staging Deployment
+
+* **Trigger:** Merge in `main`
+* **GitHub Actions:** Automatischer Deploy zu Staging
+* **Benachrichtigung:** Slack/Email bei Erfolg/Fehler
+* **URL:** https://staging.arqua42.arc42.org
+
+====== 4. Manuelles Testing auf Staging
+
+[source,bash]
+----
+# Staging-URL öffnen
+open https://staging.arqua42.arc42.org
+
+# Tests durchführen:
+# - Neue Funktion testen
+# - Regressionstests
+# - Browser-Kompatibilität
+# - Performance-Checks
+----
+
+====== 5. Production Deployment (Manual Trigger)
+
+*GitHub UI:*
+
+1. `Actions` Tab öffnen
+2. Workflow "Deploy to fly.io" auswählen
+3. `Run workflow` klicken
+4. Environment: `production` wählen
+5. `Run workflow` bestätigen
+
+*Approval-Prozess:*
+
+1. GitHub wartet auf Reviewer-Approval
+2. Team-Member reviewt Staging-Tests
+3. Approval geben: `Review deployments` → `Approve and deploy`
+4. Deployment startet automatisch
+
+*Command-Line Alternative:*
+
+[source,bash]
+----
+# GitHub CLI installiert?
+gh workflow run deploy.yml \
+  --field environment=production
+
+# Oder direkt via Makefile
+make deploy-production
+----
+
+====== 6. Production Verification
+
+[source,bash]
+----
+# Health Check
+curl https://arqua42.arc42.org/api/health
+
+# Logs monitoren
+flyctl logs --app aquarius-production
+
+# Metriken prüfen
+flyctl metrics --app aquarius-production
+
+# Smoke Tests
+curl https://arqua42.arc42.org/api/figur
+curl https://arqua42.arc42.org/api/wettkampf
+----
+
+===== Makefile-Integration
+
+====== Neue Targets für Multi-Environment
+
+[source,makefile]
+----
+.PHONY: deploy-staging
+deploy-staging: ## Deploy to Staging (fly.io)
+	@echo "🚀 Deploying to Staging..."
+	flyctl deploy --app aquarius-staging --config fly.staging.toml
+
+.PHONY: deploy-production
+deploy-production: ## Deploy to Production (fly.io) - REQUIRES CONFIRMATION
+	@echo "⚠️  PRODUCTION DEPLOYMENT"
+	@echo ""
+	@echo "Prerequisites:"
+	@echo "  - Staging tests passed"
+	@echo "  - Team approval obtained"
+	@echo "  - Off-peak hours (if applicable)"
+	@echo ""
+	@read -p "Deploy to PRODUCTION? [yes/NO] " -r; \
+	if [[ $$REPLY == "yes" ]]; then \
+		flyctl deploy --app aquarius-production --config fly.production.toml; \
+	else \
+		echo "❌ Production deployment cancelled"; \
+		exit 1; \
+	fi
+
+.PHONY: deploy-status-staging
+deploy-status-staging: ## Check Staging deployment status
+	@flyctl status --app aquarius-staging
+	@echo ""
+	@flyctl logs --app aquarius-staging --lines 20
+
+.PHONY: deploy-status-production
+deploy-status-production: ## Check Production deployment status
+	@flyctl status --app aquarius-production
+	@echo ""
+	@flyctl logs --app aquarius-production --lines 20
+
+.PHONY: deploy-logs-staging
+deploy-logs-staging: ## Stream Staging logs
+	flyctl logs --app aquarius-staging
+
+.PHONY: deploy-logs-production
+deploy-logs-production: ## Stream Production logs
+	flyctl logs --app aquarius-production
+
+.PHONY: deploy-ssh-staging
+deploy-ssh-staging: ## SSH into Staging container
+	flyctl ssh console --app aquarius-staging
+
+.PHONY: deploy-ssh-production
+deploy-ssh-production: ## SSH into Production container
+	flyctl ssh console --app aquarius-production
+
+.PHONY: deploy-rollback-staging
+deploy-rollback-staging: ## Rollback Staging to previous version
+	flyctl releases rollback --app aquarius-staging
+
+.PHONY: deploy-rollback-production
+deploy-rollback-production: ## Rollback Production to previous version - REQUIRES CONFIRMATION
+	@echo "⚠️  PRODUCTION ROLLBACK"
+	@read -p "Rollback PRODUCTION? [yes/NO] " -r; \
+	if [[ $$REPLY == "yes" ]]; then \
+		flyctl releases rollback --app aquarius-production; \
+	else \
+		echo "❌ Rollback cancelled"; \
+		exit 1; \
+	fi
+----
+
+===== Kosten-Optimierung für Zwei Umgebungen
+
+[cols="1,1,1,2"]
+|===
+|Ressource |Staging |Production |Gesamt/Monat
+
+|**fly.io VM**
+|$3 (256MB, auto-stop)
+|$5 (512MB, always-on)
+|$8
+
+|**fly.io Volume**
+|$0.15 (1GB, optional)
+|$0.15 (1GB, optional)
+|$0.30
+
+|**Turso Database**
+|Free Tier
+|Free Tier
+|$0
+|===
+
+*Geschätzte Gesamtkosten:* **$8-10 / Monat** für beide Umgebungen
+
+[NOTE]
+====
+**Kosten-Spar-Tipps für Staging:**
+
+* `auto_stop_machines = true` → Staging schläft bei Inaktivität
+* `min_machines_running = 0` → Keine Mindest-Instanzen
+* Kleinere VM-Größe (256 MB statt 512 MB)
+* Shared CPU statt Dedicated
+
+*Ergebnis:* Staging kostet nur ~$1-2/Monat bei geringer Nutzung
+====
+
+===== Checkliste: Initial Setup
+
+[cols="1,3"]
+|===
+|✓ |Aufgabe
+
+|☐
+|**1. fly.io Apps erstellen**
+`flyctl launch --name aquarius-staging`
+`flyctl launch --name aquarius-production`
+
+|☐
+|**2. Turso Databases erstellen**
+`turso db create aquarius-staging`
+`turso db create aquarius-production`
+
+|☐
+|**3. GitHub Secrets konfigurieren**
+`FLY_API_TOKEN`, `TURSO_AUTH_TOKEN_STAGING`, `TURSO_AUTH_TOKEN_PRODUCTION`
+
+|☐
+|**4. GitHub Environments einrichten**
+Staging (no protection) + Production (1 reviewer required)
+
+|☐
+|**5. fly.io Secrets setzen**
+`DATABASE_URL` für Staging + Production
+
+|☐
+|**6. DNS konfigurieren**
+CNAME für `staging.arqua42.arc42.org` + `arqua42.arc42.org`
+
+|☐
+|**7. fly.io Zertifikate erstellen**
+`flyctl certs create` für beide Domains
+
+|☐
+|**8. GitHub Actions Workflow erstellen**
+`.github/workflows/deploy.yml`
+
+|☐
+|**9. fly.toml Dateien erstellen**
+`fly.staging.toml` + `fly.production.toml`
+
+|☐
+|**10. Makefile Targets hinzufügen**
+`deploy-staging`, `deploy-production`, etc.
+
+|☐
+|**11. Initiales Deployment testen**
+Staging → Testing → Production
+
+|☐
+|**12. Health Check Endpoint implementieren**
+`/api/health` für Monitoring
+|===
+
 ==== 8.4.13 Sicherheitsaspekte
 
 ===== Transport Security
