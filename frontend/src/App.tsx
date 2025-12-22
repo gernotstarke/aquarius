@@ -47,7 +47,7 @@ const RequireAuth: React.FC = () => {
 const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           {/* Main Public App */}
           <Route path="/" element={<NewLayout><Outlet /></NewLayout>}>

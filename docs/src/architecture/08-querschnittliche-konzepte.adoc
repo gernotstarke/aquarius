@@ -284,6 +284,41 @@ Die vollständige Dokumentation dieser Konzepte befindet sich aktuell noch in:
 * 8.8 Offline-Synchronisation
 * 8.9 User Experience (UX)
 * 8.10 Performance
-* 8.11 Testbarkeit
+* 8.11 Testbarkeit und Qualitätssicherung
 * 8.12 Deployment und Betrieb
+====
+
+=== 8.11 Testbarkeit und Qualitätssicherung
+
+Das System folgt dem Prinzip der "Engineering Discipline" durch ein modulares Testkonzept auf zwei Ebenen.
+
+==== 8.11.1 Backend Tests (API & Business Logic)
+
+* *Werkzeug:* `pytest` + `httpx` (für API-Tests).
+* *Scope:* 
+** Unit-Tests für fachliche Regeln (Services).
+** Integration-Tests für API-Endpunkte (CRUD-Verifizierung).
+* *Infrastruktur:* Verwendung einer In-Memory SQLite Datenbank (`sqlite://`) für schnelle und isolierte Testausführung.
+* *Ausführung:* `make test` führt `pytest` im Backend-Container aus.
+
+==== 8.11.2 Frontend Tests (Komponenten & Validierung)
+
+* *Werkzeug:* `Vitest` + `React Testing Library` + `jsdom`.
+* *Scope:*
+** Component-Tests zur Verifizierung von UI-Elementen (z.B. `Input.tsx`).
+** Integration-Tests für Formulare (z.B. Validierung von Geschäftsregeln wie `max_participants > 1`).
+* *Struktur:* Tests liegen modular in `__tests__` Verzeichnissen direkt bei den Komponenten oder Pages.
+* *Ausführung:* `make test` führt `npm test` im Frontend-Container aus.
+
+==== 8.11.3 Test-Pyramide
+
+Die Teststrategie orientiert sich an der klassischen Test-Pyramide:
+
+1. *Unit-Tests (Basis):* Testen isolierter Logik (z.B. Altersgruppenberechnung).
+2. *Integration-Tests (Mitte):* Testen des Zusammenspiels von API, Datenbank und UI-Komponenten.
+3. *E2E-Tests (Spitze - geplant):* Validierung vollständiger Benutzer-Workflows (z.B. mit Playwright).
+
+[NOTE]
+====
+Das Ziel ist eine hohe Abdeckung der kritischen Pfade, insbesondere der Anmeldungslogik und der Bewertungsberechnung.
 ====

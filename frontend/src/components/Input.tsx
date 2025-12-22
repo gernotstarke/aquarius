@@ -5,15 +5,21 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }
 
-const Input: React.FC<InputProps> = ({ label, error, className = '', ...props }) => {
+const Input: React.FC<InputProps> = ({ label, error, className = '', id, ...props }) => {
+  const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
+
   return (
     <div className="space-y-2">
       {label && (
-        <label className="block text-body font-medium text-neutral-700">
+        <label 
+          htmlFor={inputId}
+          className="block text-body font-medium text-neutral-700"
+        >
           {label}
         </label>
       )}
       <input
+        id={inputId}
         className={`
           w-full px-4 py-3 min-h-touch
           text-body bg-white border rounded-lg

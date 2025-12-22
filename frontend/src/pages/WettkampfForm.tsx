@@ -82,7 +82,7 @@ const WettkampfForm: React.FC = () => {
     e.preventDefault();
 
     // Validation
-    if (formData.max_teilnehmer !== undefined && (formData.max_teilnehmer <= 1)) {
+    if (formData.max_teilnehmer !== undefined && formData.max_teilnehmer !== null && Number(formData.max_teilnehmer) <= 1) {
         setMaxTeilnehmerError('Max. Teilnehmer muss größer als 1 sein');
         setIsWobbling(true);
         setTimeout(() => setIsWobbling(false), 500);
@@ -162,6 +162,7 @@ const WettkampfForm: React.FC = () => {
 
           <div className={isWobbling ? 'animate-wobble' : ''}>
             <Input
+                id="max_teilnehmer"
                 label="Max. Teilnehmer (optional)"
                 type="number"
                 value={formData.max_teilnehmer || ''}

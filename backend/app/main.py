@@ -69,7 +69,7 @@ def get_saison(saison_id: int, db: Session = Depends(get_db)):
 @app.post("/api/saison", response_model=schemas.Saison, status_code=201)
 def create_saison(saison: schemas.SaisonCreate, db: Session = Depends(get_db)):
     """Create a new season."""
-    db_saison = models.Saison(**saison.dict())
+    db_saison = models.Saison(**saison.model_dump())
     db.add(db_saison)
     db.commit()
     db.refresh(db_saison)
@@ -83,7 +83,7 @@ def update_saison(saison_id: int, saison: schemas.SaisonUpdate, db: Session = De
     if not db_saison:
         raise HTTPException(status_code=404, detail="Saison not found")
 
-    for key, value in saison.dict().items():
+    for key, value in saison.model_dump().items():
         setattr(db_saison, key, value)
 
     db.commit()
@@ -125,7 +125,7 @@ def get_schwimmbad(schwimmbad_id: int, db: Session = Depends(get_db)):
 @app.post("/api/schwimmbad", response_model=schemas.Schwimmbad, status_code=201)
 def create_schwimmbad(schwimmbad: schemas.SchwimmbadCreate, db: Session = Depends(get_db)):
     """Create a new pool."""
-    db_schwimmbad = models.Schwimmbad(**schwimmbad.dict())
+    db_schwimmbad = models.Schwimmbad(**schwimmbad.model_dump())
     db.add(db_schwimmbad)
     db.commit()
     db.refresh(db_schwimmbad)
@@ -139,7 +139,7 @@ def update_schwimmbad(schwimmbad_id: int, schwimmbad: schemas.SchwimmbadUpdate, 
     if not db_schwimmbad:
         raise HTTPException(status_code=404, detail="Schwimmbad not found")
 
-    for key, value in schwimmbad.dict().items():
+    for key, value in schwimmbad.model_dump().items():
         setattr(db_schwimmbad, key, value)
 
     db.commit()
@@ -181,7 +181,7 @@ def get_wettkampf(wettkampf_id: int, db: Session = Depends(get_db)):
 @app.post("/api/wettkampf", response_model=schemas.Wettkampf, status_code=201)
 def create_wettkampf(wettkampf: schemas.WettkampfCreate, db: Session = Depends(get_db)):
     """Create a new competition."""
-    db_wettkampf = models.Wettkampf(**wettkampf.dict())
+    db_wettkampf = models.Wettkampf(**wettkampf.model_dump())
     db.add(db_wettkampf)
     db.commit()
     db.refresh(db_wettkampf)
@@ -195,7 +195,7 @@ def update_wettkampf(wettkampf_id: int, wettkampf: schemas.WettkampfUpdate, db: 
     if not db_wettkampf:
         raise HTTPException(status_code=404, detail="Wettkampf not found")
 
-    for key, value in wettkampf.dict().items():
+    for key, value in wettkampf.model_dump().items():
         setattr(db_wettkampf, key, value)
 
     db.commit()
@@ -237,7 +237,7 @@ def get_kind(kind_id: int, db: Session = Depends(get_db)):
 @app.post("/api/kind", response_model=schemas.Kind, status_code=201)
 def create_kind(kind: schemas.KindCreate, db: Session = Depends(get_db)):
     """Create a new child."""
-    db_kind = models.Kind(**kind.dict())
+    db_kind = models.Kind(**kind.model_dump())
     db.add(db_kind)
     db.commit()
     db.refresh(db_kind)
@@ -251,7 +251,7 @@ def update_kind(kind_id: int, kind: schemas.KindUpdate, db: Session = Depends(ge
     if not db_kind:
         raise HTTPException(status_code=404, detail="Kind not found")
 
-    for key, value in kind.dict().items():
+    for key, value in kind.model_dump().items():
         setattr(db_kind, key, value)
 
     db.commit()
@@ -293,7 +293,7 @@ def get_figur(figur_id: int, db: Session = Depends(get_db)):
 @app.post("/api/figur", response_model=schemas.Figur, status_code=201)
 def create_figur(figur: schemas.FigurCreate, db: Session = Depends(get_db)):
     """Create a new figure."""
-    db_figur = models.Figur(**figur.dict())
+    db_figur = models.Figur(**figur.model_dump())
     db.add(db_figur)
     db.commit()
     db.refresh(db_figur)
@@ -307,7 +307,7 @@ def update_figur(figur_id: int, figur: schemas.FigurUpdate, db: Session = Depend
     if not db_figur:
         raise HTTPException(status_code=404, detail="Figur not found")
 
-    for key, value in figur.dict().items():
+    for key, value in figur.model_dump().items():
         setattr(db_figur, key, value)
 
     db.commit()

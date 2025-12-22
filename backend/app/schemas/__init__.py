@@ -1,7 +1,7 @@
 """Pydantic schemas for request/response validation."""
 from datetime import date
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from .user import User, UserCreate, UserUpdate, Token, TokenData
 
 # Saison Schemas
@@ -17,9 +17,8 @@ class SaisonUpdate(SaisonBase):
     pass
 
 class Saison(SaisonBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
-    class Config:
-        from_attributes = True
 
 # Schwimmbad Schemas
 class SchwimmbadBase(BaseModel):
@@ -35,9 +34,8 @@ class SchwimmbadUpdate(SchwimmbadBase):
     pass
 
 class Schwimmbad(SchwimmbadBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
-    class Config:
-        from_attributes = True
 
 # Figur Schemas
 class FigurBase(BaseModel):
@@ -55,9 +53,8 @@ class FigurUpdate(FigurBase):
     pass
 
 class Figur(FigurBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
-    class Config:
-        from_attributes = True
 
 # Wettkampf Schemas
 class WettkampfBase(BaseModel):
@@ -74,9 +71,8 @@ class WettkampfUpdate(WettkampfBase):
     pass
 
 class Wettkampf(WettkampfBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
-    class Config:
-        from_attributes = True
 
 # Anmeldung Schemas
 class AnmeldungCreate(BaseModel):
@@ -90,6 +86,7 @@ class AnmeldungUpdate(BaseModel):
     figur_ids: List[int] | None = None
 
 class Anmeldung(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     kind_id: int
     wettkampf_id: int
@@ -98,9 +95,6 @@ class Anmeldung(BaseModel):
     vorlaeufig: int
     status: str
     figuren: List[Figur] = []
-    
-    class Config:
-        from_attributes = True
 
 # Wettkampf With Details (Depends on Figur and Anmeldung)
 class WettkampfWithDetails(Wettkampf):
@@ -122,6 +116,6 @@ class KindUpdate(KindBase):
     pass
 
 class Kind(KindBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
-    class Config:
-        from_attributes = True
+
