@@ -20,13 +20,11 @@ const Home: React.FC = () => {
       color: 'bg-yellow-50 hover:bg-yellow-100',
     },
     {
-      name: 'Stammdaten',
+      name: 'Grunddaten',
       description: 'Schwimmbäder, Figuren und Kinder verwalten',
       path: '/schwimmbad',
       icon: '🏊',
       color: 'bg-green-50 hover:bg-green-100',
-      hideTitle: true,
-      buttonText: 'Stammdaten',
     },
     {
       name: 'Saisonplanung',
