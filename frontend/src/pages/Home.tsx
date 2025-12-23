@@ -58,20 +58,26 @@ const Home: React.FC = () => {
 
         {/* Main Sections Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {mainSections.map((section) => (
+          {mainSections.map((section: any) => (
             <Link key={section.path} to={section.path}>
               <Card className={`h-full transition-all duration-200 ${section.color}`}>
                 <div className="space-y-6 p-4">
                   <div className="text-6xl">{section.icon}</div>
-                  <div className="space-y-2">
-                    {!section.hideTitle && (
+                  <div className="space-y-4">
+                    {section.hideTitle ? (
+                      <Button size="lg" className="w-full">
+                        {section.buttonText}
+                      </Button>
+                    ) : (
                       <h2 className="text-h2 font-bold text-neutral-900">{section.name}</h2>
                     )}
                     <p className="text-body text-neutral-600">{section.description}</p>
                   </div>
-                  <Button size="lg" className="w-full">
-                    {section.buttonText || 'Öffnen'}
-                  </Button>
+                  {!section.hideTitle && (
+                    <Button size="lg" className="w-full">
+                      Öffnen
+                    </Button>
+                  )}
                 </div>
               </Card>
             </Link>
