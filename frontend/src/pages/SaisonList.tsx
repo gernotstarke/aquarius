@@ -41,13 +41,17 @@ const SaisonList: React.FC = () => {
         {saisons?.map((saison) => (
           <Card key={saison.id}>
             <div className="flex items-center justify-between">
-              <div className="space-y-2">
-                <h3 className="text-h3 font-semibold text-neutral-900">{saison.name}</h3>
-                <p className="text-body text-neutral-600">
-                  {saison.from_date} bis {saison.to_date}
-                </p>
-              </div>
-              <div className="flex gap-4">
+              <Link to={`/saison/${saison.id}`} className="block flex-1 group">
+                <div className="space-y-2">
+                  <h3 className="text-h3 font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">
+                    {saison.name}
+                  </h3>
+                  <p className="text-body text-neutral-600">
+                    {saison.from_date} bis {saison.to_date}
+                  </p>
+                </div>
+              </Link>
+              <div className="flex gap-4 ml-4">
                 <Link to={`/saison/${saison.id}`}>
                   <Button variant="secondary">Bearbeiten</Button>
                 </Link>
