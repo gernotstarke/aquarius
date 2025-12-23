@@ -56,7 +56,7 @@ const Home: React.FC = () => {
               <Card className={`h-full transition-all duration-200 ${section.color}`}>
                 <div className="flex flex-col h-full p-4">
                   <div className="flex-1 space-y-6">
-                    <div className="text-6xl">{section.name === 'Grunddaten' ? '🏊 🤸 🧒' : section.icon}</div>
+                    <div className="text-6xl">{section.name === 'Grunddaten' ? '🏢 🤸 🧒' : section.icon}</div>
                     <div className="space-y-4">
                       {section.hideTitle ? (
                         <Button size="lg" className="w-full">
