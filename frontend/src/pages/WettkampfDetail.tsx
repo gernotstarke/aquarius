@@ -6,7 +6,6 @@ import { WettkampfWithDetails, Figur } from '../types';
 import Card from '../components/Card';
 import Tabs from '../components/Tabs';
 import Button from '../components/Button';
-import Input from '../components/Input';
 
 const WettkampfDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -78,12 +77,16 @@ const WettkampfDetail: React.FC = () => {
                 </p>
               </div>
               <div>
-                <p className="text-sm text-neutral-500">Saison ID</p>
-                <p className="text-body-lg font-medium">{wettkampf.saison_id}</p>
+                <p className="text-sm text-neutral-500">Saison</p>
+                <p className="text-body-lg font-medium">
+                  {wettkampf.saison?.name || wettkampf.saison_id}
+                </p>
               </div>
               <div>
-                <p className="text-sm text-neutral-500">Schwimmbad ID</p>
-                <p className="text-body-lg font-medium">{wettkampf.schwimmbad_id}</p>
+                <p className="text-sm text-neutral-500">Schwimmbad</p>
+                <p className="text-body-lg font-medium">
+                  {wettkampf.schwimmbad?.name || wettkampf.schwimmbad_id}
+                </p>
               </div>
             </div>
             <div className="pt-4">

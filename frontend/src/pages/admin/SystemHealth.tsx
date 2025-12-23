@@ -31,7 +31,7 @@ const formatBytes = (bytes: number) => {
 };
 
 const SystemHealth: React.FC = () => {
-  const { data: health, isLoading, error, refetch } = useQuery<SystemHealthData>({
+  const { data: health, isLoading, error } = useQuery<SystemHealthData>({
     queryKey: ['health'],
     queryFn: async () => {
       const response = await apiClient.get('/health/');

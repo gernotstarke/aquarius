@@ -6,11 +6,11 @@ import Button from '../components/Button';
 const Home: React.FC = () => {
   const mainSections = [
     {
-      name: 'Saisonplanung',
-      description: 'Saisons und Wettkämpfe planen',
-      path: '/saison',
-      icon: '📅',
-      color: 'bg-blue-50 hover:bg-blue-100',
+      name: 'Anmeldung',
+      description: 'Kinder für Wettkämpfe anmelden',
+      path: '/anmeldung/liste',
+      icon: '📝',
+      color: 'bg-purple-50 hover:bg-purple-100',
     },
     {
       name: 'Wettkampf',
@@ -25,13 +25,15 @@ const Home: React.FC = () => {
       path: '/schwimmbad',
       icon: '🏊',
       color: 'bg-green-50 hover:bg-green-100',
+      hideTitle: true,
+      buttonText: 'Stammdaten',
     },
     {
-      name: 'Anmeldung',
-      description: 'Kinder für Wettkämpfe anmelden',
-      path: '/anmeldung/liste',
-      icon: '📝',
-      color: 'bg-purple-50 hover:bg-purple-100',
+      name: 'Saisonplanung',
+      description: 'Saisons und Wettkämpfe planen',
+      path: '/saison',
+      icon: '📅',
+      color: 'bg-blue-50 hover:bg-blue-100',
     },
   ];
 
@@ -47,10 +49,10 @@ const Home: React.FC = () => {
             className="h-24 mx-auto"
           />
           <h1 className="text-display font-bold text-neutral-900">
-            Aquarius
+            Arqua42
           </h1>
           <p className="text-body-lg text-neutral-600 max-w-2xl mx-auto">
-            Kunstschwimmen-Wettkampf-Verwaltung
+            Struktur, Konzepte, Wasser
           </p>
         </div>
 
@@ -62,11 +64,13 @@ const Home: React.FC = () => {
                 <div className="space-y-6 p-4">
                   <div className="text-6xl">{section.icon}</div>
                   <div className="space-y-2">
-                    <h2 className="text-h2 font-bold text-neutral-900">{section.name}</h2>
+                    {!section.hideTitle && (
+                      <h2 className="text-h2 font-bold text-neutral-900">{section.name}</h2>
+                    )}
                     <p className="text-body text-neutral-600">{section.description}</p>
                   </div>
                   <Button size="lg" className="w-full">
-                    Öffnen
+                    {section.buttonText || 'Öffnen'}
                   </Button>
                 </div>
               </Card>

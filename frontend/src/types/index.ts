@@ -67,6 +67,7 @@ export interface Figur {
   schwierigkeitsgrad?: number;
   kategorie?: string;
   altersklasse?: string;
+  min_alter?: number;
   bild?: string;
 }
 
@@ -76,6 +77,7 @@ export interface FigurCreate {
   schwierigkeitsgrad?: number;
   kategorie?: string;
   altersklasse?: string;
+  min_alter?: number;
   bild?: string;
 }
 
@@ -99,4 +101,6 @@ export interface AnmeldungCreate {
 export interface WettkampfWithDetails extends Wettkampf {
   figuren: Figur[];
   anmeldungen: Anmeldung[];
+  saison?: Saison;
+  schwimmbad?: Schwimmbad;
 }

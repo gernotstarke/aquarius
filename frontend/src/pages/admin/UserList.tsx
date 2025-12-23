@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../../api/client';
-import { UserPlus, Trash2, Shield, User as UserIcon } from 'lucide-react';
+import { UserPlus, Trash2, User as UserIcon } from 'lucide-react';
 
 interface User {
   id: number;
-  username: str;
+  username: string;
   full_name: string;
   role: 'ROOT' | 'PLANER' | 'OFFIZIELLER';
   is_active: boolean;

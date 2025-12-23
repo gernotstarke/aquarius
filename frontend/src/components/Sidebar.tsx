@@ -74,10 +74,10 @@ const Sidebar: React.FC = () => {
 
   return (
     <aside className="w-64 bg-white border-r border-neutral-200 min-h-screen flex-shrink-0">
-      <div className="p-6">
+      <div className="p-6 text-center">
         <Link to="/" className="block">
-          <h1 className="text-h3 font-bold text-neutral-900">Arqua42</h1>
-          <p className="text-sm text-neutral-500 mt-1">Wettkampf-Management</p>
+          <img src="/aquarius-logo.png" alt="Arqua42" className="h-12 mx-auto mb-2" />
+          <p className="text-sm text-neutral-500 font-medium">Architektur in Aktion</p>
         </Link>
       </div>
 
