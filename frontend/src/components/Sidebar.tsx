@@ -76,7 +76,7 @@ const Sidebar: React.FC = () => {
     <aside className="w-64 bg-white border-r border-neutral-200 min-h-screen flex-shrink-0">
       <div className="p-6 text-center">
         <Link to="/" className="block">
-          <img src="/aquarius-logo.png" alt="Arqua42" className="h-12 mx-auto mb-2" />
+          <img src="/aquarius-logo.png" alt="Arqua42" className="h-20 mx-auto mb-2" />
           <p className="text-sm text-neutral-500 font-medium">Architektur in Aktion</p>
         </Link>
       </div>

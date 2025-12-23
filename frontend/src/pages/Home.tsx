@@ -41,11 +41,6 @@ const Home: React.FC = () => {
       <div className="flex-1 space-y-12 pb-16">
         {/* Logo and Title */}
         <div className="text-center space-y-6">
-          <img
-            src="/aquarius-logo.png"
-            alt="Aquarius Logo"
-            className="h-24 mx-auto"
-          />
           <h1 className="text-display font-bold text-neutral-900">
             Arqua42
           </h1>
