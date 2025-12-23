@@ -32,26 +32,34 @@ const WettkampfList: React.FC = () => {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h2 className="text-h1 font-bold text-neutral-900">Wettkämpfe</h2>
-        <Link to="/wettkampf/new">
+        <Link to="/wettkaempfe/new">
           <Button size="lg">Neuer Wettkampf</Button>
         </Link>
       </div>
 
       <div className="grid gap-6">
         {wettkämpfe?.map((wettkampf) => (
-          <Card key={wettkampf.id}>
+          <Card key={wettkampf.id} className="transition-shadow hover:shadow-md">
             <div className="flex items-center justify-between">
-              <div className="space-y-2">
-                <h3 className="text-h3 font-semibold text-neutral-900">{wettkampf.name}</h3>
+              <Link 
+                to={`/wettkaempfe/${wettkampf.id}/detail`} 
+                className="flex-1 space-y-2 group"
+              >
+                <h3 className="text-h3 font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">
+                  {wettkampf.name}
+                </h3>
                 <p className="text-body text-neutral-600">Datum: {wettkampf.datum}</p>
                 {wettkampf.max_teilnehmer && (
                   <p className="text-body text-neutral-500">
                     Max. Teilnehmer: {wettkampf.max_teilnehmer}
                   </p>
                 )}
-              </div>
-              <div className="flex gap-4">
-                <Link to={`/wettkampf/${wettkampf.id}`}>
+              </Link>
+              <div className="flex gap-4 ml-4">
+                <Link to={`/wettkaempfe/${wettkampf.id}/detail`}>
+                  <Button>Details</Button>
+                </Link>
+                <Link to={`/wettkaempfe/${wettkampf.id}`}>
                   <Button variant="secondary">Bearbeiten</Button>
                 </Link>
                 <Button

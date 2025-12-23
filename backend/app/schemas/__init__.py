@@ -1,7 +1,8 @@
 """Pydantic schemas for request/response validation."""
 from datetime import date
-from pydantic import BaseModel
-
+from typing import List, Optional
+from pydantic import BaseModel, ConfigDict
+from .user import User, UserCreate, UserUpdate, Token, TokenData
 
 # Saison Schemas
 class SaisonBase(BaseModel):
@@ -9,21 +10,15 @@ class SaisonBase(BaseModel):
     from_date: date
     to_date: date
 
-
 class SaisonCreate(SaisonBase):
     pass
-
 
 class SaisonUpdate(SaisonBase):
     pass
 
-
 class Saison(SaisonBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
-
-    class Config:
-        from_attributes = True
-
 
 # Schwimmbad Schemas
 class SchwimmbadBase(BaseModel):
@@ -32,21 +27,34 @@ class SchwimmbadBase(BaseModel):
     phone_no: str | None = None
     manager: str | None = None
 
-
 class SchwimmbadCreate(SchwimmbadBase):
     pass
-
 
 class SchwimmbadUpdate(SchwimmbadBase):
     pass
 
-
 class Schwimmbad(SchwimmbadBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
 
-    class Config:
-        from_attributes = True
+# Figur Schemas
+class FigurBase(BaseModel):
+    name: str
+    kategorie: str | None = None
+    beschreibung: str | None = None
+    schwierigkeitsgrad: float | None = None
+    altersklasse: str | None = None
+    bild: str | None = None
 
+class FigurCreate(FigurBase):
+    pass
+
+class FigurUpdate(FigurBase):
+    pass
+
+class Figur(FigurBase):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
 
 # Wettkampf Schemas
 class WettkampfBase(BaseModel):
@@ -56,21 +64,44 @@ class WettkampfBase(BaseModel):
     saison_id: int
     schwimmbad_id: int
 
-
 class WettkampfCreate(WettkampfBase):
     pass
-
 
 class WettkampfUpdate(WettkampfBase):
     pass
 
-
 class Wettkampf(WettkampfBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
 
-    class Config:
-        from_attributes = True
+# Anmeldung Schemas
+class AnmeldungCreate(BaseModel):
+    kind_id: int
+    wettkampf_id: int
+    figur_ids: List[int] = []
 
+class AnmeldungUpdate(BaseModel):
+    status: str | None = None
+    vorlaeufig: int | None = None
+    figur_ids: List[int] | None = None
+
+class Anmeldung(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    kind_id: int
+    wettkampf_id: int
+    startnummer: int | None = None
+    anmeldedatum: date
+    vorlaeufig: int
+    status: str
+    figuren: List[Figur] = []
+
+# Wettkampf With Details (Depends on Figur and Anmeldung)
+class WettkampfWithDetails(Wettkampf):
+    figuren: List[Figur] = []
+    anmeldungen: List[Anmeldung] = []
+    saison: Optional[Saison] = None
+    schwimmbad: Optional[Schwimmbad] = None
 
 # Kind Schemas
 class KindBase(BaseModel):
@@ -80,17 +111,13 @@ class KindBase(BaseModel):
     geschlecht: str | None = None
     verein: str | None = None
 
-
 class KindCreate(KindBase):
     pass
-
 
 class KindUpdate(KindBase):
     pass
 
-
 class Kind(KindBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
 
-    class Config:
-        from_attributes = True

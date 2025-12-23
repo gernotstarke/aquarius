@@ -1,10 +1,27 @@
 """
 SQLAlchemy models for Arqua42 CRUD prototype.
 """
-from sqlalchemy import Column, Integer, String, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, Table, Boolean, DateTime
 from sqlalchemy.orm import relationship
+from datetime import datetime, date
 from app.database import Base
+from .user import User
 
+# Association table for Wettkampf <-> Figur
+wettkampf_figur_association = Table(
+    'wettkampf_figuren',
+    Base.metadata,
+    Column('wettkampf_id', Integer, ForeignKey('wettkampf.id'), primary_key=True),
+    Column('figur_id', Integer, ForeignKey('figur.id'), primary_key=True)
+)
+
+# Association table for Anmeldung <-> Figur
+anmeldung_figur_association = Table(
+    'anmeldung_figuren',
+    Base.metadata,
+    Column('anmeldung_id', Integer, ForeignKey('anmeldung.id'), primary_key=True),
+    Column('figur_id', Integer, ForeignKey('figur.id'), primary_key=True)
+)
 
 class Saison(Base):
     """Season model - represents a competition season."""
@@ -47,6 +64,8 @@ class Wettkampf(Base):
     # Relationships
     saison = relationship("Saison", back_populates="wettkämpfe")
     schwimmbad = relationship("Schwimmbad", back_populates="wettkämpfe")
+    figuren = relationship("Figur", secondary=wettkampf_figur_association)
+    anmeldungen = relationship("Anmeldung", back_populates="wettkampf")
 
 
 class Kind(Base):
@@ -59,3 +78,37 @@ class Kind(Base):
     geburtsdatum = Column(Date, nullable=False)
     geschlecht = Column(String(1))  # M, W, D
     verein = Column(String)
+    
+    # Relationships
+    anmeldungen = relationship("Anmeldung", back_populates="kind")
+
+
+class Figur(Base):
+    """Figure model - synchronized swimming figures."""
+    __tablename__ = "figur"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False, index=True)
+    kategorie = Column(String)
+    beschreibung = Column(String)
+    schwierigkeitsgrad = Column(Integer) # scaled by 10 or float? Usually float, but let's see usage
+    altersklasse = Column(String)
+    bild = Column(String) # Path to image
+
+
+class Anmeldung(Base):
+    """Registration model."""
+    __tablename__ = "anmeldung"
+
+    id = Column(Integer, primary_key=True, index=True)
+    kind_id = Column(Integer, ForeignKey("kind.id"), nullable=False)
+    wettkampf_id = Column(Integer, ForeignKey("wettkampf.id"), nullable=False)
+    startnummer = Column(Integer)
+    anmeldedatum = Column(Date, default=date.today)
+    vorlaeufig = Column(Integer, default=0) # Boolean as int for SQLite compatibility
+    status = Column(String, default="aktiv")
+
+    # Relationships
+    kind = relationship("Kind", back_populates="anmeldungen")
+    wettkampf = relationship("Wettkampf", back_populates="anmeldungen")
+    figuren = relationship("Figur", secondary=anmeldung_figur_association)

@@ -41,17 +41,21 @@ const SchwimmbadList: React.FC = () => {
         {schwimmbäder?.map((schwimmbad) => (
           <Card key={schwimmbad.id}>
             <div className="flex items-center justify-between">
-              <div className="space-y-2">
-                <h3 className="text-h3 font-semibold text-neutral-900">{schwimmbad.name}</h3>
-                <p className="text-body text-neutral-600">{schwimmbad.adresse}</p>
-                {schwimmbad.manager && (
-                  <p className="text-body text-neutral-500">Leitung: {schwimmbad.manager}</p>
-                )}
-                {schwimmbad.phone_no && (
-                  <p className="text-body text-neutral-500">Tel: {schwimmbad.phone_no}</p>
-                )}
-              </div>
-              <div className="flex gap-4">
+              <Link to={`/schwimmbad/${schwimmbad.id}`} className="block flex-1 group">
+                <div className="space-y-2">
+                  <h3 className="text-h3 font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">
+                    {schwimmbad.name}
+                  </h3>
+                  <p className="text-body text-neutral-600">{schwimmbad.adresse}</p>
+                  {schwimmbad.manager && (
+                    <p className="text-body text-neutral-500">Leitung: {schwimmbad.manager}</p>
+                  )}
+                  {schwimmbad.phone_no && (
+                    <p className="text-body text-neutral-500">Tel: {schwimmbad.phone_no}</p>
+                  )}
+                </div>
+              </Link>
+              <div className="flex gap-4 ml-4">
                 <Link to={`/schwimmbad/${schwimmbad.id}`}>
                   <Button variant="secondary">Bearbeiten</Button>
                 </Link>

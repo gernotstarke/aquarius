@@ -1,4 +1,4 @@
-.PHONY: help docs docs-diagrams docs-adrs docs-html docs-pdf docs-watch docs-serve docs-build-image clean test dev dev-down db-reset db-seed
+.PHONY: help docs docs-diagrams docs-adrs docs-html docs-pdf docs-watch docs-serve docs-build-image clean test build dev dev-down db-reset db-seed db-import-figures
 
 # Docker configuration
 DOCKER_IMAGE := arqua42-docs:latest
@@ -179,6 +179,12 @@ docs-serve: ## Serve documentation on http://localhost:8000
 
 ##@ Development
 
+build: ## Build all Docker containers
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "🐳 Building Arqua42 Docker containers..."
+	@docker compose build
+	@echo "✓ Build complete"
+
 dev: ## Start development environment with Docker Compose
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	@echo "🚀 Starting Arqua42 CRUD Prototype..."
@@ -204,13 +210,35 @@ db-seed: ## Seed database with sample data
 	@docker compose exec backend python seed_db.py
 	@echo "✓ Database seeded with sample data"
 
+db-import-figures: ## Import figures from JSON catalog (usage: make db-import-figures FILE=path/to/catalog.json)
+	@if [ -z "$(FILE)" ]; then \
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; \
+		echo "❌ Error: FILE parameter is required"; \
+		echo ""; \
+		echo "Usage:"; \
+		echo "  make db-import-figures FILE=data/figuren-kataloge/figuren-v1.0-saison-2024.json"; \
+		echo ""; \
+		echo "Available catalogs:"; \
+		docker compose exec backend find data/figuren-kataloge -name "*.json" -type f 2>/dev/null || true; \
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; \
+		exit 1; \
+	fi
+	@docker compose exec backend python import_figures.py "$(FILE)"
+
 lint: ## Run linters
 	@echo "Running linters..."
 	@echo "⚠ Lint targets not yet implemented"
 
-test: ## Run tests
-	@echo "Running tests..."
-	@echo "⚠ Test targets not yet implemented"
+test: ## Run all tests (backend pytest and frontend vitest)
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "🧪 Running Backend Tests (pytest)..."
+	@docker compose exec backend pytest
+	@echo ""
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "🧪 Running Frontend Tests (vitest)..."
+	@docker compose exec frontend npm test
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "✓ All tests completed"
 
 ##@ Cleanup
 

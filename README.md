@@ -12,9 +12,10 @@ Arqua42 is a Progressive Web Application (PWA) designed to manage swimming compe
 ## Technology Stack
 
 - **Frontend**: React 18 + TypeScript + Vite + TailwindCSS
-- **Backend**: Python 3.11+ + FastAPI + Pydantic
-- **Database**: Turso (libSQL) with embedded replicas for offline support
-- **Architecture**: Domain-Driven Design with 6 Bounded Contexts
+- **Backend**: Python 3.11+ + FastAPI + Pydantic + SQLAlchemy
+- **Database**: SQLite (development) / Turso (production, planned)
+- **Architecture**: Domain-Driven Design
+- **Data Management**: JSON-based catalogs for maintainability
 
 ## Documentation
 
@@ -57,9 +58,13 @@ Run `make help` to see all available targets. Key targets include:
 
 **Development Targets:**
 
-- `make test` - Run tests (not yet implemented)
+- `make dev` - Start development environment (Backend + Frontend + Database)
+- `make dev-down` - Stop development environment
+- `make db-reset` - Reset database (drop all tables and recreate)
+- `make db-seed` - Seed database with sample data from JSON catalog
+- `make db-import-figures FILE=<path>` - Import figures from JSON catalog (updates existing, adds new)
+- `make test` - Run all tests
 - `make lint` - Run linters (not yet implemented)
-- `make dev` - Start development environment (not yet implemented)
 
 **Cleanup:**
 
@@ -134,9 +139,31 @@ arqua42/
 │       ├── architecture.html      # Generated HTML (via make docs)
 │       ├── architecture.pdf       # Generated PDF (via make docs-pdf)
 │       └── images/                # Generated PNG diagrams
-├── backend/                       # FastAPI backend (to be implemented)
-├── frontend/                      # React frontend (to be implemented)
+├── backend/                       # FastAPI backend
+│   ├── app/                       # Application code
+│   │   ├── models/                # SQLAlchemy models
+│   │   ├── schemas/               # Pydantic schemas
+│   │   ├── main.py                # FastAPI application
+│   │   └── database.py            # Database configuration
+│   ├── data/                      # Data files
+│   │   └── figuren-kataloge/      # Figure catalogs (JSON)
+│   │       ├── figuren-v1.0-saison-2024.json
+│   │       └── README.md
+│   ├── static/                    # Static files
+│   │   └── figuren/               # Figure images (PNG/JPG)
+│   │       └── README.md
+│   ├── seed_db.py                 # Database seeding script
+│   └── requirements.txt           # Python dependencies
+├── frontend/                      # React frontend
+│   ├── src/
+│   │   ├── components/            # Reusable components
+│   │   ├── pages/                 # Page components
+│   │   ├── types/                 # TypeScript types
+│   │   └── App.tsx                # Main application
+│   └── package.json               # Node.js dependencies
+├── BILDER_UND_KATALOG.md         # Figure images and catalog guide
 ├── Dockerfile.docs                # Docker image for documentation build
+├── docker-compose.yml             # Docker Compose for development
 ├── docker-compose.docs.yml        # Docker Compose for documentation services
 ├── Makefile                       # Build automation
 └── README.md                      # This file
@@ -167,7 +194,66 @@ make docs-serve
 
 ### Development Setup
 
-*Coming soon - Development environment setup will be added once implementation begins.*
+```bash
+# Start development environment (Backend, Frontend, Database)
+make dev
+
+# Access the applications:
+# - Backend API:  http://localhost:8000
+# - Frontend UI:  http://localhost:5173
+# - API Docs:     http://localhost:8000/docs
+```
+
+#### Database Seeding
+
+The project uses a JSON-based figure catalog system for easy maintenance:
+
+```bash
+# Seed database with sample data (from JSON catalog)
+make db-seed
+
+# Or reset and seed from scratch
+make db-reset
+
+# Import/update figures from a specific JSON catalog
+make db-import-figures FILE=data/figuren-kataloge/figuren-v1.0-saison-2024.json
+```
+
+**Seeding vs. Importing:**
+
+- `make db-seed` - **Full seeding**: Drops all tables, recreates them, and populates with sample data (seasons, pools, competitions, children, registrations, figures)
+- `make db-import-figures` - **Figures only**: Updates existing figures or adds new ones from a JSON catalog without affecting other data
+
+**Importing Figures:**
+
+```bash
+# Import the default catalog
+make db-import-figures FILE=data/figuren-kataloge/figuren-v1.0-saison-2024.json
+
+# Import a different version
+make db-import-figures FILE=data/figuren-kataloge/figuren-v2.0-saison-2025.json
+```
+
+The import process:
+- Loads figures from the specified JSON catalog
+- Updates existing figures (matched by name)
+- Creates new figures that don't exist yet
+- Checks for figure images in `backend/static/figuren/`
+- Reports statistics (created, updated, images found/missing)
+
+**Adding Figure Images:**
+
+1. Place your PNG/JPG images in `backend/static/figuren/`
+2. Run `make db-import-figures FILE=<path-to-catalog>` to update the database
+3. See `BILDER_UND_KATALOG.md` for detailed instructions
+
+**Editing the Figure Catalog:**
+
+The JSON catalog can be manually edited:
+- File: `backend/data/figuren-kataloge/figuren-v1.0-saison-2024.json`
+- Contains all 26 swimming figures with IDs, difficulty, age groups, and image paths
+- After editing, run `make db-import-figures FILE=<path>` to apply changes
+- See `backend/data/figuren-kataloge/README.md` for schema documentation
 
 ## Architecture
 

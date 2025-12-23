@@ -2,9 +2,17 @@
 Database seeding script for Arqua42 CRUD prototype.
 Populates the database with sample data for testing.
 """
+import json
+import os
+import shutil
 from datetime import date, timedelta
+from pathlib import Path
 from app.database import SessionLocal, engine, Base
-from app.models import Saison, Schwimmbad, Wettkampf, Kind
+from app.models import Saison, Schwimmbad, Wettkampf, Kind, Figur, Anmeldung, User
+from app.auth import get_password_hash
+
+# Pfad zum Figurenkatalog
+FIGUREN_KATALOG = "data/figuren/figuren-v1.0-saison-2024.json"
 
 def reset_database():
     """Drop all tables and recreate them."""
@@ -19,6 +27,22 @@ def seed_data():
     db = SessionLocal()
     try:
         print("\n📋 Seeding database with sample data...")
+
+        # Create Admin User
+        print("\n🔑 Creating admin user...")
+        admin_password = os.getenv("INITIAL_ADMIN_PASSWORD", "admin")
+        admin_user = User(
+            username="admin",
+            full_name="System Administrator",
+            hashed_password=get_password_hash(admin_password),
+            role="ROOT",
+            is_active=True
+        )
+        db.add(admin_user)
+        db.commit()
+        print(f"   ✓ Created user: admin (Role: ROOT)")
+        if admin_password == "admin":
+             print("   ⚠️  Using default password 'admin'. Change this in production!")
 
         # Create Saisons
         print("\n📅 Creating saisons...")
@@ -150,12 +174,135 @@ def seed_data():
         print(f"   ✓ Created: {kind5.vorname} {kind5.nachname}")
         print(f"   ✓ Created: {kind6.vorname} {kind6.nachname}")
 
+        # Create Figuren (Kunstschwimm-Figuren) from JSON catalog
+        print("\n🎯 Creating figuren from JSON catalog...")
+
+        # Load figuren from JSON catalog
+        katalog_path = Path(__file__).parent / FIGUREN_KATALOG
+        if not katalog_path.exists():
+            print(f"   ⚠️  Katalog nicht gefunden: {katalog_path}")
+            print("   ℹ️  Verwende leere Figurenliste")
+            figuren_data = []
+        else:
+            with open(katalog_path, 'r', encoding='utf-8') as f:
+                katalog = json.load(f)
+                figuren_data = katalog.get('figuren', [])
+                print(f"   ℹ️  Katalog geladen: Version {katalog.get('version')}, Saison {katalog.get('saison')}")
+
+        figuren = []
+        bilder_gefunden = 0
+        for figur_data in figuren_data:
+            # Handle image: find relative to JSON file, copy to static/figuren/
+            bild_pfad = figur_data.get('bild')
+            if bild_pfad:
+                # Source: relative to JSON file (e.g., data/figuren/images/ballettbein.png)
+                source_bild = katalog_path.parent / bild_pfad
+
+                if source_bild.exists():
+                    # Destination: static/figuren/<bild_pfad> (e.g., static/figuren/images/ballettbein.png)
+                    dest_bild = Path(__file__).parent / 'static' / 'figuren' / bild_pfad
+
+                    # Create destination directory if needed
+                    dest_bild.parent.mkdir(parents=True, exist_ok=True)
+
+                    # Copy image file
+                    shutil.copy2(source_bild, dest_bild)
+
+                    # Store relative path in DB: figuren/<bild_pfad>
+                    bild_pfad = f"figuren/{bild_pfad}"
+                    bilder_gefunden += 1
+                else:
+                    print(f"   ⚠️  Bild nicht gefunden: {source_bild}")
+                    bild_pfad = None
+            else:
+                bild_pfad = None
+
+            figur = Figur(
+                name=figur_data['name'],
+                kategorie=figur_data.get('kategorie'),
+                beschreibung=figur_data.get('beschreibung'),
+                schwierigkeitsgrad=figur_data.get('schwierigkeitsgrad'),
+                altersklasse=figur_data.get('altersklasse'),
+                bild=bild_pfad
+            )
+            figuren.append(figur)
+            db.add(figur)
+
+        db.commit()
+        print(f"   ✓ Created {len(figuren)} Figuren")
+        print(f"   ✓ {bilder_gefunden} Bilder gefunden, {len(figuren) - bilder_gefunden} fehlen noch")
+
+        # Assign some figures to competitions
+        print("\n🔗 Assigning figuren to wettkämpfe...")
+        # Herbstcup: Einfache Figuren für Anfänger
+        wettkampf1.figuren.extend([f for f in figuren if f.schwierigkeitsgrad <= 13])
+        # Winterpokal: Mittelschwere Figuren
+        wettkampf2.figuren.extend([f for f in figuren if 12 <= f.schwierigkeitsgrad <= 16])
+        # Frühjahrsmeeting: Fortgeschrittene
+        wettkampf3.figuren.extend([f for f in figuren if f.schwierigkeitsgrad >= 14])
+        # Sommerfest: Alle Figuren
+        wettkampf4.figuren.extend(figuren)
+        db.commit()
+        print(f"   ✓ Herbstcup: {len(wettkampf1.figuren)} Figuren")
+        print(f"   ✓ Winterpokal: {len(wettkampf2.figuren)} Figuren")
+        print(f"   ✓ Frühjahrsmeeting: {len(wettkampf3.figuren)} Figuren")
+        print(f"   ✓ Sommerfest: {len(wettkampf4.figuren)} Figuren")
+
+        # Create some sample registrations
+        print("\n📝 Creating anmeldungen...")
+
+        # Only create sample registrations if we have enough figures
+        if len(figuren) >= 23:
+            # Anna meldet sich für Herbstcup an
+            anmeldung1 = Anmeldung(
+                kind_id=kind1.id,
+                wettkampf_id=wettkampf1.id,
+                startnummer=1,
+                anmeldedatum=date(2024, 9, 15),
+                vorlaeufig=0,
+                status="aktiv"
+            )
+            # Wähle 3 Figuren für Anna
+            anmeldung1.figuren.extend([figuren[0], figuren[8], figuren[17]])  # Ballettbein, Flamingo, Hocke
+            db.add(anmeldung1)
+
+            # Max für Winterpokal
+            anmeldung2 = Anmeldung(
+                kind_id=kind2.id,
+                wettkampf_id=wettkampf2.id,
+                startnummer=1,
+                anmeldedatum=date(2024, 10, 1),
+                vorlaeufig=0,
+                status="aktiv"
+            )
+            anmeldung2.figuren.extend([figuren[4], figuren[11], figuren[18]])  # Vertikale, Ritter, Pike
+            db.add(anmeldung2)
+
+            # Sophie für Frühjahrsmeeting
+            anmeldung3 = Anmeldung(
+                kind_id=kind3.id,
+                wettkampf_id=wettkampf3.id,
+                startnummer=1,
+                anmeldedatum=date(2025, 2, 10),
+                vorlaeufig=0,
+                status="aktiv"
+            )
+            anmeldung3.figuren.extend([figuren[6], figuren[16], figuren[22]])  # Vertikale im Spagat, Spagat zur Vertikalen, Spagat zur Vertikalen
+            db.add(anmeldung3)
+
+            db.commit()
+            print(f"   ✓ Created 3 Anmeldungen")
+        else:
+            print(f"   ⚠️  Skipping sample registrations (need at least 23 figures, have {len(figuren)})")
+
         print("\n✨ Database seeding complete!")
         print(f"\n📊 Summary:")
         print(f"   • {db.query(Saison).count()} Saisons")
         print(f"   • {db.query(Schwimmbad).count()} Schwimmbäder")
         print(f"   • {db.query(Wettkampf).count()} Wettkämpfe")
         print(f"   • {db.query(Kind).count()} Kinder")
+        print(f"   • {db.query(Figur).count()} Figuren")
+        print(f"   • {db.query(Anmeldung).count()} Anmeldungen")
 
     except Exception as e:
         print(f"\n❌ Error seeding database: {e}")

@@ -1,0 +1,1562 @@
+=== 8.4 Cloud Deployment
+
+==== 8.4.1 Überblick
+
+Das Aquarius-System wird als Cloud-Native-Anwendung auf **fly.io** bereitgestellt. Dies ermöglicht eine kostengünstige, skalierbare und wartungsarme Infrastruktur für Kunstschwimm-Wettkämpfe.
+
+*Deployment-Zielarchitektur:*
+
+----
+┌─────────────────────────────────────────────────────────┐
+│                  arqua42.arc42.org                       │
+│                    (Custom Domain)                       │
+└────────────────────┬────────────────────────────────────┘
+                     │ HTTPS
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│                    fly.io Platform                       │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│  ┌────────────────────────────────────────┐             │
+│  │      Aquarius App Container            │             │
+│  │  (Frontend + Backend + Static Files)   │             │
+│  │                                         │             │
+│  │  Port 8080:                             │             │
+│  │  • FastAPI Backend (/)                  │             │
+│  │  • React Frontend (static build)        │             │
+│  │  • Static Assets (/static)              │             │
+│  └──────────┬─────────────────────────────┘             │
+│             │                                            │
+│             │ libSQL Protocol                            │
+│             │ (over HTTP/WebSocket)                      │
+│             ▼                                            │
+│  ┌────────────────────────────────────────┐             │
+│  │         Turso Database                 │             │
+│  │         (libSQL Cloud)                 │             │
+│  │                                         │             │
+│  │  • Managed SQLite Database              │             │
+│  │  • Edge Replication (optional)          │             │
+│  │  • Automatic Backups                    │             │
+│  └────────────────────────────────────────┘             │
+│                                                          │
+└─────────────────────────────────────────────────────────┘
+----
+
+==== 8.4.2 Technologie-Stack für Cloud Deployment
+
+[cols="1,2,2"]
+|===
+|Komponente |Technologie |Begründung
+
+|Container-Platform
+|**fly.io**
+|• Einfaches Deployment mit `flyctl`
+• Automatisches HTTPS/TLS
+• Integriertes Load Balancing
+• Globale Edge-Locations
+• Kostenlose Tier für kleine Apps
+
+|Datenbank
+|**Turso (libSQL)**
+|• Managed SQLite-as-a-Service
+• SQLAlchemy-kompatibel über libSQL-Treiber
+• Edge-Replication für niedrige Latenz
+• Automatische Backups
+• Kostenlose Tier (500 MB, 1 Mrd. Row Reads/Monat)
+
+|Application Server
+|**uvicorn**
+|• ASGI-Server für FastAPI
+• Hohe Performance
+• WebSocket-Support
+
+|Static File Serving
+|**FastAPI StaticFiles**
+|• Direkt aus Container
+• Alternative: fly.io Volumes für größere Mengen
+
+|Domain & SSL
+|**Custom Domain + fly.io SSL**
+|• arqua42.arc42.org
+• Automatische TLS-Zertifikate (Let's Encrypt)
+|===
+
+==== 8.4.3 Deployment-Architektur
+
+===== Single-Region Deployment (Initial)
+
+*Deployment-Region:* Frankfurt (fra) oder Amsterdam (ams) für niedrige Latenz in Deutschland/Europa
+
+----
+┌──────────────────────────────────────────┐
+│          fly.io Region: fra              │
+├──────────────────────────────────────────┤
+│                                           │
+│  ┌────────────────────────────┐          │
+│  │   Aquarius Instance        │          │
+│  │   • 1 VM (shared-cpu-1x)   │          │
+│  │   • 256 MB RAM             │          │
+│  │   • 1 GB Disk              │          │
+│  └────────────────────────────┘          │
+│                 │                         │
+│                 │ libSQL/HTTP             │
+│                 ▼                         │
+│  ┌────────────────────────────┐          │
+│  │   Turso Database           │          │
+│  │   • Primary Location: fra  │          │
+│  │   • 500 MB Storage         │          │
+│  └────────────────────────────┘          │
+│                                           │
+└──────────────────────────────────────────┘
+----
+
+[NOTE]
+====
+*Skalierung für spätere Phasen:*
+
+* **Multi-Region Deployment:** Replicas in mehreren Regionen
+* **Database Replication:** Turso Edge-Replicas für globale Verfügbarkeit
+* **Auto-Scaling:** Fly.io Autoscaling basierend auf Traffic
+====
+
+==== 8.4.4 Container-Strategie
+
+===== Dockerfile-Architektur
+
+*Multi-Stage Build für optimale Image-Größe:*
+
+[source,dockerfile]
+----
+# Stage 1: Frontend Build
+FROM node:20-alpine AS frontend-builder
+WORKDIR /app/frontend
+COPY frontend/package*.json ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
+
+# Stage 2: Python Dependencies
+FROM python:3.11-slim AS backend-builder
+WORKDIR /app
+COPY backend/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Stage 3: Production Image
+FROM python:3.11-slim
+WORKDIR /app
+
+# Copy Python dependencies
+COPY --from=backend-builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=backend-builder /usr/local/bin /usr/local/bin
+
+# Copy backend code
+COPY backend/ ./backend/
+
+# Copy built frontend
+COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
+
+# Expose port
+EXPOSE 8080
+
+# Start application
+CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+----
+
+===== Static File Serving
+
+Frontend wird als **statische Build-Artefakte** in den Container integriert:
+
+[source,python]
+----
+# backend/app/main.py (Cloud-Konfiguration)
+import os
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
+
+app = FastAPI()
+
+# Serve React Frontend (Cloud)
+if os.getenv("FLY_APP_NAME"):  # Production auf fly.io
+    frontend_dist = Path(__file__).parent.parent.parent / "frontend" / "dist"
+
+    # API routes unter /api
+    app.include_router(router, prefix="/api")
+
+    # Static assets (JS, CSS, Images)
+    app.mount("/assets", StaticFiles(directory=str(frontend_dist / "assets")), name="assets")
+
+    # Figuren-Bilder
+    app.mount("/static", StaticFiles(directory=str(frontend_dist / "static")), name="static")
+
+    # SPA fallback: Alle anderen Routes → index.html
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        return FileResponse(frontend_dist / "index.html")
+----
+
+==== 8.4.5 Datenbank-Migration: SQLite → Turso
+
+===== Turso Connection String
+
+[source,python]
+----
+# backend/app/database.py
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+# Cloud: Turso libSQL
+# Local: SQLite File
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "sqlite:///./database/arqua42.db"  # Fallback für lokale Entwicklung
+)
+
+# Turso Format: libsql://[db-name]-[org].turso.io?authToken=...
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {},
+    echo=False
+)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+----
+
+===== Unterschiede SQLite vs. libSQL (Turso)
+
+[cols="1,2,2"]
+|===
+|Aspekt |SQLite (lokal) |Turso (libSQL Cloud)
+
+|Connection
+|File-basiert
+|HTTP/WebSocket
+
+|Schema Migrations
+|Alembic mit SQLite-Dialekt
+|Alembic mit libSQL-Dialekt (kompatibel)
+
+|Concurrency
+|Write-Locks auf Datei
+|Optimistic Locking in Cloud
+
+|Backups
+|Manuell (File-Copy)
+|Automatisch (Turso)
+
+|Replication
+|Nicht verfügbar
+|Edge-Replicas verfügbar
+|===
+
+[IMPORTANT]
+====
+*Kompatibilität:* libSQL ist ein SQLite-Fork. Die meisten SQLAlchemy-Queries funktionieren ohne Änderung.
+
+*Nicht unterstützt:*
+
+* `PRAGMA` Statements für Konfiguration
+* WAL-Mode (wird von Turso verwaltet)
+====
+
+==== 8.4.6 Umgebungsvariablen und Secrets
+
+===== fly.io Secrets Management
+
+Secrets werden mit `flyctl secrets` verwaltet, **nicht** in `fly.toml`:
+
+[source,bash]
+----
+# Turso Database URL mit Auth-Token
+flyctl secrets set DATABASE_URL="libsql://aquarius-abc123.turso.io?authToken=eyJ..."
+
+# Weitere Secrets (optional)
+flyctl secrets set SECRET_KEY="$(openssl rand -base64 32)"
+flyctl secrets set ADMIN_PASSWORD="..."
+----
+
+===== Umgebungsvariablen in fly.toml
+
+[source,toml]
+----
+# fly.toml
+app = "aquarius-production"
+primary_region = "fra"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  # Öffentliche Konfiguration (keine Secrets!)
+  ENVIRONMENT = "production"
+  LOG_LEVEL = "info"
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256
+----
+
+[WARNING]
+====
+*Niemals Secrets in `fly.toml` committen!*
+
+Verwende immer `flyctl secrets set` für sensible Daten.
+====
+
+==== 8.4.7 Deployment-Workflow
+
+===== Automatisches Deployment (CI/CD)
+
+*GitHub Actions Workflow:*
+
+[source,yaml]
+----
+name: Deploy to fly.io
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to fly.io
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+----
+
+===== Manuelles Deployment
+
+[source,bash]
+----
+# 1. Login bei fly.io
+flyctl auth login
+
+# 2. App erstellen (einmalig)
+flyctl launch --name aquarius-production --region fra
+
+# 3. Secrets konfigurieren (einmalig)
+flyctl secrets set DATABASE_URL="libsql://..."
+
+# 4. Deploy durchführen
+make deploy-to-fly
+
+# 5. Status prüfen
+flyctl status
+flyctl logs
+----
+
+==== 8.4.8 Makefile-Integration
+
+[source,makefile]
+----
+.PHONY: deploy-to-fly
+deploy-to-fly: ## Deploy application to fly.io
+	@echo "🚀 Deploying to fly.io..."
+	@echo ""
+	@echo "Prerequisites:"
+	@echo "  - flyctl installed (brew install flyctl)"
+	@echo "  - Logged in (flyctl auth login)"
+	@echo "  - Secrets configured (flyctl secrets list)"
+	@echo ""
+	@read -p "Continue with deployment? [y/N] " -n 1 -r; \
+	echo; \
+	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
+		flyctl deploy --remote-only; \
+	else \
+		echo "❌ Deployment cancelled"; \
+		exit 1; \
+	fi
+
+.PHONY: deploy-status
+deploy-status: ## Check fly.io deployment status
+	@flyctl status
+	@echo ""
+	@flyctl logs --lines 50
+
+.PHONY: deploy-logs
+deploy-logs: ## Show fly.io application logs
+	flyctl logs
+
+.PHONY: deploy-ssh
+deploy-ssh: ## SSH into fly.io container
+	flyctl ssh console
+----
+
+==== 8.4.9 Custom Domain Konfiguration
+
+===== DNS-Konfiguration für arqua42.arc42.org
+
+[source,bash]
+----
+# 1. Zertifikat für Custom Domain erstellen
+flyctl certs create arqua42.arc42.org
+
+# 2. DNS CNAME-Eintrag bei Domain-Provider
+# Name:   arqua42
+# Type:   CNAME
+# Value:  aquarius-production.fly.dev
+# TTL:    300
+----
+
+*DNS-Propagation prüfen:*
+
+[source,bash]
+----
+dig arqua42.arc42.org
+nslookup arqua42.arc42.org
+----
+
+===== Automatisches HTTPS/TLS
+
+fly.io verwaltet TLS-Zertifikate automatisch via Let's Encrypt:
+
+* Zertifikat wird bei erstem Request ausgestellt
+* Automatische Renewal vor Ablauf
+* HTTP → HTTPS Redirect automatisch aktiv
+
+==== 8.4.10 Monitoring und Logging
+
+===== fly.io Monitoring
+
+*Integrierte Metriken:*
+
+* CPU/Memory Usage
+* Request Count & Latency
+* HTTP Status Codes
+* Health Checks
+
+[source,bash]
+----
+# Metriken anzeigen
+flyctl metrics
+
+# Live-Logs streamen
+flyctl logs -a aquarius-production
+----
+
+===== Health Checks
+
+[source,toml]
+----
+# fly.toml
+[[services.http_checks]]
+  interval = "30s"
+  timeout = "5s"
+  grace_period = "10s"
+  method = "GET"
+  path = "/api/health"
+
+  [services.http_checks.headers]
+    User-Agent = "fly-health-check"
+----
+
+[source,python]
+----
+# backend/app/main.py
+@app.get("/api/health")
+async def health_check():
+    """Health check endpoint für fly.io"""
+    return {
+        "status": "healthy",
+        "version": os.getenv("FLY_APP_VERSION", "unknown"),
+        "database": await check_database_connection()
+    }
+----
+
+===== Turso Database Monitoring
+
+[source,bash]
+----
+# Turso CLI installieren
+brew install tursodatabase/tap/turso
+
+# Database Status
+turso db show aquarius-production
+
+# Query Statistics
+turso db stats aquarius-production
+----
+
+==== 8.4.11 Backup und Disaster Recovery
+
+===== Turso Automatic Backups
+
+* **Point-in-Time Recovery:** Automatisch für letzte 24-48h
+* **Manual Snapshots:** Vor größeren Änderungen
+
+[source,bash]
+----
+# Manual Backup erstellen
+turso db dump aquarius-production --output backup.sql
+
+# Restore aus Backup
+turso db restore aquarius-production --from backup.sql
+----
+
+===== Container Volumes (für Figuren-Bilder)
+
+*Optional: Persistentes Volume für Upload-Bilder:*
+
+[source,toml]
+----
+# fly.toml
+[mounts]
+  source = "aquarius_data"
+  destination = "/app/data"
+----
+
+[source,bash]
+----
+# Volume erstellen
+flyctl volumes create aquarius_data --region fra --size 1
+
+# Backup von Volume
+flyctl ssh sftp get -r /app/data ./local-backup/
+----
+
+==== 8.4.12 Kosten-Kalkulation
+
+===== fly.io Pricing (Stand 2024)
+
+[cols="1,1,2"]
+|===
+|Ressource |Menge |Kosten/Monat
+
+|**Shared CPU VM**
+|1x (256 MB RAM)
+|~$3-5
+
+|**Persistentes Volume**
+|1 GB
+|~$0.15
+
+|**Outbound Traffic**
+|~10 GB
+|Inkludiert
+
+|**Custom Domain + SSL**
+|1 Domain
+|Kostenlos
+|===
+
+*Geschätzte Gesamtkosten:* **$5-10 / Monat** für kleine bis mittlere Nutzung
+
+===== Turso Pricing
+
+[cols="1,1,2"]
+|===
+|Tier |Limits |Kosten
+
+|**Free Tier**
+|• 500 MB Storage
+• 1 Mrd. Row Reads
+• 100 Mio. Row Writes
+|$0
+
+|**Starter**
+|• 5 GB Storage
+• 10 Mrd. Row Reads
+• 1 Mrd. Row Writes
+|~$29
+|===
+
+[NOTE]
+====
+*Für Aquarius-Wettkampfsystem:* Free Tier ist ausreichend für:
+
+* ~20.000 Kinder-Registrierungen
+* ~100 Wettkämpfe/Jahr
+* ~500.000 Bewertungs-Einträge
+
+*Upgrade nötig bei:* >50 Wettkämpfe/Jahr mit >200 Teilnehmern
+====
+
+==== 8.4.12a Multi-Environment Setup (Staging & Production)
+
+===== Übersicht: Zwei Umgebungen
+
+*Empfohlene Strategie:* Zwei getrennte Umgebungen für sicheres Deployment
+
+----
+┌─────────────────────────────────────────────────────────┐
+│                  GitHub Repository                       │
+│              gernotstarke/aquarius                       │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│  Feature Branches  ──→  Pull Request  ──→  main         │
+│       ↓                                      ↓           │
+│    (lokal)                            Auto-Deploy        │
+│                                              ↓           │
+│                                    ┌──────────────────┐  │
+│                                    │  STAGING         │  │
+│                                    │  Environment     │  │
+│                                    └──────────────────┘  │
+│                                              ↓           │
+│                                    Manual Approval       │
+│                                              ↓           │
+│                                    ┌──────────────────┐  │
+│                                    │  PRODUCTION      │  │
+│                                    │  Environment     │  │
+│                                    └──────────────────┘  │
+└─────────────────────────────────────────────────────────┘
+----
+
+[cols="1,2,2"]
+|===
+|Aspekt |Staging |Production
+
+|**Deployment-Trigger**
+|Automatisch bei Push zu `main`
+|Manuell nach Testing + Approval
+
+|**fly.io App-Name**
+|`aquarius-staging`
+|`aquarius-production`
+
+|**Turso Database**
+|`aquarius-staging`
+|`aquarius-production`
+
+|**Custom Domain**
+|`staging.arqua42.arc42.org`
+|`arqua42.arc42.org`
+
+|**GitHub Environment**
+|`staging`
+|`production`
+
+|**Zweck**
+|Manuelles Testing vor Production
+|Live-System für Endnutzer
+|===
+
+===== Branch-Strategie
+
+*Empfohlene Git-Workflow:*
+
+----
+main Branch (protected)
+  ↓
+  ├─→ Auto-Deploy zu Staging
+  ↓
+  └─→ Manual Deploy zu Production (nach Testing)
+----
+
+[IMPORTANT]
+====
+**Kein separater `production` Branch notwendig!**
+
+Stattdessen:
+
+* `main` = Source of Truth
+* **Staging:** Auto-Deploy bei jedem Push zu `main`
+* **Production:** Manual Trigger via GitHub Actions (Dispatch)
+
+*Vorteil:* Einfacher Workflow, kein Branch-Merging zwischen Environments
+====
+
+Alternative für größere Teams:
+
+----
+feature/* ──→ Pull Request ──→ main ──→ Staging
+                                ↓
+                         Git Tag (v1.0.0)
+                                ↓
+                           Production
+----
+
+===== GitHub Secrets Setup
+
+====== 1. API Tokens erstellen
+
+*fly.io API Token:*
+
+[source,bash]
+----
+# Interaktiv
+flyctl auth token
+
+# Output: FlyV1 fm2_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+----
+
+*Turso Auth Tokens (getrennt für Staging & Production):*
+
+[source,bash]
+----
+# Turso Login
+turso auth login
+
+# Staging Database Token
+turso db tokens create aquarius-staging --expiration none
+# Output: eyJhbGc...
+
+# Production Database Token
+turso db tokens create aquarius-production --expiration none
+# Output: eyJhbGc...
+----
+
+====== 2. GitHub Repository Secrets konfigurieren
+
+*Navigation:* `GitHub → Settings → Secrets and variables → Actions`
+
+**Repository Secrets** (global für alle Environments):
+
+[cols="1,2"]
+|===
+|Secret Name |Value
+
+|`FLY_API_TOKEN`
+|`FlyV1 fm2_XXXXXX...`
+
+|`TURSO_AUTH_TOKEN_STAGING`
+|`eyJhbGc...` (von aquarius-staging)
+
+|`TURSO_AUTH_TOKEN_PRODUCTION`
+|`eyJhbGc...` (von aquarius-production)
+|===
+
+[WARNING]
+====
+**Niemals die gleichen Tokens für Staging und Production verwenden!**
+
+Separate Tokens ermöglichen:
+
+* Independent Secret Rotation
+* Audit Trail per Environment
+* Least-Privilege Access
+====
+
+====== 3. GitHub Environments konfigurieren
+
+*Navigation:* `GitHub → Settings → Environments`
+
+**Staging Environment:**
+
+[source,yaml]
+----
+Name: staging
+Protection Rules:
+  - Required Reviewers: 0 (keine Approval nötig)
+  - Wait Timer: 0 minutes
+  - Deployment Branches: main only
+
+Secrets:
+  - DATABASE_URL: libsql://aquarius-staging-xxx.turso.io?authToken=${{ secrets.TURSO_AUTH_TOKEN_STAGING }}
+  - ENVIRONMENT: staging
+  - FLY_APP_NAME: aquarius-staging
+----
+
+**Production Environment:**
+
+[source,yaml]
+----
+Name: production
+Protection Rules:
+  - Required Reviewers: 1 (mindestens 1 Approval)
+  - Wait Timer: 5 minutes (optional)
+  - Deployment Branches: main only
+
+Secrets:
+  - DATABASE_URL: libsql://aquarius-production-xxx.turso.io?authToken=${{ secrets.TURSO_AUTH_TOKEN_PRODUCTION }}
+  - ENVIRONMENT: production
+  - FLY_APP_NAME: aquarius-production
+----
+
+[IMPORTANT]
+====
+**Production Protection Rules:**
+
+* **Required Reviewers:** Verhindert versehentliches Production Deployment
+* **Wait Timer:** Zeit für letzte Checks (optional)
+* **Deployment Branches:** Nur `main` darf nach Production deployen
+====
+
+===== CI/CD Pipeline (GitHub Actions)
+
+====== Workflow-Datei: `.github/workflows/deploy.yml`
+
+[source,yaml]
+----
+name: Deploy to fly.io
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:  # Manual trigger für Production
+    inputs:
+      environment:
+        description: 'Deployment Environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  # Job 1: Auto-Deploy zu Staging bei Push zu main
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    environment:
+      name: staging
+      url: https://staging.arqua42.arc42.org
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Staging
+        run: |
+          flyctl deploy \
+            --remote-only \
+            --app aquarius-staging \
+            --config fly.staging.toml
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Run Database Migrations
+        run: |
+          flyctl ssh console \
+            --app aquarius-staging \
+            --command "cd /app/backend && alembic upgrade head"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Health Check
+        run: |
+          sleep 10
+          curl -f https://staging.arqua42.arc42.org/api/health || exit 1
+
+      - name: Notify Deployment
+        run: |
+          echo "✅ Staging Deployment erfolgreich!"
+          echo "🔗 URL: https://staging.arqua42.arc42.org"
+
+  # Job 2: Manual Deploy zu Production
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production'
+    environment:
+      name: production
+      url: https://arqua42.arc42.org
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Production
+        run: |
+          flyctl deploy \
+            --remote-only \
+            --app aquarius-production \
+            --config fly.production.toml
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Run Database Migrations
+        run: |
+          flyctl ssh console \
+            --app aquarius-production \
+            --command "cd /app/backend && alembic upgrade head"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Health Check
+        run: |
+          sleep 10
+          curl -f https://arqua42.arc42.org/api/health || exit 1
+
+      - name: Notify Deployment
+        run: |
+          echo "🚀 Production Deployment erfolgreich!"
+          echo "🔗 URL: https://arqua42.arc42.org"
+----
+
+====== Workflow-Übersicht
+
+*Automatisches Staging Deployment:*
+
+1. Push zu `main` Branch
+2. GitHub Actions startet automatisch
+3. Build + Deploy zu `aquarius-staging`
+4. Database Migrations ausführen
+5. Health Check
+6. Benachrichtigung bei Erfolg/Fehler
+
+*Manuelles Production Deployment:*
+
+1. GitHub → Actions → "Deploy to fly.io" → Run workflow
+2. Environment auswählen: `production`
+3. **Protection Rule:** 1 Reviewer muss approven
+4. Nach Approval: Build + Deploy zu `aquarius-production`
+5. Database Migrations ausführen
+6. Health Check
+7. Benachrichtigung
+
+[NOTE]
+====
+**Warum Manual Trigger für Production?**
+
+* Kontrolle über Deployment-Zeitpunkt
+* Testing auf Staging abschließen
+* Deployment außerhalb von Geschäftszeiten vermeiden
+* Bewusste Entscheidung statt Auto-Deploy
+====
+
+===== fly.io App-Konfiguration
+
+====== fly.staging.toml
+
+[source,toml]
+----
+# fly.staging.toml
+app = "aquarius-staging"
+primary_region = "fra"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  ENVIRONMENT = "staging"
+  LOG_LEVEL = "debug"
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0  # Staging darf schlafen
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256
+----
+
+====== fly.production.toml
+
+[source,toml]
+----
+# fly.production.toml
+app = "aquarius-production"
+primary_region = "fra"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  ENVIRONMENT = "production"
+  LOG_LEVEL = "info"
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false  # Production immer wach
+  auto_start_machines = true
+  min_machines_running = 1    # Mindestens 1 Instanz
+
+  # Health Check
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/api/health"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512  # Production: Mehr RAM
+----
+
+[IMPORTANT]
+====
+**Unterschiede Staging vs Production:**
+
+* **Staging:** Auto-Stop erlaubt (Kosten sparen)
+* **Production:** Immer aktiv (min_machines_running = 1)
+* **Production:** Mehr RAM (512 MB vs 256 MB)
+* **Production:** Health Checks aktiviert
+====
+
+===== Turso Database Setup
+
+====== Datenbanken erstellen
+
+[source,bash]
+----
+# Staging Database
+turso db create aquarius-staging --location fra
+turso db show aquarius-staging
+
+# Connection URL kopieren
+# Beispiel: libsql://aquarius-staging-abc123.turso.io
+
+# Production Database
+turso db create aquarius-production --location fra
+turso db show aquarius-production
+
+# Connection URL kopieren
+# Beispiel: libsql://aquarius-production-xyz789.turso.io
+----
+
+====== Secrets in fly.io setzen
+
+[source,bash]
+----
+# Staging
+flyctl secrets set \
+  DATABASE_URL="libsql://aquarius-staging-abc123.turso.io?authToken=eyJhbGc..." \
+  --app aquarius-staging
+
+# Production
+flyctl secrets set \
+  DATABASE_URL="libsql://aquarius-production-xyz789.turso.io?authToken=eyJhbGc..." \
+  --app aquarius-production
+----
+
+====== Daten von Staging → Production kopieren (optional)
+
+[source,bash]
+----
+# Staging Dump erstellen
+turso db dump aquarius-staging --output staging-backup.sql
+
+# In Production importieren (VORSICHT!)
+turso db restore aquarius-production --from staging-backup.sql
+----
+
+[WARNING]
+====
+**Niemals Production-Daten nach Staging kopieren!**
+
+* Datenschutz: Echte Nutzerdaten nicht in Staging
+* Staging darf experimentell sein
+* DSGVO-Konformität
+
+*Empfehlung:* Staging mit synthetischen Testdaten befüllen (via `make db-seed`)
+====
+
+===== Custom Domain Setup
+
+====== DNS-Konfiguration
+
+*Bei Domain-Provider (z.B. IONOS, Namecheap, etc.):*
+
+[source,text]
+----
+# Staging Subdomain
+Name:   staging.arqua42
+Type:   CNAME
+Value:  aquarius-staging.fly.dev
+TTL:    300
+
+# Production Subdomain
+Name:   arqua42
+Type:   CNAME
+Value:  aquarius-production.fly.dev
+TTL:    300
+----
+
+====== fly.io Zertifikate
+
+[source,bash]
+----
+# Staging
+flyctl certs create staging.arqua42.arc42.org --app aquarius-staging
+
+# Production
+flyctl certs create arqua42.arc42.org --app aquarius-production
+
+# Status prüfen
+flyctl certs list --app aquarius-staging
+flyctl certs list --app aquarius-production
+----
+
+===== Deployment-Workflow in der Praxis
+
+====== 1. Feature entwickeln
+
+[source,bash]
+----
+# Neuen Feature Branch
+git checkout -b feature/neue-funktion
+
+# Entwicklung, Tests lokal
+make dev
+make test
+
+# Commit & Push
+git add .
+git commit -m "Add neue Funktion"
+git push origin feature/neue-funktion
+----
+
+====== 2. Pull Request erstellen
+
+* GitHub Pull Request von `feature/neue-funktion` → `main`
+* Code Review durch Team
+* CI Tests laufen (Unit Tests, Linting)
+* Nach Approval: Merge in `main`
+
+====== 3. Automatisches Staging Deployment
+
+* **Trigger:** Merge in `main`
+* **GitHub Actions:** Automatischer Deploy zu Staging
+* **Benachrichtigung:** Slack/Email bei Erfolg/Fehler
+* **URL:** https://staging.arqua42.arc42.org
+
+====== 4. Manuelles Testing auf Staging
+
+[source,bash]
+----
+# Staging-URL öffnen
+open https://staging.arqua42.arc42.org
+
+# Tests durchführen:
+# - Neue Funktion testen
+# - Regressionstests
+# - Browser-Kompatibilität
+# - Performance-Checks
+----
+
+====== 5. Production Deployment (Manual Trigger)
+
+*GitHub UI:*
+
+1. `Actions` Tab öffnen
+2. Workflow "Deploy to fly.io" auswählen
+3. `Run workflow` klicken
+4. Environment: `production` wählen
+5. `Run workflow` bestätigen
+
+*Approval-Prozess:*
+
+1. GitHub wartet auf Reviewer-Approval
+2. Team-Member reviewt Staging-Tests
+3. Approval geben: `Review deployments` → `Approve and deploy`
+4. Deployment startet automatisch
+
+*Command-Line Alternative:*
+
+[source,bash]
+----
+# GitHub CLI installiert?
+gh workflow run deploy.yml \
+  --field environment=production
+
+# Oder direkt via Makefile
+make deploy-production
+----
+
+====== 6. Production Verification
+
+[source,bash]
+----
+# Health Check
+curl https://arqua42.arc42.org/api/health
+
+# Logs monitoren
+flyctl logs --app aquarius-production
+
+# Metriken prüfen
+flyctl metrics --app aquarius-production
+
+# Smoke Tests
+curl https://arqua42.arc42.org/api/figur
+curl https://arqua42.arc42.org/api/wettkampf
+----
+
+===== Makefile-Integration
+
+====== Neue Targets für Multi-Environment
+
+[source,makefile]
+----
+.PHONY: deploy-staging
+deploy-staging: ## Deploy to Staging (fly.io)
+	@echo "🚀 Deploying to Staging..."
+	flyctl deploy --app aquarius-staging --config fly.staging.toml
+
+.PHONY: deploy-production
+deploy-production: ## Deploy to Production (fly.io) - REQUIRES CONFIRMATION
+	@echo "⚠️  PRODUCTION DEPLOYMENT"
+	@echo ""
+	@echo "Prerequisites:"
+	@echo "  - Staging tests passed"
+	@echo "  - Team approval obtained"
+	@echo "  - Off-peak hours (if applicable)"
+	@echo ""
+	@read -p "Deploy to PRODUCTION? [yes/NO] " -r; \
+	if [[ $$REPLY == "yes" ]]; then \
+		flyctl deploy --app aquarius-production --config fly.production.toml; \
+	else \
+		echo "❌ Production deployment cancelled"; \
+		exit 1; \
+	fi
+
+.PHONY: deploy-status-staging
+deploy-status-staging: ## Check Staging deployment status
+	@flyctl status --app aquarius-staging
+	@echo ""
+	@flyctl logs --app aquarius-staging --lines 20
+
+.PHONY: deploy-status-production
+deploy-status-production: ## Check Production deployment status
+	@flyctl status --app aquarius-production
+	@echo ""
+	@flyctl logs --app aquarius-production --lines 20
+
+.PHONY: deploy-logs-staging
+deploy-logs-staging: ## Stream Staging logs
+	flyctl logs --app aquarius-staging
+
+.PHONY: deploy-logs-production
+deploy-logs-production: ## Stream Production logs
+	flyctl logs --app aquarius-production
+
+.PHONY: deploy-ssh-staging
+deploy-ssh-staging: ## SSH into Staging container
+	flyctl ssh console --app aquarius-staging
+
+.PHONY: deploy-ssh-production
+deploy-ssh-production: ## SSH into Production container
+	flyctl ssh console --app aquarius-production
+
+.PHONY: deploy-rollback-staging
+deploy-rollback-staging: ## Rollback Staging to previous version
+	flyctl releases rollback --app aquarius-staging
+
+.PHONY: deploy-rollback-production
+deploy-rollback-production: ## Rollback Production to previous version - REQUIRES CONFIRMATION
+	@echo "⚠️  PRODUCTION ROLLBACK"
+	@read -p "Rollback PRODUCTION? [yes/NO] " -r; \
+	if [[ $$REPLY == "yes" ]]; then \
+		flyctl releases rollback --app aquarius-production; \
+	else \
+		echo "❌ Rollback cancelled"; \
+		exit 1; \
+	fi
+----
+
+===== Kosten-Optimierung für Zwei Umgebungen
+
+[cols="1,1,1,2"]
+|===
+|Ressource |Staging |Production |Gesamt/Monat
+
+|**fly.io VM**
+|$3 (256MB, auto-stop)
+|$5 (512MB, always-on)
+|$8
+
+|**fly.io Volume**
+|$0.15 (1GB, optional)
+|$0.15 (1GB, optional)
+|$0.30
+
+|**Turso Database**
+|Free Tier
+|Free Tier
+|$0
+|===
+
+*Geschätzte Gesamtkosten:* **$8-10 / Monat** für beide Umgebungen
+
+[NOTE]
+====
+**Kosten-Spar-Tipps für Staging:**
+
+* `auto_stop_machines = true` → Staging schläft bei Inaktivität
+* `min_machines_running = 0` → Keine Mindest-Instanzen
+* Kleinere VM-Größe (256 MB statt 512 MB)
+* Shared CPU statt Dedicated
+
+*Ergebnis:* Staging kostet nur ~$1-2/Monat bei geringer Nutzung
+====
+
+===== Checkliste: Initial Setup
+
+[cols="1,3"]
+|===
+|✓ |Aufgabe
+
+|☐
+|**1. fly.io Apps erstellen**
+`flyctl launch --name aquarius-staging`
+`flyctl launch --name aquarius-production`
+
+|☐
+|**2. Turso Databases erstellen**
+`turso db create aquarius-staging`
+`turso db create aquarius-production`
+
+|☐
+|**3. GitHub Secrets konfigurieren**
+`FLY_API_TOKEN`, `TURSO_AUTH_TOKEN_STAGING`, `TURSO_AUTH_TOKEN_PRODUCTION`
+
+|☐
+|**4. GitHub Environments einrichten**
+Staging (no protection) + Production (1 reviewer required)
+
+|☐
+|**5. fly.io Secrets setzen**
+`DATABASE_URL` für Staging + Production
+
+|☐
+|**6. DNS konfigurieren**
+CNAME für `staging.arqua42.arc42.org` + `arqua42.arc42.org`
+
+|☐
+|**7. fly.io Zertifikate erstellen**
+`flyctl certs create` für beide Domains
+
+|☐
+|**8. GitHub Actions Workflow erstellen**
+`.github/workflows/deploy.yml`
+
+|☐
+|**9. fly.toml Dateien erstellen**
+`fly.staging.toml` + `fly.production.toml`
+
+|☐
+|**10. Makefile Targets hinzufügen**
+`deploy-staging`, `deploy-production`, etc.
+
+|☐
+|**11. Initiales Deployment testen**
+Staging → Testing → Production
+
+|☐
+|**12. Health Check Endpoint implementieren**
+`/api/health` für Monitoring
+|===
+
+==== 8.4.13 Sicherheitsaspekte
+
+===== Transport Security
+
+* **TLS 1.3:** Automatisch durch fly.io
+* **HSTS:** Strict-Transport-Security Header
+* **Certificate Pinning:** Optional für Mobile Apps
+
+===== Database Security
+
+* **Encrypted Connections:** libSQL über HTTPS/WSS
+* **Authentication Token:** Turso Auth Token in Secrets
+* **Row-Level Security:** Zukünftig via Turso RLS
+
+[source,python]
+----
+# backend/app/main.py
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+
+if os.getenv("ENVIRONMENT") == "production":
+    # Force HTTPS
+    app.add_middleware(HTTPSRedirectMiddleware)
+
+    # Restrict to trusted hosts
+    app.add_middleware(
+        TrustedHostMiddleware,
+        allowed_hosts=["arqua42.arc42.org", "*.fly.dev"]
+    )
+----
+
+===== Secrets Rotation
+
+[source,bash]
+----
+# Turso Token rotieren
+turso db tokens create aquarius-production
+
+# Neuen Token in fly.io setzen
+flyctl secrets set DATABASE_URL="libsql://...?authToken=NEW_TOKEN"
+
+# Deployment triggern
+flyctl deploy
+----
+
+==== 8.4.14 Migrations-Strategie
+
+===== Schema Migrations mit Alembic
+
+[source,bash]
+----
+# Lokale Migration testen
+cd backend
+alembic upgrade head
+
+# Cloud Migration durchführen (manuell)
+flyctl ssh console
+cd /app/backend
+alembic upgrade head
+----
+
+[IMPORTANT]
+====
+*Zero-Downtime Migrations:*
+
+1. **Backward-Compatible Changes:** Neue Spalten als nullable
+2. **Blue-Green Deployment:** Alte Version läuft während Migration
+3. **Rollback-Plan:** Jede Migration muss `downgrade()` haben
+====
+
+===== Automatische Migrations im Container
+
+[source,dockerfile]
+----
+# Dockerfile (Production)
+CMD ["sh", "-c", "cd backend && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8080"]
+----
+
+[WARNING]
+====
+*Risiko bei Auto-Migrations:*
+
+* Container-Restart kann fehlschlagen bei Migration-Fehler
+* **Empfehlung:** Manuell vor Deployment ausführen
+====
+
+==== 8.4.15 Rollback-Strategie
+
+===== fly.io Release Management
+
+[source,bash]
+----
+# Releases anzeigen
+flyctl releases
+
+# Rollback zur vorherigen Version
+flyctl releases rollback
+
+# Rollback zu spezifischer Version
+flyctl releases rollback --version v123
+----
+
+===== Database Rollback
+
+[source,bash]
+----
+# Alembic Downgrade (lokal testen!)
+alembic downgrade -1
+
+# Im Notfall: Turso Point-in-Time Restore
+turso db restore aquarius-production --timestamp "2024-01-15T10:00:00Z"
+----
+
+==== 8.4.16 Entwicklungs-Workflow
+
+===== Lokale Entwicklung mit Turso
+
+[source,bash]
+----
+# Turso CLI installieren
+brew install tursodatabase/tap/turso
+
+# Turso Auth Token holen
+turso db tokens create aquarius-dev
+
+# In .env setzen
+DATABASE_URL="libsql://aquarius-dev.turso.io?authToken=..."
+
+# App starten
+make dev
+----
+
+===== Staging-Environment
+
+[source,bash]
+----
+# Separate Staging-App auf fly.io
+flyctl launch --name aquarius-staging --region fra
+
+# Staging-Database bei Turso
+turso db create aquarius-staging --location fra
+
+# Deployment nach Staging
+flyctl deploy -a aquarius-staging
+----
+
+*Deployment-Pipeline:*
+
+----
+Local Dev → Staging → Production
+   ↓           ↓          ↓
+SQLite     Turso      Turso
+           (staging)  (production)
+----
+
+==== 8.4.17 Offene Punkte und nächste Schritte
+
+[cols="1,2,1"]
+|===
+|Aufgabe |Beschreibung |Status
+
+|**Dockerfile erstellen**
+|Multi-Stage Build mit Frontend + Backend
+|⏳ TODO
+
+|**fly.toml konfigurieren**
+|App-Config für fly.io
+|⏳ TODO
+
+|**Turso Database einrichten**
+|Production + Staging Datenbanken
+|⏳ TODO
+
+|**Secrets konfigurieren**
+|DATABASE_URL in fly.io Secrets
+|⏳ TODO
+
+|**Makefile-Target**
+|`make deploy-to-fly` implementieren
+|⏳ TODO
+
+|**DNS konfigurieren**
+|CNAME für arqua42.arc42.org
+|⏳ TODO
+
+|**Health Checks**
+|`/api/health` Endpoint implementieren
+|⏳ TODO
+
+|**CI/CD Pipeline**
+|GitHub Actions Workflow
+|⏳ TODO
+|===
+
+[NOTE]
+====
+*Dokumentations-Referenzen:*
+
+* fly.io Docs: https://fly.io/docs/
+* Turso Docs: https://docs.turso.tech/
+* libSQL Python Client: https://github.com/libsql/libsql-client-py
+====

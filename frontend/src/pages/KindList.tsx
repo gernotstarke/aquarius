@@ -41,21 +41,23 @@ const KindList: React.FC = () => {
         {kinder?.map((kind) => (
           <Card key={kind.id}>
             <div className="flex items-center justify-between">
-              <div className="space-y-2">
-                <h3 className="text-h3 font-semibold text-neutral-900">
-                  {kind.vorname} {kind.nachname}
-                </h3>
-                <p className="text-body text-neutral-600">
-                  Geboren: {kind.geburtsdatum}
-                </p>
-                {kind.geschlecht && (
-                  <p className="text-body text-neutral-500">Geschlecht: {kind.geschlecht}</p>
-                )}
-                {kind.verein && (
-                  <p className="text-body text-neutral-500">Verein: {kind.verein}</p>
-                )}
-              </div>
-              <div className="flex gap-4">
+              <Link to={`/kind/${kind.id}`} className="block flex-1 group">
+                <div className="space-y-2">
+                  <h3 className="text-h3 font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">
+                    {kind.vorname} {kind.nachname}
+                  </h3>
+                  <p className="text-body text-neutral-600">
+                    Geboren: {kind.geburtsdatum}
+                  </p>
+                  {kind.geschlecht && (
+                    <p className="text-body text-neutral-500">Geschlecht: {kind.geschlecht}</p>
+                  )}
+                  {kind.verein && (
+                    <p className="text-body text-neutral-500">Verein: {kind.verein}</p>
+                  )}
+                </div>
+              </Link>
+              <div className="flex gap-4 ml-4">
                 <Link to={`/kind/${kind.id}`}>
                   <Button variant="secondary">Bearbeiten</Button>
                 </Link>

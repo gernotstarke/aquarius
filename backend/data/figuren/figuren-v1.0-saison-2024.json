@@ -1,0 +1,221 @@
+{
+  "version": "1.0",
+  "saison": "2024/2025",
+  "erstellt_am": "2024-12-20",
+  "beschreibung": "Offizieller Figurenkatalog für die Saison 2024/2025 - Kategorien 1-6",
+  "figuren": [
+    {
+      "id": "F01",
+      "name": "Ballettbein",
+      "kategorie": "Ballettbein",
+      "beschreibung": "Ein Bein senkrecht gestreckt aus dem Wasser, Körper stabil",
+      "schwierigkeitsgrad": 12,
+      "altersklasse": "U8–U10",
+      "bild": "images/f01-balletbein.png"
+    },
+    {
+      "id": "F02",
+      "name": "Ballettbein beidbeinig",
+      "kategorie": "Ballettbein",
+      "beschreibung": "Beide Beine senkrecht gestreckt",
+      "schwierigkeitsgrad": 15,
+      "altersklasse": "U10–U12",
+      "bild": "images/f02-balletbein-beidbeinig.png"
+    },
+    {
+      "id": "F03",
+      "name": "Ballettbein angewinkelt",
+      "kategorie": "Ballettbein",
+      "beschreibung": "Ein Bein gestreckt, ein Bein angewinkelt",
+      "schwierigkeitsgrad": 13,
+      "altersklasse": "U9–U11",
+      "bild": "images/f03-ballettbein-angewinkelt.png"
+    },
+    {
+      "id": "F04",
+      "name": "Ballettbein gestreckt",
+      "kategorie": "Ballettbein",
+      "beschreibung": "Fokus auf maximale Streckung und Höhe",
+      "schwierigkeitsgrad": 14,
+      "altersklasse": "U10–U12"
+    },
+    {
+      "id": "F05",
+      "name": "Vertikale",
+      "kategorie": "Vertikale",
+      "beschreibung": "Beide Beine senkrecht gestreckt, Kopf nach unten",
+      "schwierigkeitsgrad": 16,
+      "altersklasse": "U9–U12",
+      "bild": "images/f05-vertikale.png"
+    },
+    {
+      "id": "F06",
+      "name": "Vertikale angewinkelt",
+      "kategorie": "Vertikale",
+      "beschreibung": "Vertikale mit angewinkeltem Bein",
+      "schwierigkeitsgrad": 17,
+      "altersklasse": "U10–U12",
+      "bild": "images/f06-vertikale-angewinkelt.png"
+    },
+    {
+      "id": "F07",
+      "name": "Vertikale im Spagat",
+      "kategorie": "Vertikale",
+      "beschreibung": "Vertikale mit gespreizten Beinen",
+      "schwierigkeitsgrad": 19,
+      "altersklasse": "U11–U13"
+    },
+    {
+      "id": "F08",
+      "name": "Vertikale beidbeinig",
+      "kategorie": "Vertikale",
+      "beschreibung": "Klassische doppelte Beinführung",
+      "schwierigkeitsgrad": 16,
+      "altersklasse": "U9–U12"
+    },
+    {
+      "id": "F09",
+      "name": "Flamingo",
+      "kategorie": "Flamingo",
+      "beschreibung": "Ein Bein angewinkelt, ein Bein gestreckt",
+      "schwierigkeitsgrad": 11,
+      "altersklasse": "U8–U10"
+    },
+    {
+      "id": "F10",
+      "name": "Flamingo angewinkelt",
+      "kategorie": "Flamingo",
+      "beschreibung": "Variante mit stärkerer Beugung",
+      "schwierigkeitsgrad": 12,
+      "altersklasse": "U8–U10"
+    },
+    {
+      "id": "F11",
+      "name": "Flamingo zur Vertikalen",
+      "kategorie": "Flamingo",
+      "beschreibung": "Übergang von Flamingo in Vertikale",
+      "schwierigkeitsgrad": 16,
+      "altersklasse": "U10–U12"
+    },
+    {
+      "id": "F12",
+      "name": "Ritter",
+      "kategorie": "Ritter",
+      "beschreibung": "Ein Bein senkrecht, ein Bein horizontal",
+      "schwierigkeitsgrad": 13,
+      "altersklasse": "U9–U11"
+    },
+    {
+      "id": "F13",
+      "name": "Ritter angewinkelt",
+      "kategorie": "Ritter",
+      "beschreibung": "Variante mit angewinkeltem Bein",
+      "schwierigkeitsgrad": 14,
+      "altersklasse": "U9–U11"
+    },
+    {
+      "id": "F14",
+      "name": "Ritter zur Vertikalen",
+      "kategorie": "Ritter",
+      "beschreibung": "Übergang von Ritter in Vertikale",
+      "schwierigkeitsgrad": 17,
+      "altersklasse": "U10–U12"
+    },
+    {
+      "id": "F15",
+      "name": "Spagat",
+      "kategorie": "Spagat",
+      "beschreibung": "Beine im 180°-Winkel gespreizt",
+      "schwierigkeitsgrad": 14,
+      "altersklasse": "U9–U11"
+    },
+    {
+      "id": "F16",
+      "name": "Spagat angewinkelt",
+      "kategorie": "Spagat",
+      "beschreibung": "Spagat mit angewinkeltem Bein",
+      "schwierigkeitsgrad": 15,
+      "altersklasse": "U10–U12"
+    },
+    {
+      "id": "F17",
+      "name": "Spagat zur Vertikalen",
+      "kategorie": "Spagat",
+      "beschreibung": "Übergang vom Spagat in Vertikale",
+      "schwierigkeitsgrad": 18,
+      "altersklasse": "U11–U13"
+    },
+    {
+      "id": "F18",
+      "name": "Hocke",
+      "kategorie": "Grundposition",
+      "beschreibung": "Knie zur Brust gezogen, kompakte Position",
+      "schwierigkeitsgrad": 10,
+      "altersklasse": "U8–U10"
+    },
+    {
+      "id": "F19",
+      "name": "Pike",
+      "kategorie": "Grundposition",
+      "beschreibung": "Gestreckte Beine, Oberkörper nach unten",
+      "schwierigkeitsgrad": 12,
+      "altersklasse": "U9–U11"
+    },
+    {
+      "id": "F20",
+      "name": "Strecklage",
+      "kategorie": "Grundposition",
+      "beschreibung": "Körper vollständig gestreckt an der Wasseroberfläche",
+      "schwierigkeitsgrad": 11,
+      "altersklasse": "U8–U10"
+    },
+    {
+      "id": "F21",
+      "name": "Umgekehrte Pike",
+      "kategorie": "Grundposition",
+      "beschreibung": "Pike-Position mit Kopf nach unten",
+      "schwierigkeitsgrad": 15,
+      "altersklasse": "U10–U12"
+    },
+    {
+      "id": "F22",
+      "name": "Ballettbein zur Vertikalen",
+      "kategorie": "Kombination",
+      "beschreibung": "Übergang vom Ballettbein in Vertikale",
+      "schwierigkeitsgrad": 17,
+      "altersklasse": "U10–U12"
+    },
+    {
+      "id": "F23",
+      "name": "Spagat zur Vertikalen",
+      "kategorie": "Kombination",
+      "beschreibung": "Übergang vom Spagat in Vertikale",
+      "schwierigkeitsgrad": 18,
+      "altersklasse": "U11–U13"
+    },
+    {
+      "id": "F24",
+      "name": "Ritter zur Vertikalen",
+      "kategorie": "Kombination",
+      "beschreibung": "Übergang vom Ritter in Vertikale",
+      "schwierigkeitsgrad": 17,
+      "altersklasse": "U10–U12"
+    },
+    {
+      "id": "F25",
+      "name": "Flamingo zur Vertikalen",
+      "kategorie": "Kombination",
+      "beschreibung": "Übergang vom Flamingo in Vertikale",
+      "schwierigkeitsgrad": 16,
+      "altersklasse": "U10–U12"
+    },
+    {
+      "id": "F26",
+      "name": "Umgekehrte Pike zur Vertikalen",
+      "kategorie": "Kombination",
+      "beschreibung": "Übergang von umgekehrter Pike in Vertikale",
+      "schwierigkeitsgrad": 19,
+      "altersklasse": "U11–U13"
+    }
+  ]
+}

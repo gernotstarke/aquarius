@@ -4,61 +4,89 @@ import Card from '../components/Card';
 import Button from '../components/Button';
 
 const Home: React.FC = () => {
-  const entities = [
+  const mainSections = [
     {
-      name: 'Saisons',
-      description: 'Wettkampf-Saisons verwalten',
-      path: '/saison',
-      icon: '📅',
+      name: 'Anmeldung',
+      description: 'Kinder für Wettkämpfe anmelden',
+      path: '/anmeldung/liste',
+      icon: '📝',
+      color: 'bg-purple-50 hover:bg-purple-100',
     },
     {
-      name: 'Schwimmbäder',
-      description: 'Schwimmbäder und Austragungsorte',
-      path: '/schwimmbad',
-      icon: '🏊',
-    },
-    {
-      name: 'Wettkämpfe',
-      description: 'Wettkämpfe planen und organisieren',
+      name: 'Wettkampf',
+      description: 'Wettkämpfe organisieren und durchführen',
       path: '/wettkampf',
       icon: '🏆',
+      color: 'bg-yellow-50 hover:bg-yellow-100',
     },
     {
-      name: 'Kinder',
-      description: 'Teilnehmende Kinder verwalten',
-      path: '/kind',
-      icon: '👶',
+      name: 'Grunddaten',
+      description: 'Schwimmbäder, Figuren und Kinder verwalten',
+      path: '/schwimmbad',
+      icon: '🏊',
+      color: 'bg-green-50 hover:bg-green-100',
+    },
+    {
+      name: 'Saisonplanung',
+      description: 'Saisons und Wettkämpfe planen',
+      path: '/saison',
+      icon: '📅',
+      color: 'bg-blue-50 hover:bg-blue-100',
     },
   ];
 
   return (
-    <div className="space-y-12">
-      <div className="text-center space-y-4">
-        <h1 className="text-display font-bold text-neutral-900">
-          Arqua42 CRUD Prototype
-        </h1>
-        <p className="text-body-lg text-neutral-600 max-w-2xl mx-auto">
-          Einfache Verwaltung von Saisons, Schwimmbädern, Wettkämpfen und Kindern
-        </p>
+    <div className="min-h-screen flex flex-col">
+      {/* Main Content */}
+      <div className="flex-1 space-y-12 pb-16">
+        {/* Logo and Title */}
+        <div className="text-center space-y-6">
+          <h1 className="text-display font-bold text-neutral-900">
+            Arqua42
+          </h1>
+          <p className="text-body-lg text-neutral-600 max-w-2xl mx-auto">
+            Struktur, Konzepte, Wasser
+          </p>
+        </div>
+
+        {/* Main Sections Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {mainSections.map((section: any) => (
+            <Link key={section.path} to={section.path}>
+              <Card className={`h-full transition-all duration-200 ${section.color}`}>
+                <div className="flex flex-col h-full p-4">
+                  <div className="flex-1 space-y-6">
+                    <div className="text-6xl">{section.name === 'Grunddaten' ? '🏢 🤸 🧒' : section.icon}</div>
+                    <div className="space-y-4">
+                      {section.hideTitle ? (
+                        <Button size="lg" className="w-full">
+                          {section.buttonText}
+                        </Button>
+                      ) : (
+                        <h2 className="text-h2 font-bold text-neutral-900">{section.name}</h2>
+                      )}
+                      <p className="text-body text-neutral-600">{section.description}</p>
+                    </div>
+                  </div>
+                  <div className="mt-6">
+                    {!section.hideTitle && (
+                      <Button size="lg" className="w-full">
+                        Öffnen
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            </Link>
+          ))}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-        {entities.map((entity) => (
-          <Card key={entity.path} className="hover:shadow-md transition-shadow">
-            <div className="space-y-6">
-              <div className="text-6xl">{entity.icon}</div>
-              <div className="space-y-2">
-                <h2 className="text-h2 font-bold text-neutral-900">{entity.name}</h2>
-                <p className="text-body text-neutral-600">{entity.description}</p>
-              </div>
-              <Link to={entity.path}>
-                <Button size="lg" className="w-full">
-                  Öffnen
-                </Button>
-              </Link>
-            </div>
-          </Card>
-        ))}
+      {/* Footer */}
+      <div className="border-t border-neutral-200 py-6">
+        <p className="text-center text-sm text-neutral-500">
+          made with passion in Cologne
+        </p>
       </div>
     </div>
   );

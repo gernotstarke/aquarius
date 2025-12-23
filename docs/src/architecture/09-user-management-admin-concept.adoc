@@ -1,0 +1,137 @@
+# ADR-020: Benutzerverwaltung und Admin-Anwendung
+
+**Status:** Proposed
+**Datum:** 2025-12-20
+**Entscheider:** Entwicklungsteam
+**Bezieht sich auf:** [ADR-014 FastAPI Backend](ADR-014-python-fastapi-backend.md), [ADR-013 React Frontend](ADR-013-react-typescript-frontend.md)
+
+---
+
+## Kontext
+
+Bisher ist die Aquarius-Anwendung komplett ungeschützt. Jeder mit Netzwerkzugriff kann Daten lesen, ändern und löschen.
+Für den produktiven Betrieb benötigen wir:
+1.  **Schutz sensibler Funktionen** (Löschen von Saisons, Ändern von Stammdaten).
+2.  **Unterschiedliche Rollen** (Admin, Planer, Kampfrichter).
+3.  **Dedizierte Verwaltungsoberfläche**, die sich optisch klar abhebt, um versehentliche Änderungen ("Fat Finger"-Fehler) zu vermeiden.
+4.  Eine Möglichkeit, Kampfrichter-Accounts für die spätere Bewertungs-App vorzubereiten.
+
+**Anforderung des Product Owners:**
+Die Admin-Oberfläche soll "Root-Zugriff"-Charakter haben: Rötlicher Hintergrund, Signalwirkung, aber gut lesbar.
+
+## Entscheidung
+
+### 1. Datenmodell & Sicherheit
+Wir erweitern das Datenmodell um eine `User`-Entität und implementieren Authentifizierung via **JWT (JSON Web Tokens)**.
+
+**Rollen-Konzept (RBAC):**
+*   `ROOT` (System-Admin): Darf alles, insbesondere User verwalten.
+*   `PLANER` (Organisation): Darf Saisons, Wettkämpfe, Stammdaten verwalten. Darf *keine* User anlegen.
+*   `OFFIZIELLER` (Kampfrichter/Punktrichter): Darf sich später an der Mobile-App anmelden und bewerten. Zugriff auf Admin-UI ist gesperrt.
+
+### 2. Eigenständige Admin-Anwendung
+Wir entwickeln eine **separate React-Anwendung** (`frontend/apps/admin`), die getrennt von der Hauptanwendung gebaut und deployt wird.
+
+*   **URL:** `admin.aquarius.arc42.org` (Subdomain)
+*   **Technologie:** React, TailwindCSS (wie Haupt-App, Shared Components möglich).
+*   **Design-Philosophie:** "Danger Zone"
+    *   Hintergrund: Helles Rötlich (`bg-red-50`)
+    *   Akzentfarbe: Rot (`red-700`)
+    *   Permanenter Header: "SYSTEM ADMINISTRATION - CAUTION"
+
+## Detailliertes Konzept
+
+### 1. Datenbank-Schema (`users` Tabelle)
+
+Wir fügen dem Backend-Modell folgende Tabelle hinzu:
+
+```python
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    full_name = Column(String, nullable=True)
+    hashed_password = Column(String, nullable=False)
+    role = Column(String, nullable=False, default="OFFIZIELLER") # ROOT, PLANER, OFFIZIELLER
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+```
+
+**Sicherheit:**
+*   Passwörter werden **niemals** im Klartext gespeichert.
+*   Hashing-Algorithmus: **bcrypt** (via `passlib`).
+*   Auth-Flow: OAuth2 mit Password Flow (User sendet User/Pass, erhält JWT Access Token).
+
+### 2. Visuelles Design (Admin UI)
+
+Um den "Root"-Charakter zu unterstreichen und die kognitive Trennung zur normalen Anwendung zu erzwingen:
+
+*   **Global Theme:**
+    *   Body Background: `#FEF2F2` (Tailwind `bg-red-50`)
+    *   Card Background: `#FFFFFF` (White) mit rotem Border-Top (`border-t-4 border-red-600`)
+    *   Text: Dunkelgrau für Lesbarkeit, aber Überschriften in Dunkelrot.
+*   **Warnhinweise:** Kritische Aktionen (Löschen, User anlegen) erfordern explizite Bestätigung mit rotem Button.
+*   **Layout:**
+    *   Sidebar dunkelrot (`bg-red-900`) statt dem Blau der Hauptanwendung.
+    *   Favicon in Rot.
+
+**Mockup-Beschreibung:**
+> Der Bildschirm hat einen warmen, leicht rötlichen Ton. Oben prangt eine Leiste: "ADMINSTRATION MODE". Die Navigation links ist dunkelrot. Die Tabelle der User ist weiß, aber wenn man über eine Zeile fährt, wird sie zartrot hervorgehoben. Der "Löschen"-Button ist ein ausgefülltes, leuchtendes Rot.
+
+### 3. Funktionaler Umfang der Admin-App
+
+1.  **Dashboard:**
+    *   Status des Systems (DB-Größe, Anzahl User, Letztes Backup).
+    *   System-Logs (aus der `.crush/logs` oder Backend-Logs).
+2.  **User Management (Nur Rolle ROOT):**
+    *   Liste aller User.
+    *   User anlegen (Username, Initialpasswort, Rolle).
+    *   Passwort zurücksetzen.
+    *   User deaktivieren (statt löschen, um Referenzen zu erhalten).
+3.  **System-Reset (Nur Rolle ROOT + Extra Bestätigung):**
+    *   "Not-Aus": Datenbank zurücksetzen (für Testphasen).
+
+### 4. API Endpoints
+
+Das Backend wird erweitert um:
+
+*   `POST /auth/token`: Login (Gibt JWT zurück).
+*   `GET /users/me`: Profil des aktuellen Users.
+*   `GET /users`: Liste aller User (Nur Admin).
+*   `POST /users`: User anlegen (Nur Admin).
+*   `PUT /users/{id}`: User ändern/sperren.
+
+### 5. Deployment Strategie
+
+Da wir GitHub Pages nutzen, ist das Hosting von zwei Apps trivial:
+
+*   **Struktur im Repo:**
+    *   `frontend/main/` -> Baut nach `dist/main`
+    *   `frontend/admin/` -> Baut nach `dist/admin`
+*   **URL Mapping:**
+    *   `aquarius.arc42.org` -> Lädt `index.html` aus `dist/main`
+    *   `admin.aquarius.arc42.org` -> Lädt `index.html` aus `dist/admin` (oder `aquarius.arc42.org/admin`)
+
+## Implementierungs-Plan
+
+1.  **Backend:**
+    *   `pip install python-jose passlib[bcrypt]`
+    *   SQLAlchemy Model `User` erstellen.
+    *   Alembic Migration erstellen.
+    *   `auth.py` Modul für JWT Handling.
+    *   Seed-Script anpassen: Erstellen eines Default `admin / changeme` Users.
+2.  **Frontend:**
+    *   Refactoring des `frontend`-Ordners zu einem Monorepo (Workspace) oder Anlage eines parallelen Ordners.
+    *   Setup des "Red Theme".
+    *   Login-Screen implementieren.
+
+## Konsequenzen
+
+*   **Positiv:**
+    *   Klare Trennung von Konfiguration und operativem Geschäft.
+    *   Hohe Sicherheit durch physisch getrennte UIs (User kann sich nicht "versehentlich" im falschen Modus befinden).
+    *   Erfüllt die Sicherheitsanforderungen für die öffentliche Erreichbarkeit.
+*   **Negativ:**
+    *   Initialer Mehraufwand (Auth-Implementierung, zweite Frontend-App).
+    *   User müssen sich Passwörter merken.
