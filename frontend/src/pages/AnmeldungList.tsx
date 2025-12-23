@@ -65,14 +65,14 @@ const AnmeldungList: React.FC = () => {
 
       <div className="grid gap-6">
         {anmeldungen?.map((anmeldung) => (
-          <Card key={anmeldung.id}>
+          <Card key={anmeldung.id} className="transition-shadow hover:shadow-md">
             <div className="flex items-start justify-between">
-              <div className="space-y-3 flex-1">
+              <Link to={`/anmeldung/${anmeldung.id}`} className="space-y-3 flex-1 group block">
                 <div className="flex items-center gap-3">
                   <span className="px-3 py-1 bg-primary-600 text-white rounded-full text-sm font-semibold">
                     #{anmeldung.startnummer}
                   </span>
-                  <h3 className="text-h3 font-semibold text-neutral-900">
+                  <h3 className="text-h3 font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">
                     {getKindName(anmeldung.kind_id)}
                   </h3>
                   {anmeldung.vorlaeufig === 1 && (
@@ -114,8 +114,8 @@ const AnmeldungList: React.FC = () => {
                     </div>
                   </div>
                 )}
-              </div>
-              <div className="flex gap-4">
+              </Link>
+              <div className="flex gap-4 ml-4">
                 <Link to={`/anmeldung/${anmeldung.id}`}>
                   <Button variant="secondary">Bearbeiten</Button>
                 </Link>

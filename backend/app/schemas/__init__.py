@@ -100,6 +100,8 @@ class Anmeldung(BaseModel):
 class WettkampfWithDetails(Wettkampf):
     figuren: List[Figur] = []
     anmeldungen: List[Anmeldung] = []
+    saison: Optional[Saison] = None
+    schwimmbad: Optional[Schwimmbad] = None
 
 # Kind Schemas
 class KindBase(BaseModel):

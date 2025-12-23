@@ -50,21 +50,22 @@ const FigurenList: React.FC = () => {
           <h3 className="text-h2 font-bold text-neutral-800 mb-4">{kategorie}</h3>
           <div className="grid gap-4">
             {figs.map((figur) => (
-              <Card key={figur.id}>
+              <Card key={figur.id} className="transition-shadow hover:shadow-md">
                 <div className="flex items-center justify-between">
-                  <div className="space-y-2 flex-1">
-                    <Link to={`/stammdaten/figuren/${figur.id}/detail`}>
-                      <h4 className="text-h3 font-semibold text-neutral-900 hover:text-primary-600 cursor-pointer">
-                        {figur.name}
-                      </h4>
-                    </Link>
+                  <Link 
+                    to={`/stammdaten/figuren/${figur.id}/detail`}
+                    className="flex-1 space-y-2 group block"
+                  >
+                    <h4 className="text-h3 font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">
+                      {figur.name}
+                    </h4>
                     <p className="text-body text-neutral-600">{figur.beschreibung}</p>
                     <div className="flex gap-4 text-sm text-neutral-500">
                       <span>Schwierigkeit: {(figur.schwierigkeitsgrad || 0) / 10}</span>
                       {figur.altersklasse && <span>{figur.altersklasse}</span>}
                     </div>
-                  </div>
-                  <div className="flex gap-4">
+                  </Link>
+                  <div className="flex gap-4 ml-4">
                     <Link to={`/stammdaten/figuren/${figur.id}`}>
                       <Button variant="secondary">Bearbeiten</Button>
                     </Link>
