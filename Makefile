@@ -17,6 +17,7 @@ help: ## Show all available targets
 	@echo "  make web-dev        - Start web app development servers"
 	@echo "  make mobile-ios     - Run iOS simulator"
 	@echo "  make docs-build     - Generate documentation"
+	@echo "  make docs-jekyll    - Start Jekyll site (http://localhost:4000)"
 	@echo ""
 	@echo "For project-specific help:"
 	@echo "  cd web && make help"
@@ -94,6 +95,24 @@ docs-pdf: ## Generate PDF documentation
 
 docs-clean: ## Clean documentation build artifacts
 	@cd documentation && make clean
+
+##@ Jekyll Documentation Site
+
+docs-jekyll: ## Start Jekyll documentation site (http://localhost:4000)
+	@echo "🚀 Starting Jekyll documentation site..."
+	@echo "📖 Visit: http://localhost:4000"
+	@cd docs && docker compose up
+
+docs-jekyll-bg: ## Start Jekyll in background
+	@cd docs && docker compose up -d
+	@echo "✅ Jekyll running in background"
+	@echo "📖 Visit: http://localhost:4000"
+
+docs-jekyll-down: ## Stop Jekyll server
+	@cd docs && docker compose down
+
+docs-jekyll-logs: ## View Jekyll logs
+	@cd docs && docker compose logs -f jekyll
 
 ##@ Installation & Setup
 
