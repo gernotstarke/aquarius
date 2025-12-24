@@ -1,0 +1,42 @@
+# fly.toml - Aquarius Production Configuration
+# Domain: aquarius.arc42.org
+# Deploy with: flyctl deploy
+
+app = "aquarius"
+primary_region = "fra"  # Frankfurt, Germany
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  ENVIRONMENT = "production"
+  LOG_LEVEL = "info"
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true   # On-demand: Schläft bei Inaktivität (spart Kosten)
+  auto_start_machines = true  # Startet automatisch bei Request
+  min_machines_running = 0    # Keine Mindest-Instanzen
+
+  # Health check vorerst deaktiviert (kann später aktiviert werden)
+  # [[http_service.checks]]
+  #   interval = "30s"
+  #   timeout = "5s"
+  #   grace_period = "10s"
+  #   method = "GET"
+  #   path = "/api/health"
+  #
+  #   [http_service.checks.headers]
+  #     User-Agent = "fly-health-check"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256  # 256 MB ausreichend
+
+# Uncomment if you need persistent storage for uploaded files
+# [mounts]
+#   source = "aquarius_data"
+#   destination = "/app/data"

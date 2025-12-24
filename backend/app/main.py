@@ -47,6 +47,23 @@ def read_root():
     return {"message": "Arqua42 CRUD API", "version": "0.1.0"}
 
 
+@app.get("/api/health")
+def health_check(db: Session = Depends(get_db)):
+    """Health check endpoint for monitoring and fly.io health checks."""
+    try:
+        # Test database connection
+        db.execute("SELECT 1")
+        db_status = "healthy"
+    except Exception as e:
+        db_status = f"unhealthy: {str(e)}"
+
+    return {
+        "status": "healthy",
+        "database": db_status,
+        "version": "0.1.0"
+    }
+
+
 # ============================================================================
 # SAISON CRUD ENDPOINTS
 # ============================================================================
