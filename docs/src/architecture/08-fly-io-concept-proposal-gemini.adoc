@@ -1,0 +1,177 @@
+# ADR-019: Deployment Strategy with Fly.io & GitHub Pages
+
+**Status:** Proposed
+**Date:** 2025-12-20
+**Decider:** Development Team
+**Relates to:** [ADR-014 FastAPI Backend](ADR-014-python-fastapi-backend.md), [ADR-015 Turso Database](ADR-015-turso-database.md), [ADR-016 PWA Architecture](ADR-016-pwa-architecture.md)
+
+---
+
+## Context
+
+The Aquarius system consists of a Python FastAPI backend and a React frontend (PWA). The system needs to be deployed in a way that is:
+1.  **Cost-effective** for a small club (ideally free tier compatible).
+2.  **Reliable** enough for competition days.
+3.  **Low maintenance**.
+4.  **Accessible** via a custom domain (e.g., `aquarius.arc42.org`).
+
+**Key Constraints:**
+- The backend needs to run Python.
+- The database (Turso) is already hosted as a managed service, but needs to be accessible.
+- The frontend is a static SPA/PWA but interacts with the backend.
+- Future mobile apps need API access.
+- Domain management is handled via GitHub (for `arc42.org`).
+
+## Decision
+
+We will adopt a hybrid deployment strategy:
+1.  **Backend:** Deployed on **Fly.io** (running FastAPI in a Docker container).
+2.  **Frontend:** Deployed on **GitHub Pages** (hosting the static React build).
+3.  **Database:** Remains on **Turso** (as per ADR-015).
+4.  **Domain:** `aquarius.arc42.org` (CNAME to GitHub Pages), with `api.aquarius.arc42.org` (CNAME to Fly.io).
+
+### Architecture Diagram
+
+```mermaid
+graph TD
+    User[User / Mobile App] -->|HTTPS| CDN[GitHub Pages CDN]
+    CDN -->|Serves Static Files| FE[Frontend PWA]
+    
+    FE -->|API Calls (HTTPS)| Fly[Fly.io Backend]
+    Mobile[Native Mobile App] -->|API Calls (HTTPS)| Fly
+    
+    Fly -->|SQL over HTTP| Turso[Turso Cloud DB]
+    
+    subgraph "Fly.io Region (fra)"
+        Fly
+    end
+    
+    subgraph "Edge"
+        CDN
+        Turso
+    end
+```
+
+## Detailed Concept
+
+### 1. Backend on Fly.io
+
+**Why Fly.io?**
+-   **Docker Support:** Native support for running our `backend/Dockerfile`.
+-   **Free Tier:** Generous free allowance (3 shared-cpu-1x VMs) sufficient for our low traffic.
+-   **Global/Regional:** Can deploy close to users (e.g., `fra` Frankfurt).
+-   **Secrets Management:** Secure storage for `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`.
+
+**Configuration (`fly.toml`):**
+```toml
+app = "aquarius-backend"
+primary_region = "fra"
+
+[build]
+  dockerfile = "backend/Dockerfile"
+
+[env]
+  PORT = "8000"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+```
+
+**Secrets:**
+Set via CLI: `fly secrets set TURSO_DATABASE_URL=... TURSO_AUTH_TOKEN=...`
+
+### 2. Frontend on GitHub Pages
+
+**Why GitHub Pages?**
+-   **Integration:** Closely tied to our repository.
+-   **Cost:** Free.
+-   **Performance:** Fast CDN for static assets.
+-   **Custom Domain:** Easy CNAME setup for `aquarius.arc42.org`.
+
+**Workflow:**
+1.  Build React app (`vite build`).
+2.  GitHub Action uploads `frontend/dist` artifact.
+3.  Deploy to `gh-pages` branch or directly via Actions.
+
+### 3. Database (Turso)
+
+**Persistence:**
+-   Turso is a managed service, so persistence is handled by them.
+-   **Backups:** Turso provides built-in backup/restore features.
+-   **Connectivity:** The backend connects via `libsql` protocol over HTTPS. No persistent volume needed on Fly.io (stateless backend container).
+
+### 4. Mobile App Connectivity
+
+-   **Public API:** The Fly.io backend exposes the REST API publicly.
+-   **Security:**
+    -   **CORS:** Backend must configure CORS to allow `https://aquarius.arc42.org`.
+    -   **Authentication:** JWT-based auth (future) for secure endpoints.
+    -   **HTTPS:** Fly.io provides automatic SSL certificates.
+
+### 5. DNS Configuration
+
+Assuming `arc42.org` DNS is managed where the domain is registered:
+
+| Type  | Host/Name | Value | Purpose |
+| :--- | :--- | :--- | :--- |
+| CNAME | `aquarius` | `username.github.io` | Frontend (GitHub Pages) |
+| CNAME | `api.aquarius` | `aquarius-backend.fly.dev` | Backend (Fly.io) |
+
+*Note: Fly.io requires certificate verification for custom domains.*
+
+## Deployment Pipeline (CI/CD)
+
+We will use **GitHub Actions** for automated deployment.
+
+**Workflow 1: Backend (on push to main/tags)**
+1.  Check out code.
+2.  Install `flyctl`.
+3.  `fly deploy --remote-only` (uses Fly's builder to build Docker image).
+
+**Workflow 2: Frontend (on push to main/tags)**
+1.  Check out code.
+2.  Setup Node.js.
+3.  `npm ci && npm run build`.
+4.  `actions/upload-pages-artifact`.
+5.  `actions/deploy-pages`.
+
+## Implementation Steps
+
+1.  **Fly.io Setup:**
+    -   Install `flyctl`.
+    -   `fly launch` inside `backend/`.
+    -   Set secrets: `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`.
+2.  **Frontend Config:**
+    -   Update `VITE_API_URL` to point to `https://api.aquarius.arc42.org` (or the Fly.dev URL initially).
+3.  **GitHub Actions:**
+    -   Create `.github/workflows/deploy-backend.yml`.
+    -   Create `.github/workflows/deploy-frontend.yml`.
+4.  **DNS:**
+    -   Configure DNS records for `aquarius` and `api.aquarius`.
+
+## Alternatives Considered
+
+### Option A: Full Stack on Fly.io
+-   **Pros:** Single provider, backend can serve frontend static files (simplifies CORS).
+-   **Cons:** Higher resource usage on Fly VM (serving static assets). Slower than CDN.
+-   **Verdict:** Rejected. CDN (GitHub Pages) is superior for static content.
+
+### Option B: Frontend on Vercel/Netlify
+-   **Pros:** Excellent Git integration, preview deployments.
+-   **Cons:** Free tier limits (commercial use restrictions sometimes ambiguous), another account to manage.
+-   **Verdict:** Feasible, but GitHub Pages is sufficient and already integrated.
+
+## Consequences
+
+-   **Positive:**
+    -   Cost = $0 (Free tiers).
+    -   Scalable (Fly can scale up, Turso is serverless).
+    -   Professional infrastructure (CDN, Global DB).
+-   **Negative:**
+    -   Cold starts on Fly.io free tier (backend might take 2-3s to wake up). *Mitigation: Keep 1 machine active if needed, or accept delay for "Planung" use case.*
+    -   CORS management required between Frontend and Backend.
