@@ -1,277 +1,209 @@
-# Arqua42
+# Aquarius - Kunstschwimmen Wettkampf-Verwaltungssystem
 
-A swimming competition rating system for children's competitions, optimized for offline-first operation and touch-friendly interfaces.
+Ein Monorepo für die komplette Aquarius-Plattform zur Verwaltung von Kunstschwimm-Wettkämpfen.
 
-## Overview
-
-Arqua42 is a Progressive Web Application (PWA) designed to manage swimming competitions for children. It consists of two main applications:
-
-- **Planning Application**: Desktop-optimized interface for organizing competitions, managing participants, and configuring events
-- **Execution Application**: Mobile/tablet-optimized interface for real-time scoring during competitions with offline capability
-
-## Technology Stack
-
-- **Frontend**: React 18 + TypeScript + Vite + TailwindCSS
-- **Backend**: Python 3.11+ + FastAPI + Pydantic + SQLAlchemy
-- **Database**: SQLite (development) / Turso (production, planned)
-- **Architecture**: Domain-Driven Design
-- **Data Management**: JSON-based catalogs for maintainability
-
-## Documentation
-
-Full architecture documentation is available in `docs/architecture.html` (generated from AsciiDoc sources).
-
-### Building Documentation
-
-The project uses a **Docker-based build system** to avoid dependency installation nightmares. You only need:
-
-- **Make** (prerequisite)
-- **Docker** (recommended) or local tools as fallback
-
-#### Quick Start
-
-```bash
-# Generate all documentation (diagrams + HTML)
-make docs
-
-# View documentation in browser
-make docs-serve
-# Then open http://localhost:8000/architecture.html
-```
-
-#### Available Make Targets
-
-Run `make help` to see all available targets. Key targets include:
-
-**Documentation Targets:**
-
-- `make docs` - Generate all documentation (diagrams + HTML) using Docker
-- `make docs-diagrams` - Generate PNG diagrams from PlantUML sources (Docker-based)
-- `make docs-html` - Generate HTML documentation from AsciiDoc (Docker-based)
-- `make docs-pdf` - Generate PDF documentation (Docker-based)
-- `make docs-serve` - Serve documentation on http://localhost:8000
-- `make docs-watch` - Watch for changes and rebuild automatically (requires docker-compose)
-
-**Docker Targets:**
-
-- `make docs-build-image` - Build the Docker image for documentation generation
-
-**Development Targets:**
-
-- `make dev` - Start development environment (Backend + Frontend + Database)
-- `make dev-down` - Stop development environment
-- `make db-reset` - Reset database (drop all tables and recreate)
-- `make db-seed` - Seed database with sample data from JSON catalog
-- `make db-import-figures FILE=<path>` - Import figures from JSON catalog (updates existing, adds new)
-- `make test` - Run tests (not yet implemented)
-- `make lint` - Run linters (not yet implemented)
-
-**Cleanup:**
-
-- `make clean` - Remove generated files (HTML, PDF, diagrams)
-
-#### Docker-First Approach
-
-The build system follows a **Docker-first** approach with local fallback:
-
-1. **If Docker image exists**: Use it for fast builds
-2. **If Docker available but no image**: Build image automatically, then use it
-3. **If Docker not available**: Fall back to local tools (plantuml, asciidoctor, etc.)
-4. **If neither available**: Show helpful error message with installation instructions
-
-This ensures:
-- ✅ **Reproducible builds** across different machines
-- ✅ **No version conflicts** with system-installed tools
-- ✅ **Consistent output** for all team members
-- ✅ **Fallback support** for environments without Docker
-
-#### Building the Docker Image
-
-The documentation Docker image includes:
-- Ruby 3.2 (Alpine-based)
-- PlantUML 1.2024.7
-- AsciiDoctor 2.0.23 with diagram and PDF support
-- Graphviz for diagram rendering
-
-Build manually if needed:
-
-```bash
-make docs-build-image
-```
-
-The image is automatically built when needed by documentation targets.
-
-#### Local Development (without Docker)
-
-If you prefer local tools, install:
-
-```bash
-# PlantUML (for diagrams)
-# macOS:
-brew install plantuml
-
-# Linux:
-apt install plantuml
-
-# AsciiDoctor (for HTML/PDF)
-gem install asciidoctor asciidoctor-diagram asciidoctor-pdf rouge
-```
-
-Then use the same `make` commands - they'll automatically use local tools.
-
-## Project Structure
+## 📦 Monorepo-Struktur
 
 ```
-arqua42/
-├── docs/                          # Documentation
-│   ├── src/                       # Documentation source files
-│   │   ├── architecture.adoc      # Main architecture document (AsciiDoc)
-│   │   ├── architecture/          # Modular architecture chapters
-│   │   │   ├── 05-bausteinsicht.adoc
-│   │   │   ├── 08-querschnittliche-konzepte.adoc
-│   │   │   ├── adr/               # Architecture Decision Records
-│   │   │   └── images/
-│   │   │       ├── puml/          # PlantUML source files
-│   │   │       └── screenshots/   # Screenshots and mockups
-│   │   ├── requirements/          # Requirements documentation
-│   │   └── domain-model.md        # Domain model documentation
-│   └── build/                     # Generated documentation (git-ignored)
-│       ├── architecture.html      # Generated HTML (via make docs)
-│       ├── architecture.pdf       # Generated PDF (via make docs-pdf)
-│       └── images/                # Generated PNG diagrams
-├── backend/                       # FastAPI backend
-│   ├── app/                       # Application code
-│   │   ├── models/                # SQLAlchemy models
-│   │   ├── schemas/               # Pydantic schemas
-│   │   ├── main.py                # FastAPI application
-│   │   └── database.py            # Database configuration
-│   ├── data/                      # Data files
-│   │   └── figuren-kataloge/      # Figure catalogs (JSON)
-│   │       ├── figuren-v1.0-saison-2024.json
-│   │       └── README.md
-│   ├── static/                    # Static files
-│   │   └── figuren/               # Figure images (PNG/JPG)
-│   │       └── README.md
-│   ├── seed_db.py                 # Database seeding script
-│   └── requirements.txt           # Python dependencies
-├── frontend/                      # React frontend
-│   ├── src/
-│   │   ├── components/            # Reusable components
-│   │   ├── pages/                 # Page components
-│   │   ├── types/                 # TypeScript types
-│   │   └── App.tsx                # Main application
-│   └── package.json               # Node.js dependencies
-├── BILDER_UND_KATALOG.md         # Figure images and catalog guide
-├── Dockerfile.docs                # Docker image for documentation build
-├── docker-compose.yml             # Docker Compose for development
-├── docker-compose.docs.yml        # Docker Compose for documentation services
-├── Makefile                       # Build automation
-└── README.md                      # This file
+aquarius/
+├── web/                    # Desktop/Web Application
+│   ├── backend/           # FastAPI Backend
+│   ├── frontend/          # React Frontend
+│   ├── Dockerfile         # Production build
+│   ├── fly.toml           # fly.io deployment config
+│   └── docker-compose.yml # Development environment
+│
+├── mobile/                 # Mobile App (iOS/Android)
+│   ├── ios/               # iOS-specific code
+│   ├── android/           # Android-specific code
+│   └── shared/            # Shared business logic
+│
+├── documentation/          # Architecture & Requirements
+│   ├── adr/               # Architecture Decision Records (shared!)
+│   ├── architecture/      # arc42 Documentation
+│   ├── requirements/      # Requirements & User Stories
+│   └── guides/            # Development Guides
+│
+├── docs/                   # Jekyll Static Website (GitHub Pages)
+│   └── (placeholder for future Jekyll site)
+│
+├── shared/                 # Shared Code & Types (optional)
+│   ├── types/             # TypeScript/Python type definitions
+│   └── schemas/           # OpenAPI/JSON schemas
+│
+└── Makefile               # Root orchestration
 ```
 
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- **Docker** (recommended) or local development tools
-- **Make**
-- **Python 3.11+** (for backend, when implemented)
-- **Node.js 18+** (for frontend, when implemented)
+- Docker & Docker Compose
+- Node.js 20+ & npm
+- Python 3.11+
+- (Optional) fly.io CLI for deployment
+- (Optional) Turso CLI for database
 
-### Build Documentation
+### Installation
 
 ```bash
-# Clone repository
-git clone <repository-url>
-cd arqua42
+# Install all dependencies
+make install
 
-# Generate documentation
-make docs
+# Or install per project:
+cd web/backend && pip install -r requirements.txt
+cd web/frontend && npm install
+cd mobile && npm install
+```
 
-# View documentation
+### Development
+
+**Web App:**
+```bash
+# Start backend + frontend
+make web-dev
+
+# Or from web/ directory
+cd web && make dev
+```
+
+Access:
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:8000
+- API Docs: http://localhost:8000/docs
+
+**Mobile App:**
+```bash
+# iOS Simulator
+make mobile-ios
+
+# Android Emulator
+make mobile-android
+```
+
+**Documentation:**
+```bash
+# Generate docs
+make docs-build
+
+# Serve locally
 make docs-serve
 ```
 
-### Development Setup
+## 📚 Project-Specific Documentation
+
+Each project has its own README with detailed information:
+
+- **[Web App](web/README.md)** - Desktop/Web application setup, development, and deployment
+- **[Mobile App](mobile/README.md)** - Mobile app development for iOS/Android
+- **[Documentation](documentation/README.md)** - How to write and generate documentation
+
+## 🎯 Common Tasks
+
+### Database Operations
 
 ```bash
-# Start development environment (Backend, Frontend, Database)
-make dev
+# Reset database (web app)
+make web-db-reset
 
-# Access the applications:
-# - Backend API:  http://localhost:8000
-# - Frontend UI:  http://localhost:5173
-# - API Docs:     http://localhost:8000/docs
+# Seed with sample data
+make web-db-seed
+
+# Import figures from JSON catalog
+cd web && make db-import-figures FILE=backend/data/figuren/figuren-v1.0-saison-2024.json
 ```
 
-#### Database Seeding
-
-The project uses a JSON-based figure catalog system for easy maintenance:
+### Deployment
 
 ```bash
-# Seed database with sample data (from JSON catalog)
-make db-seed
+# Deploy web app to fly.io
+make web-deploy
 
-# Or reset and seed from scratch
-make db-reset
+# Check deployment status
+make web-deploy-status
 
-# Import/update figures from a specific JSON catalog
-make db-import-figures FILE=data/figuren-kataloge/figuren-v1.0-saison-2024.json
+# View logs
+make web-logs
 ```
 
-**Seeding vs. Importing:**
-
-- `make db-seed` - **Full seeding**: Drops all tables, recreates them, and populates with sample data (seasons, pools, competitions, children, registrations, figures)
-- `make db-import-figures` - **Figures only**: Updates existing figures or adds new ones from a JSON catalog without affecting other data
-
-**Importing Figures:**
+### Testing
 
 ```bash
-# Import the default catalog
-make db-import-figures FILE=data/figuren-kataloge/figuren-v1.0-saison-2024.json
+# Run web app tests
+make web-test
 
-# Import a different version
-make db-import-figures FILE=data/figuren-kataloge/figuren-v2.0-saison-2025.json
+# Run mobile app tests
+make mobile-test
 ```
 
-The import process:
-- Loads figures from the specified JSON catalog
-- Updates existing figures (matched by name)
-- Creates new figures that don't exist yet
-- Checks for figure images in `backend/static/figuren/`
-- Reports statistics (created, updated, images found/missing)
+## 📖 Architecture Decision Records (ADRs)
 
-**Adding Figure Images:**
+ADRs are located in `documentation/adr/` and are **shared across all projects**.
 
-1. Place your PNG/JPG images in `backend/static/figuren/`
-2. Run `make db-import-figures FILE=<path-to-catalog>` to update the database
-3. See `BILDER_UND_KATALOG.md` for detailed instructions
+Naming convention:
+- `ADR-001-web-*` - Web app specific
+- `ADR-002-mobile-*` - Mobile app specific
+- `ADR-003-shared-*` - Affects multiple projects
 
-**Editing the Figure Catalog:**
+## 🌐 Deployment
 
-The JSON catalog can be manually edited:
-- File: `backend/data/figuren-kataloge/figuren-v1.0-saison-2024.json`
-- Contains all 26 swimming figures with IDs, difficulty, age groups, and image paths
-- After editing, run `make db-import-figures FILE=<path>` to apply changes
-- See `backend/data/figuren-kataloge/README.md` for schema documentation
+### Web App (fly.io + Turso)
 
-## Architecture
+```bash
+# Initial setup
+cd web && make deploy-setup
 
-The system follows **Domain-Driven Design** with 6 Bounded Contexts:
+# Deploy
+make web-deploy
+```
 
-1. **Club Management**: Managing clubs and their members
-2. **Competition Management**: Planning and configuring competitions
-3. **Registration**: Enrolling children in competitions
-4. **Judging**: Real-time scoring during competitions
-5. **Results**: Computing and publishing results
-6. **System Administration**: User management and configuration
+**Production URL:** https://aquarius.arc42.org
 
-For detailed architecture documentation, see `docs/architecture.html`.
+### Mobile App (App Store / TestFlight)
 
-## Contributing
+See [mobile/README.md](mobile/README.md) for deployment instructions.
 
-*Contribution guidelines will be added as the project evolves.*
+### Documentation (GitHub Pages)
 
-## License
+Documentation is automatically published to GitHub Pages from the `docs/` directory.
 
-*License information to be added.*
+## 🛠️ Tech Stack
+
+### Web App
+- **Backend:** Python 3.11, FastAPI, SQLAlchemy, uvicorn
+- **Frontend:** React 18, TypeScript, Vite, TailwindCSS
+- **Database:** Turso (libSQL) - Managed SQLite in the cloud
+- **Deployment:** fly.io
+- **Development:** Docker Compose
+
+### Mobile App
+- **Framework:** React Native / Flutter (TBD)
+- **Database:** Turso local replica (offline-first)
+- **Platform:** iOS (primary), Android (future)
+
+### Documentation
+- **Format:** AsciiDoc (arc42), Markdown (ADRs)
+- **Build:** asciidoctor
+- **Website:** Jekyll (GitHub Pages)
+
+## 🤝 Contributing
+
+1. Create a feature branch
+2. Make your changes
+3. Write/update tests
+4. Update documentation (ADRs if architectural change)
+5. Submit a Pull Request
+
+## 📝 License
+
+[Add your license here]
+
+## 🔗 Links
+
+- **Web App:** https://aquarius.arc42.org
+- **Documentation:** https://gernotstarke.github.io/aquarius
+- **Repository:** https://github.com/gernotstarke/aquarius
+
+---
+
+**Made with 🏊 in Cologne**
