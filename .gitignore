@@ -1,5 +1,5 @@
 # Documentation build artifacts
-docs/build/
+documentation/build/
 
 # Python
 __pycache__/
