@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert, Image } from 'react-native';
+import { View, Text, StyleSheet, Alert, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import { useAppStore } from '../store/useAppStore';
 import apiClient from '../api/client';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { colors, layout, spacing } from '../theme';
 
 export const LoginScreen = () => {
   const [username, setUsername] = useState('');
@@ -20,7 +21,6 @@ export const LoginScreen = () => {
 
     setLoading(true);
     try {
-      // 1. Get Token
       const formData = new FormData();
       formData.append('username', username);
       formData.append('password', password);
@@ -31,12 +31,6 @@ export const LoginScreen = () => {
 
       const { access_token } = response.data;
 
-      // 2. Get User Details
-      // Need to temporarily set token in store or header for this request? 
-      // Client interceptor reads from store, so we might need to set it first or pass explicitly.
-      // Let's manually add header here for simplicity or update store optimistically.
-      // Actually, standard OAuth flow often returns user info or we call /me.
-      
       const meResponse = await apiClient.get('/auth/me', {
         headers: { Authorization: `Bearer ${access_token}` },
       });
@@ -53,33 +47,48 @@ export const LoginScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Arqua42</Text>
-          <Text style={styles.subtitle}>Offiziellen-Login</Text>
-        </View>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardView}
+      >
+        <View style={styles.content}>
+          <View style={styles.header}>
+            <Image 
+              source={require('../../assets/logo.png')} 
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <Text style={styles.title}>Arqua42</Text>
+            <Text style={styles.subtitle}>Bewertungs-App</Text>
+          </View>
 
-        <View style={styles.form}>
-          <Input 
-            label="Benutzername"
-            value={username}
-            onChangeText={setUsername}
-            autoCapitalize="none"
-          />
-          <Input 
-            label="Passwort"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-          
-          <Button 
-            title="Anmelden" 
-            onPress={handleLogin} 
-            loading={loading} 
-          />
+          <View style={styles.form}>
+            <Text style={styles.loginTitle}>Anmelden</Text>
+            <Input 
+              label="Benutzername"
+              value={username}
+              onChangeText={setUsername}
+              autoCapitalize="none"
+              placeholder="benutzer@verein.de"
+            />
+            <Input 
+              label="Passwort"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              placeholder="••••••••"
+            />
+            
+            <View style={styles.buttonContainer}>
+              <Button 
+                title="Login" 
+                onPress={handleLogin} 
+                loading={loading} 
+              />
+            </View>
+          </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -87,35 +96,54 @@ export const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
+  },
+  keyboardView: {
+    flex: 1,
   },
   content: {
     flex: 1,
-    padding: 24,
+    padding: spacing.lg,
     justifyContent: 'center',
   },
   header: {
     alignItems: 'center',
-    marginBottom: 48,
+    marginBottom: spacing.xxl,
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: spacing.md,
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#0f172a',
-    marginBottom: 8,
+    fontSize: 42,
+    fontWeight: '800',
+    color: colors.primaryDark,
+    marginBottom: spacing.xs,
   },
   subtitle: {
-    fontSize: 18,
-    color: '#64748b',
+    fontSize: 20,
+    color: colors.textLight,
+    fontWeight: '500',
   },
   form: {
-    backgroundColor: 'white',
-    padding: 24,
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    backgroundColor: colors.surface,
+    padding: spacing.lg,
+    borderRadius: layout.borderRadius,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  loginTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: spacing.lg,
+    textAlign: 'center',
+  },
+  buttonContainer: {
+    marginTop: spacing.md,
   },
 });

@@ -6,8 +6,8 @@ import { useAppStore } from '../store/useAppStore';
 import apiClient from '../api/client';
 import { Figur, Wettkampf } from '../types';
 import { Button } from '../components/Button';
+import { colors, layout, spacing } from '../theme';
 
-// Extended type for this screen logic
 interface WettkampfDetail extends Wettkampf {
   figuren: Figur[];
 }
@@ -23,15 +23,12 @@ export const FigureSelectionScreen = () => {
     
     setLoading(true);
     try {
-      // Need to fetch details of the competition to get associated figures
-      // Endpoint: /wettkampf/{id} which should return WettkampfWithDetails
       const response = await apiClient.get(`/wettkampf/${selectedWettkampf.id}`);
       const detail: WettkampfDetail = response.data;
       
       if (detail.figuren) {
         setAvailableFiguren(detail.figuren);
       } else {
-        // Fallback or error handling if no figures attached
         setAvailableFiguren([]);
       }
     } catch (error) {
@@ -48,7 +45,6 @@ export const FigureSelectionScreen = () => {
   const handleSelect = (figur: Figur) => {
     selectFigur(figur);
     Alert.alert('Info', `Figur "${figur.name}" gewählt. Bewertungs-Screen folgt.`);
-    // navigation.navigate('RatingScreen'); // Next step
   };
 
   const renderItem = ({ item }: { item: Figur }) => (
@@ -80,7 +76,7 @@ export const FigureSelectionScreen = () => {
           <Text style={styles.subTitle}>{selectedWettkampf.name}</Text>
           <Text style={styles.title}>Figur wählen</Text>
         </View>
-        <View style={{ width: 60 }} />{/* Spacer for alignment */}
+        <View style={{ width: 80 }} />
       </View>
 
       <FlatList
@@ -91,7 +87,9 @@ export const FigureSelectionScreen = () => {
         refreshing={loading}
         onRefresh={loadFigures}
         ListEmptyComponent={
-          <Text style={styles.empty}>Keine Figuren für diesen Wettkampf definiert.</Text>
+          <View style={styles.emptyContainer}>
+            <Text style={styles.empty}>Keine Figuren definiert.</Text>
+          </View>
         }
       />
     </SafeAreaView>
@@ -101,16 +99,16 @@ export const FigureSelectionScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
   },
   header: {
-    padding: 16,
+    padding: spacing.md,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    borderBottomColor: colors.primaryLight,
   },
   headerInfo: {
     alignItems: 'center',
@@ -118,56 +116,63 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#0f172a',
+    color: colors.text,
   },
   subTitle: {
     fontSize: 12,
-    color: '#64748b',
+    color: colors.textLight,
     marginBottom: 2,
   },
   list: {
-    padding: 16,
+    padding: spacing.lg,
   },
   card: {
-    backgroundColor: 'white',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    backgroundColor: colors.surface,
+    padding: spacing.lg,
+    borderRadius: layout.borderRadius,
+    marginBottom: spacing.md,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
-    shadowRadius: 4,
+    shadowRadius: 8,
     elevation: 2,
+    borderLeftWidth: 4,
+    borderLeftColor: colors.primary,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
-    color: '#0f172a',
+    color: colors.text,
     flex: 1,
-    marginRight: 8,
+    marginRight: spacing.sm,
   },
   difficulty: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#0ea5e9',
-    backgroundColor: '#e0f2fe',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
+    color: colors.primary,
+    backgroundColor: colors.primaryLight,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    overflow: 'hidden',
   },
   cardDesc: {
     fontSize: 14,
-    color: '#64748b',
+    color: colors.textLight,
+    lineHeight: 20,
+  },
+  emptyContainer: {
+    marginTop: spacing.xl,
+    alignItems: 'center',
   },
   empty: {
     textAlign: 'center',
-    marginTop: 40,
-    color: '#94a3b8',
+    color: colors.textLight,
   },
 });

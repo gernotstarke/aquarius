@@ -6,6 +6,7 @@ import { useAppStore } from '../store/useAppStore';
 import apiClient from '../api/client';
 import { Wettkampf } from '../types';
 import { Button } from '../components/Button';
+import { colors, layout, spacing } from '../theme';
 
 export const WettkampfSelectionScreen = () => {
   const navigation = useNavigation<any>();
@@ -15,8 +16,6 @@ export const WettkampfSelectionScreen = () => {
   const loadWettkaempfe = async () => {
     setLoading(true);
     try {
-      // Assuming GET /wettkampf returns all competitions.
-      // In a real app, might want to filter by date or relevance.
       const response = await apiClient.get('/wettkampf');
       setWettkaempfe(response.data);
     } catch (error) {
@@ -40,8 +39,14 @@ export const WettkampfSelectionScreen = () => {
       style={styles.card} 
       onPress={() => handleSelect(item)}
     >
-      <Text style={styles.cardTitle}>{item.name}</Text>
-      <Text style={styles.cardDate}>{item.datum}</Text>
+      <View style={styles.cardIcon}>
+        <Text style={styles.iconText}>🏆</Text>
+      </View>
+      <View style={styles.cardContent}>
+        <Text style={styles.cardTitle}>{item.name}</Text>
+        <Text style={styles.cardDate}>{item.datum}</Text>
+      </View>
+      <Text style={styles.chevron}>›</Text>
     </TouchableOpacity>
   );
 
@@ -49,11 +54,13 @@ export const WettkampfSelectionScreen = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.welcome}>Hallo, {user?.full_name || user?.username}</Text>
-          <Text style={styles.title}>Wettkampf wählen</Text>
+          <Text style={styles.welcome}>Willkommen,</Text>
+          <Text style={styles.userName}>{user?.full_name || user?.username}</Text>
         </View>
         <Button title="Logout" variant="outline" onPress={logout} />
       </View>
+
+      <Text style={styles.sectionTitle}>Aktive Wettkämpfe</Text>
 
       <FlatList
         data={wettkaempfe}
@@ -63,7 +70,10 @@ export const WettkampfSelectionScreen = () => {
         refreshing={loading}
         onRefresh={loadWettkaempfe}
         ListEmptyComponent={
-          <Text style={styles.empty}>Keine Wettkämpfe verfügbar.</Text>
+          <View style={styles.emptyContainer}>
+            <Text style={styles.empty}>Keine Wettkämpfe verfügbar.</Text>
+            <Button title="Aktualisieren" onPress={loadWettkaempfe} variant="secondary" />
+          </View>
         }
       />
     </SafeAreaView>
@@ -73,53 +83,87 @@ export const WettkampfSelectionScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: colors.background,
   },
   header: {
-    padding: 24,
+    padding: spacing.lg,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    borderBottomColor: colors.primaryLight,
   },
   welcome: {
     fontSize: 14,
-    color: '#64748b',
+    color: colors.textLight,
   },
-  title: {
+  userName: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#0f172a',
+    color: colors.text,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
+    marginLeft: spacing.lg,
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
   },
   list: {
-    padding: 16,
+    padding: spacing.lg,
   },
   card: {
-    backgroundColor: 'white',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    backgroundColor: colors.surface,
+    padding: spacing.md,
+    borderRadius: layout.borderRadius,
+    marginBottom: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
-    shadowRadius: 4,
+    shadowRadius: 8,
     elevation: 2,
   },
+  cardIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
+  },
+  iconText: {
+    fontSize: 24,
+  },
+  cardContent: {
+    flex: 1,
+  },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
-    color: '#0f172a',
+    color: colors.text,
     marginBottom: 4,
   },
   cardDate: {
     fontSize: 14,
-    color: '#64748b',
+    color: colors.textLight,
+  },
+  chevron: {
+    fontSize: 24,
+    color: colors.primary,
+    fontWeight: '300',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    marginTop: spacing.xl,
   },
   empty: {
     textAlign: 'center',
-    marginTop: 40,
-    color: '#94a3b8',
+    color: colors.textLight,
+    marginBottom: spacing.md,
   },
 });

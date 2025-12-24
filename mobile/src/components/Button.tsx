@@ -1,5 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { colors, layout, spacing } from '../theme';
 
 interface ButtonProps {
   title: string;
@@ -27,7 +28,7 @@ export const Button: React.FC<ButtonProps> = ({
       disabled={disabled || loading}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'outline' ? '#0ea5e9' : 'white'} />
+        <ActivityIndicator color={variant === 'outline' ? colors.primary : colors.surface} />
       ) : (
         <Text style={[styles.text, variant === 'outline' && styles.textOutline]}>
           {title}
@@ -40,32 +41,32 @@ export const Button: React.FC<ButtonProps> = ({
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    paddingHorizontal: 24,
+    borderRadius: layout.borderRadius,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 48,
+    minHeight: 56,
   },
   primary: {
-    backgroundColor: '#0ea5e9', // primary-500
+    backgroundColor: colors.primary,
   },
   secondary: {
-    backgroundColor: '#64748b', // neutral-500
+    backgroundColor: colors.secondary,
   },
   outline: {
     backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#0ea5e9',
+    borderWidth: 2,
+    borderColor: colors.primary,
   },
   disabled: {
     opacity: 0.6,
   },
   text: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
+    color: colors.surface,
+    fontSize: 18,
+    fontWeight: '700',
   },
   textOutline: {
-    color: '#0ea5e9',
+    color: colors.primary,
   },
 });
