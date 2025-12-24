@@ -1,0 +1,48 @@
+=== CAP-Theorem: Unique Device Binding vs. Offline Operation
+
+==== Context and Problem
+The system requirement states: *"A mobile device shall be used for rating by exactly one user, and no user shall have a second rating device."*
+
+In a distributed system with offline capabilities (Partition tolerance), enforcing a strict global uniqueness constraint (Consistency) presents a classic CAP theorem challenge.
+
+*   **P (Partition Tolerance):** The system must function during network outages (Wettkampf hall has poor WiFi).
+*   **A (Availability):** Judges must be able to rate figures without interruption.
+*   **C (Consistency):** The mapping `User <-> Device` must be unique globally to prevent fraud or data corruption.
+
+==== CAP Analysis
+In the event of a network partition (offline mode), the system cannot simultaneously guarantee **Consistency** (checking if the user is already logged in elsewhere) and **Availability** (allowing the user to log in and work).
+
+1.  **CP Approach (Consistency Priority):** To guarantee uniqueness, the device MUST contact the server to "claim" the user session.
+    *   *Consequence:* If offline, the judge cannot log in. Availability is sacrificed.
+2.  **AP Approach (Availability Priority):** The device allows login based on cached credentials/tokens.
+    *   *Consequence:* Two devices could theoretically be logged in as the same user (Split-Brain). Consistency is sacrificed.
+
+==== Solution Strategies
+
+Given the domain constraints (competitions cannot pause for internet issues), we lean towards **Availability**, but can mitigate Consistency risks through architectural patterns:
+
+===== 1. Optimistic Locking with Conflict Detection (AP)
+We accept the risk of dual logins during the partition.
+*   **Mechanism:** Each device generates a unique `SessionID` (UUID) upon login. Ratings are tagged with `(UserID, DeviceID, SessionID)`.
+*   **Reconciliation:** When syncing, the server checks for multiple active `SessionIDs` for the same UserID in the same timeframe.
+*   **Handling:** If duplicates are found, they are flagged for the Chief Recorder (human arbitration).
+*   **Pros:** Maximum uptime.
+*   **Cons:** Post-event cleanup required if discipline fails.
+
+===== 2. The "Token Check-out" Pattern (Hybrid)
+We shift the Consistency check to a time *before* the Partition occurs (Preparation Phase).
+*   **Mechanism:**
+    1.  **Online Phase:** A device must "download" a cryptographic lease (Token) for a specific user. The server marks the user as "Checked Out".
+    2.  **Offline Phase:** The app only functions if a valid lease exists locally.
+    3.  **Return:** To switch devices, the token must be "returned" (synced) or expire.
+*   **Pros:** Guarantees uniqueness without needing live internet during the event.
+*   **Cons:** If a device breaks mid-competition, a "Force Release" admin override is needed on the backend to allow a new device to log in.
+
+===== 3. Local Authority (Edge Computing)
+Reduce the scope of the Partition.
+*   **Mechanism:** Do not sync against the Cloud, but sync against a local "Wettkampf Server" (e.g., the Laptop of the protocol officer) via a local LAN/Hotspot.
+*   **Pros:** The Laptop acts as the single source of truth (CP system within the local network).
+*   **Cons:** Higher infrastructure complexity on-site.
+
+==== Decision Recommendation
+For Arqua42, we recommend **Strategy 2 (Token Check-out)** combined with an **Admin Override**. This aligns with the "Stammdaten" workflow where judges are assigned to competitions beforehand. The "Check-out" happens when the device creates the offline cache.
