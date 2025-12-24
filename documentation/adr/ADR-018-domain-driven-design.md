@@ -75,79 +75,7 @@ app/modules/{context}/
 └── routers/         # API Endpoints (REST)
 ```
 
-## Begründung
 
-### Pro Domain-Driven Design
-
-**Vorteile:**
-- ✅ **Fachliche Sprache**: Code verwendet Domain-Begriffe (Ubiquitous Language)
-- ✅ **Klare Grenzen**: Jedes Modul hat definierte Verantwortlichkeit
-- ✅ **Wartbarkeit**: Änderungen sind lokal begrenzt
-- ✅ **Testbarkeit**: Module können isoliert getestet werden
-- ✅ **Team-Skalierung**: Verschiedene Entwickler können parallel arbeiten
-- ✅ **Verständlichkeit**: Fachexperten verstehen Code-Struktur
-
-**Bounded Contexts:**
-- ✅ Vermeiden von God-Objects
-- ✅ Keine zyklischen Abhängigkeiten
-- ✅ Klare Schnittstellen zwischen Modulen
-
-**3-Schichten-Architektur:**
-- ✅ Separation of Concerns
-- ✅ Router: HTTP-Handling
-- ✅ Service: Business-Logic
-- ✅ Repository: Datenzugriff
-
-### Alternative: Monolithische Struktur
-
-```
-app/
-├── models.py        # Alle 15+ Entitäten in einer Datei
-├── api.py           # Alle Endpoints in einer Datei
-└── crud.py          # Alle DB-Operationen
-```
-
-**Contra:**
-- ❌ Unübersichtlich bei Wachstum
-- ❌ Merge-Konflikte bei paralleler Entwicklung
-- ❌ Schwer testbar (alles gekoppelt)
-- ❌ Keine fachlichen Grenzen
-
-**Entscheidung gegen Monolith:** Nicht wartbar, keine Skalierung
-
-### Alternative: Feature-basierte Struktur
-
-```
-app/
-├── features/
-│   ├── user_registration/
-│   ├── competition_scoring/
-│   └── results_export/
-```
-
-**Pro:**
-- ✅ Gruppierung nach Use-Cases
-
-**Contra:**
-- ❌ Weniger fachliche Kohäsion (Features schneiden quer durch Domäne)
-- ❌ Schwieriger, Bounded Contexts zu identifizieren
-- ❌ Mehr Code-Duplizierung (Entitäten in mehreren Features)
-
-**Entscheidung gegen Feature-basiert:** DDD ist besser für fachliche Domäne
-
-### Alternative: Microservices
-
-**Pro:**
-- ✅ Unabhängiges Deployment pro Service
-- ✅ Technology-Heterogenität
-
-**Contra:**
-- ❌ **Overkill** für kleine Liga (20 Kinder)
-- ❌ Deployment-Komplexität (6+ Services)
-- ❌ Netzwerk-Overhead zwischen Services
-- ❌ Distributed Transactions kompliziert
-
-**Entscheidung gegen Microservices:** Zu komplex für Projektgröße
 
 ## Konsequenzen
 
@@ -441,12 +369,6 @@ pydeps app --show-cycles
 # Test-Coverage pro Modul
 pytest --cov=app/modules/anmeldung --cov-report=term
 ```
-
-## Referenzen
-
-- [Domain-Driven Design (Eric Evans)](https://www.domainlanguage.com/ddd/)
-- [Implementing Domain-Driven Design (Vaughn Vernon)](https://vaughnvernon.co/)
-- [Bounded Context (Martin Fowler)](https://martinfowler.com/bliki/BoundedContext.html)
 
 ## Historie
 

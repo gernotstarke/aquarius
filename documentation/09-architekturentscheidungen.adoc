@@ -1,0 +1,14 @@
+== Architekturentscheidungen (ADRs)
+
+Die detaillierten Architecture Decision Records befinden sich in: `docs/architecture/adr/`
+
+* link:architecture/adr/ADR-009-testkonzept.md[ADR-009: Testkonzept]
+* link:architecture/adr/ADR-010-makefile-build-interface.md[ADR-010: Makefile als Build-Interface]
+* link:architecture/adr/ADR-011-docker-development.md[ADR-011: Docker für Entwicklung]
+* link:architecture/adr/ADR-012-act-local-ci.md[ADR-012: Act für lokale GitHub Actions]
+* link:architecture/adr/ADR-013-react-typescript-frontend.md[ADR-013: React + TypeScript Frontend]
+* link:architecture/adr/ADR-014-python-fastapi-backend.md[ADR-014: Python + FastAPI Backend]
+* link:architecture/adr/ADR-015-turso-database.md[ADR-015: Turso (libSQL) Datenbank]
+* link:architecture/adr/ADR-016-pwa-architecture.md[ADR-016: Progressive Web App Architektur]
+* link:architecture/adr/ADR-017-tailwindcss-styling.md[ADR-017: TailwindCSS für Styling]
+* link:architecture/adr/ADR-018-domain-driven-design.md[ADR-018: Domain-Driven Design mit Bounded Contexts]
