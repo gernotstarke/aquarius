@@ -5,9 +5,11 @@ Simple CRUD operations for Kind, Wettkampf, Schwimmbad, and Saison.
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from typing import List
 from pathlib import Path
+import os
 
 from app.database import get_db, engine, Base
 from app import models, schemas
@@ -22,9 +24,15 @@ app = FastAPI(
 )
 
 # CORS middleware for frontend
+# In production, frontend is served from same origin (no CORS needed)
+# In development, allow Vite dev server
+allowed_origins = ["http://localhost:5173"]  # Vite default port
+if os.getenv("ENVIRONMENT") == "production":
+    allowed_origins.append("https://aquarius.arc42.org")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite default port
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -34,6 +42,16 @@ app.add_middleware(
 static_dir = Path(__file__).parent.parent / "static"
 if static_dir.exists():
     app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
+# Mount frontend dist for production (built React app)
+# In production (Docker), frontend is at /app/frontend/dist
+# In development, we rely on Vite dev server
+frontend_dist = Path(__file__).parent.parent.parent / "frontend" / "dist"
+if frontend_dist.exists():
+    # Mount assets directory for JS/CSS bundles
+    assets_dir = frontend_dist / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
 
 
 @app.get("/")
@@ -574,3 +592,23 @@ def set_wettkampf_figuren(wettkampf_id: int, figur_ids: List[int], db: Session =
 
     db.commit()
     return {"message": f"{len(figur_ids)} figures set for Wettkampf"}
+
+
+# ============================================================================
+# FRONTEND SERVING (Catchall for React Router)
+# ============================================================================
+# This must be the LAST route to not interfere with API endpoints
+@app.get("/{full_path:path}")
+def serve_frontend(full_path: str):
+    """
+    Serve frontend index.html for all non-API routes.
+    This enables client-side routing in React.
+    """
+    frontend_dist = Path(__file__).parent.parent.parent / "frontend" / "dist"
+    index_file = frontend_dist / "index.html"
+
+    if index_file.exists():
+        return FileResponse(str(index_file))
+
+    # If frontend not built, return API info
+    return {"message": "Arqua42 CRUD API", "version": "0.1.0", "note": "Frontend not built"}
