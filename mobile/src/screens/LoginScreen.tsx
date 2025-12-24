@@ -38,8 +38,26 @@ export const LoginScreen = () => {
       setAuth(access_token, meResponse.data);
       
     } catch (error: any) {
-      console.error(error);
-      Alert.alert('Login fehlgeschlagen', 'Überprüfen Sie Ihre Zugangsdaten.');
+      let message = 'Ein unbekannter Fehler ist aufgetreten.';
+
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        if (error.response.status === 401) {
+          message = 'Benutzername oder Passwort falsch.';
+        } else if (error.response.status >= 500) {
+          message = 'Server-Fehler. Bitte später erneut versuchen.';
+        } else {
+           message = `Server antwortete mit Fehlercode ${error.response.status}`;
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        message = 'Server nicht erreichbar. Bitte Netzwerkverbindung prüfen.';
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        message = error.message;
+      }
+      
+      Alert.alert('Anmeldung nicht möglich', message);
     } finally {
       setLoading(false);
     }
