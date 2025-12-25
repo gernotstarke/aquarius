@@ -15,14 +15,18 @@ The site uses the **minimal-mistakes** theme with a clean, professional design i
 ```
 docs/
 ├── _config.yml          # Jekyll configuration
-├── index.html           # Homepage with three-box layout
+├── index.md             # Homepage with feature_row layout
 ├── _pages/              # Section pages
 │   ├── requirements.md  # Requirements documentation (req42)
 │   ├── architecture.md  # Architecture documentation (arc42)
 │   └── app.md          # Application documentation
 ├── assets/
-│   └── images/         # Site images
-└── Gemfile             # Ruby dependencies
+│   ├── images/         # Site images (logos, backgrounds)
+│   │   └── icons/      # Section icons (optional)
+│   ├── css/            # Custom stylesheets (optional)
+│   └── js/             # Custom JavaScript (optional)
+├── Gemfile             # Ruby dependencies
+└── docker-compose.yml  # Local development (Apple Silicon compatible)
 ```
 
 ## 🚀 Deployment
