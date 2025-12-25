@@ -1,0 +1,133 @@
+---
+layout: splash
+permalink: /
+header:
+  overlay_color: "#2c5aa0"
+  overlay_filter: "0.5"
+  overlay_image: /assets/images/splash-bg.jpg
+  actions:
+    - label: "View on GitHub"
+      url: "https://github.com/gernotstarke/aquarius"
+excerpt: "Documentation for the Aquarius swimming competition rating system"
+---
+
+<style>
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin: 4rem auto;
+  max-width: 1200px;
+  padding: 0 2rem;
+}
+
+.feature-box {
+  background: #ffffff;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 3rem 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  color: inherit;
+}
+
+.feature-box:hover {
+  border-color: #2c5aa0;
+  box-shadow: 0 4px 16px rgba(44, 90, 160, 0.2);
+  transform: translateY(-4px);
+}
+
+.feature-box h2 {
+  color: #2c5aa0;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.feature-box p {
+  color: #666;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.feature-icon {
+  font-size: 4rem;
+  color: #2c5aa0;
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}
+
+.intro-section {
+  text-align: center;
+  margin: 4rem auto 2rem;
+  max-width: 800px;
+  padding: 0 2rem;
+}
+
+.intro-section h1 {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.intro-section p {
+  font-size: 1.2rem;
+  color: #666;
+  line-height: 1.8;
+}
+
+@media (max-width: 768px) {
+  .feature-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin: 2rem auto;
+  }
+
+  .feature-box {
+    padding: 2rem 1.5rem;
+  }
+
+  .intro-section h1 {
+    font-size: 2rem;
+  }
+}
+</style>
+
+<div class="intro-section">
+  <h1>Aquarius Documentation</h1>
+  <p>
+    A comprehensive swimming competition rating system combining desktop, web, and mobile applications
+    with synchronized data management and real-time scoring.
+  </p>
+</div>
+
+<div class="feature-grid">
+  <a href="/requirements/" class="feature-box">
+    <div class="feature-icon">📋</div>
+    <h2>Requirements</h2>
+    <p>
+      User stories, use cases, and functional requirements for the competition management system.
+    </p>
+  </a>
+
+  <a href="/architecture/" class="feature-box">
+    <div class="feature-icon">🏗️</div>
+    <h2>Architecture</h2>
+    <p>
+      Technical architecture, design decisions, and solution approach following arc42 template.
+    </p>
+  </a>
+
+  <a href="/app/" class="feature-box">
+    <div class="feature-icon">🚀</div>
+    <h2>Application</h2>
+    <p>
+      Deployment guide, API documentation, and user guides for the Aquarius application.
+    </p>
+  </a>
+</div>
