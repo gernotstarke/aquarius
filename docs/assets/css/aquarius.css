@@ -93,10 +93,29 @@
 .page__hero-actions .btn, 
 .header__actions .btn,
 .page__header-actions .btn {
-  /* Apply our custom class styles if they are not directly on the element */
-  /* Ideally, we should add the class 'btn-header-action' to the element in index.md */
-  /* But since we modify CSS, we map the theme class to our new styles here */
-  @extend .btn-header-action;
+  /* Apply custom button styles for header actions */
+  font-size: 0.7rem !important;
+  padding: 6px 14px !important;
+  margin-top: 5px !important;
+  line-height: 1.2 !important;
+  min-height: auto !important;
+  display: inline-block !important;
+  width: auto !important;
+  border: 2px solid rgba(255,255,255,0.9) !important; /* More visible border */
+  background-color: rgba(255,255,255,0.15) !important; /* Light background */
+  color: #fff !important;
+}
+
+.page__hero-actions .btn:hover, 
+.header__actions .btn:hover,
+.page__header-actions .btn:hover {
+  animation-name: wobble-ver;
+  animation-duration: 0.8s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: 1;
+  background-color: rgba(255,255,255,0.25) !important;
+  border-color: rgba(255,255,255,1) !important;
+  text-decoration: none !important;
 }
 
 
