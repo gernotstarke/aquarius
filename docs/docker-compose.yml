@@ -1,32 +1,7 @@
-version: '3.8'
-
 services:
   jekyll:
-    # Official Jekyll image with multi-platform support (amd64 + arm64)
-    image: jekyll/jekyll:4.2.2
-    platform: linux/arm64  # Explicit platform for Apple Silicon
-    container_name: aquarius-docs-jekyll
-
-    # Environment variables
-    environment:
-      - JEKYLL_ENV=development
-
-    # Mount the docs directory
+    image: bretfisher/jekyll-serve
     volumes:
-      - ./:/srv/jekyll
-      - jekyll-bundle:/usr/local/bundle  # Cache gems for faster rebuilds
-
-    # Expose Jekyll server port
+      - .:/site
     ports:
-      - "4000:4000"
-      - "35729:35729"  # LiveReload port
-
-    # Start Jekyll server with live reload
-    command: jekyll serve --livereload --host 0.0.0.0 --incremental
-
-    # Keep container running
-    stdin_open: true
-    tty: true
-
-volumes:
-  jekyll-bundle:  # Named volume for gem cache
+      - '4000:4000'
