@@ -1,7 +1,7 @@
 ---
 layout: splash
 title: "Aquarius"
-excerpt: "Methodische Architektur in Aktion. Von und mit arc42."
+excerpt: "Methodische Architektur in Aktion.<br>Von und mit [arc42](https://arc42.org)."
 header:
   overlay_image: /assets/images/aquarius-splash-dark.png
   actions:
@@ -33,10 +33,10 @@ aquarius_sections:
     btn_class: "btn btn--violet"
 ---
 
-# Willkommen bei Aquarius, der Fallstudie für methodische Softwarearchitektur
+# Fallstudie für methodische Softwarearchitektur
 
 
-Ein umfassendes Bewertungssystem für Kunstschwimmen, das einige trotz der überschaubaren Aufgabenstellung einige architektonische Herausforderungen bietet.
+Aquarius, ein umfassendes Bewertungssystem für Kunstschwimmen, bietet trotz der überschaubaren Aufgabenstellung einige architektonische Herausforderungen.
 Das System unterstützt 
 
 * Desktop-/Web-Anwendungen für Organisation und Administration, 

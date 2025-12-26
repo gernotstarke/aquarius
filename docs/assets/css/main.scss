@@ -71,3 +71,19 @@
 .footer-badges img {
   height: 20px;
 }
+
+/* Header Buttons refinement */
+.page__header-actions .btn {
+  font-size: 0.8em !important;
+  padding: 0.5em 1.2em !important;
+  margin-top: 5px !important;
+}
+
+/* Link color in header excerpt */
+.page__hero-excerpt a {
+  color: #fff;
+  text-decoration: underline;
+}
+.page__hero-excerpt a:hover {
+  color: #eee;
+}
