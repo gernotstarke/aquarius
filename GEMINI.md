@@ -1,7 +1,7 @@
-# Arqua42 (Aquarius)
+# Aquarius
 
 ## Project Overview
-Arqua42 is a swimming competition rating system designed for children's competitions. It is a Progressive Web Application (PWA) optimized for offline-first operation and touch-friendly interfaces. The system is split into two main components:
+Aquarius is a swimming competition rating system designed for children's competitions. It is a Progressive Web Application (PWA) optimized for offline-first operation and touch-friendly interfaces. The system is split into two main components:
 - **Planning Application:** Desktop-optimized for organizing competitions, managing participants/teams, and configuring events.
 - **Execution Application:** Mobile/tablet-optimized for real-time scoring during competitions, featuring offline capabilities.
 
