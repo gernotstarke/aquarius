@@ -1,15 +1,28 @@
 ---
+# Only the main Sass file needs front matter (the dashes are enough)
 ---
-/* Custom Button Styles for Aquarius Documentation */
 
-/* Ensure buttons are visible */
+@charset "utf-8";
+
+@import "minimal-mistakes"; // Import the remote theme's styles
+
+/* ==========================================================================
+   CUSTOM STYLES FOR ARQUA42
+   ========================================================================== */
+
+/* Custom Button Styles */
 .btn {
   display: inline-block !important;
   margin-top: 10px !important;
+  padding: 0.75em 1.5em !important;
   border: 1px solid transparent !important;
   border-radius: 4px !important;
   text-decoration: none !important;
   cursor: pointer !important;
+  font-weight: bold !important;
+  text-align: center !important;
+  line-height: 1.5 !important;
+  transition: all 0.2s ease-in-out !important;
 }
 
 /* Specific Colors */
@@ -20,6 +33,9 @@
 }
 .btn--blue:hover {
   background-color: #0069d9 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  text-decoration: none !important;
 }
 
 .btn--green {
@@ -29,6 +45,9 @@
 }
 .btn--green:hover {
   background-color: #218838 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  text-decoration: none !important;
 }
 
 .btn--violet {
@@ -38,6 +57,9 @@
 }
 .btn--violet:hover {
   background-color: #5a32a3 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  text-decoration: none !important;
 }
 
 /* Footer Badges */
