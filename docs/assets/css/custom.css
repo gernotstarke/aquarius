@@ -1,30 +1,51 @@
-.btn--violet {
-  background-color: #8a2be2 !important;
-  color: #fff !important;
-  border-color: #8a2be2 !important;
-}
-.btn--violet:hover {
-  background-color: #6a1bb2 !important;
+/* Custom Button Styles for Aquarius Documentation */
+
+.btn--blue, .btn--green, .btn--violet {
+  display: inline-block !important;
+  padding: 0.8em 1.6em !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  border-radius: 4px !important;
+  border: 2px solid transparent !important;
+  transition: all 0.3s ease !important;
+  margin-top: 1em !important;
+  text-align: center !important;
 }
 
 .btn--blue {
   background-color: #007bff !important;
   color: #fff !important;
-  border-color: #007bff !important;
+  border-color: #0056b3 !important;
 }
 .btn--blue:hover {
   background-color: #0056b3 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .btn--green {
   background-color: #28a745 !important;
   color: #fff !important;
-  border-color: #28a745 !important;
+  border-color: #1e7e34 !important;
 }
 .btn--green:hover {
   background-color: #1e7e34 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
+.btn--violet {
+  background-color: #6f42c1 !important; /* Standard Purple */
+  color: #fff !important;
+  border-color: #59359a !important;
+}
+.btn--violet:hover {
+  background-color: #59359a !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Footer Badges Styling */
 .footer-badges {
   display: inline-flex;
   gap: 10px;
