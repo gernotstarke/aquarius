@@ -1,6 +1,6 @@
 ---
 layout: splash
-title: "<img src='/assets/images/aquarius-logo-wave.webp' alt='Arqua42' style='max-width: 600px; height: auto;' />"
+title: "Arqua42"
 excerpt: "Ein umfassendes Bewertungssystem für Kunstschwimmen, das Desktop-, Web- und mobile Anwendungen mit synchronisierter Datenverwaltung und Echtzeit-Bewertung verbindet."
 header:
   overlay_image: /assets/images/aquarius-splash-dark.png
