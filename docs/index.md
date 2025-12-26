@@ -33,53 +33,6 @@ aquarius_sections:
     btn_class: "btn btn--violet"
 ---
 
-<style>
-/* Custom Button Styles - Injected directly into page */
-.btn {
-  display: inline-block !important;
-  margin-top: 10px !important;
-  padding: 10px 20px !important;
-  border: 1px solid transparent !important;
-  border-radius: 4px !important;
-  text-decoration: none !important;
-  cursor: pointer !important;
-  font-weight: bold !important;
-  text-align: center !important;
-}
-
-.btn--blue {
-  background-color: #007bff !important;
-  color: #fff !important;
-  border-color: #007bff !important;
-}
-.btn--blue:hover { background-color: #0069d9 !important; text-decoration: none !important; }
-
-.btn--green {
-  background-color: #28a745 !important;
-  color: #fff !important;
-  border-color: #28a745 !important;
-}
-.btn--green:hover { background-color: #218838 !important; text-decoration: none !important; }
-
-.btn--violet {
-  background-color: #6f42c1 !important;
-  color: #fff !important;
-  border-color: #6f42c1 !important;
-}
-.btn--violet:hover { background-color: #5a32a3 !important; text-decoration: none !important; }
-
-/* Footer Badges */
-.footer-badges {
-  display: inline-flex;
-  gap: 10px;
-  vertical-align: middle;
-  margin-left: 10px;
-}
-.footer-badges img {
-  height: 20px;
-}
-</style>
-
 # Willkommen bei Arqua42
 
 Arqua42 ist ein modernes Bewertungssystem für Kunstschwimm-Wettkämpfe (Synchron-Schwimmen).
