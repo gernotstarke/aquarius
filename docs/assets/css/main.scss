@@ -73,10 +73,16 @@
 }
 
 /* Header Buttons refinement */
+.page__hero-actions .btn, 
+.header__actions .btn,
 .page__header-actions .btn {
-  font-size: 0.8em !important;
-  padding: 0.5em 1.2em !important;
+  font-size: 0.7rem !important;
+  padding: 5px 10px !important;
   margin-top: 5px !important;
+  line-height: 1.2 !important;
+  min-height: auto !important;
+  display: inline-block !important;
+  width: auto !important;
 }
 
 /* Link color in header excerpt */
