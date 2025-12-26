@@ -82,6 +82,15 @@ mobile-test: ## Run mobile app tests
 		echo "⚠️  Mobile app not yet initialized"; \
 	fi
 
+##@ Project Website (Jekyll)
+
+website-dev: ## Start project website locally (http://localhost:4000)
+	@echo "🌐 Starting Jekyll website..."
+	@cd docs && docker compose up
+
+website-clean: ## Stop project website
+	@cd docs && docker compose down
+
 ##@ Documentation
 
 docs-build: ## Generate all documentation (arc42, ADRs)
