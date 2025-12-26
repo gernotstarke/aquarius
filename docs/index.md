@@ -7,6 +7,7 @@ header:
   actions:
     - label: "Auf GitHub ansehen"
       url: "https://github.com/gernotstarke/aquarius"
+      btn_class: "btn"
 
 aquarius_sections:
   - title: "Anforderungen"
