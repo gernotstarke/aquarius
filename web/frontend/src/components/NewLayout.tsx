@@ -25,6 +25,7 @@ const NewLayout: React.FC<LayoutProps> = ({ children }) => {
                 href="https://github.com/gernotstarke/aquarius/blob/main/LICENSE" 
                 target="_blank" 
                 rel="noopener noreferrer"
+                aria-label="View MIT License on GitHub"
                 className="ml-1 text-primary-600 hover:text-primary-700 hover:underline"
               >
                 MIT License

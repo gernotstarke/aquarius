@@ -49,6 +49,7 @@ const AdminLayout: React.FC = () => {
             href="https://github.com/gernotstarke/aquarius/blob/main/LICENSE" 
             target="_blank" 
             rel="noopener noreferrer"
+            aria-label="View MIT License on GitHub"
             className="ml-1 text-red-900 hover:text-red-950 hover:underline font-medium"
           >
             MIT License
