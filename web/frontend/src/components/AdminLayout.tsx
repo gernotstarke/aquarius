@@ -43,7 +43,17 @@ const AdminLayout: React.FC = () => {
       </main>
 
       <footer className="bg-red-100 border-t border-red-200 mt-auto py-6 text-center text-red-800 text-sm">
-        <p>⚠️ Authorized Personnel Only. All actions are logged.</p>
+        <p>
+          ⚠️ Authorized Personnel Only. All actions are logged. | 
+          <a 
+            href="https://github.com/gernotstarke/aquarius/blob/main/LICENSE" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="ml-1 text-red-900 hover:text-red-950 hover:underline font-medium"
+          >
+            MIT License
+          </a>
+        </p>
       </footer>
     </div>
   );

@@ -1,5 +1,7 @@
 # Aquarius - Kunstschwimmen Wettkampf-Verwaltungssystem
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Ein Monorepo für die komplette Aquarius-Plattform zur Verwaltung von Kunstschwimm-Wettkämpfen.
 
 ## 📦 Monorepo-Struktur
@@ -196,7 +198,11 @@ Documentation is automatically published to GitHub Pages from the `docs/` direct
 
 ## 📝 License
 
-[Add your license here]
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+**No Warranty**: This software is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement.
+
+**No Support**: This is an open-source project provided as-is. There is no official support or maintenance guarantee.
 
 ## 🔗 Links
 
