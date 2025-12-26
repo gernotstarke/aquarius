@@ -17,6 +17,7 @@ import FigurenForm from './pages/FigurenForm';
 import FigurDetail from './pages/FigurDetail';
 import AnmeldungList from './pages/AnmeldungList';
 import AnmeldungForm from './pages/AnmeldungForm';
+import Impressum from './pages/Impressum';
 
 // Admin imports
 import AdminLayout from './components/AdminLayout';
@@ -100,6 +101,9 @@ const App: React.FC = () => {
             <Route path="/kind/new" element={<KindForm />} />
             <Route path="/kind/:id" element={<KindForm />} />
             <Route path="/kind" element={<KindList />} />
+
+            {/* Legal */}
+            <Route path="/impressum" element={<Impressum />} />
           </Route>
 
           {/* Admin App */}
