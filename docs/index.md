@@ -15,7 +15,7 @@ aquarius_sections:
     Umfassende und req42-basierte Dokumentation der Stakeholder-Bedürfnisse."
     url: "/requirements/"
     btn_label: "Mehr lesen..."
-    btn_class: "btn--blue"
+    btn_class: "btn btn--blue"
 
   - title: "Architektur"
     excerpt: "![architecture](/assets/images/aquarius-architecture-logo.jpeg)<br>
@@ -23,14 +23,14 @@ aquarius_sections:
     Bausteine, Laufzeitsichten und Deployment-Szenarien."
     url: "/architecture/"
     btn_label: "Mehr lesen..."
-    btn_class: "btn--green"
+    btn_class: "btn btn--green"
 
   - title: "Anwendung"
     excerpt: "![application](/assets/images/aquarius-application-logo.jpeg)<br>Deployment-Guide, API-Dokumentation und Benutzerhandbücher für die Aquarius-Anwendung.
     Alles, was Sie für den Betrieb und die Nutzung des Systems benötigen."
     url: "/app/"
     btn_label: "Mehr lesen..."
-    btn_class: "btn--violet"
+    btn_class: "btn btn--violet"
 ---
 
 # Willkommen bei Arqua42
