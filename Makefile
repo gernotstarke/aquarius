@@ -90,6 +90,7 @@ website-dev: ## Start project website locally (http://localhost:4000)
 
 website-clean: ## Stop project website
 	@cd docs && docker compose down
+	@rm -rf docs/_site
 
 ##@ Documentation
 
