@@ -52,7 +52,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <footer className="bg-neutral-100 border-t border-neutral-200 mt-auto py-4 px-8">
         <div className="max-w-7xl mx-auto text-center text-neutral-600 text-sm">
           <p>
-            Made with 🏊 in Cologne | 
+            Made with 🏊 in Cologne |{' '}
             <a 
               href="https://github.com/gernotstarke/aquarius/blob/main/LICENSE" 
               target="_blank" 

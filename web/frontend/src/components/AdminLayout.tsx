@@ -44,7 +44,7 @@ const AdminLayout: React.FC = () => {
 
       <footer className="bg-red-100 border-t border-red-200 mt-auto py-6 text-center text-red-800 text-sm">
         <p>
-          ⚠️ Authorized Personnel Only. All actions are logged. | 
+          ⚠️ Authorized Personnel Only. All actions are logged. |{' '}
           <a 
             href="https://github.com/gernotstarke/aquarius/blob/main/LICENSE" 
             target="_blank" 
