@@ -24,3 +24,14 @@
 .btn--green:hover {
   background-color: #1e7e34 !important;
 }
+
+.footer-badges {
+  display: inline-flex;
+  gap: 10px;
+  vertical-align: middle;
+  margin-left: 10px;
+}
+
+.footer-badges img {
+  height: 20px;
+}

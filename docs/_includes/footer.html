@@ -8,13 +8,14 @@
       {% endfor %}
     {% endif %}
     <li><a href="/impressum"><i class="fas fa-file-contract" aria-hidden="true"></i> Impressum/Legal</a></li>
-    {% if site.github.open_issues_count %}
-      <li>
-        <a href="https://github.com/{{ site.repository }}/issues" target="_blank" rel="noopener noreferrer">
-          <i class="fas fa-bug" aria-hidden="true"></i> {{ site.github.open_issues_count }} Issues
-        </a>
-      </li>
-    {% endif %}
+    <li class="footer-badges">
+      <a href="https://github.com/{{ site.repository }}/issues" target="_blank" rel="noopener noreferrer">
+        <img src="https://img.shields.io/github/issues/{{ site.repository }}?color=blue&style=flat-square" alt="GitHub issues">
+      </a>
+      <a href="https://github.com/{{ site.repository }}/pulls" target="_blank" rel="noopener noreferrer">
+        <img src="https://img.shields.io/github/issues-pr/{{ site.repository }}?color=orange&style=flat-square" alt="GitHub pull requests">
+      </a>
+    </li>
   </ul>
 </div>
 
