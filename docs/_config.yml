@@ -53,13 +53,10 @@ keep_files:
 
 # Outputting
 permalink: /:categories/:title/
-paginate: 5
-paginate_path: /page:num/
 timezone: Europe/Berlin
 
 # Plugins
 plugins:
-  - jekyll-paginate
   - jekyll-sitemap
   - jekyll-gist
   - jekyll-feed
