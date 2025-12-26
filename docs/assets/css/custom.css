@@ -1,0 +1,26 @@
+.btn--violet {
+  background-color: #8a2be2 !important;
+  color: #fff !important;
+  border-color: #8a2be2 !important;
+}
+.btn--violet:hover {
+  background-color: #6a1bb2 !important;
+}
+
+.btn--blue {
+  background-color: #007bff !important;
+  color: #fff !important;
+  border-color: #007bff !important;
+}
+.btn--blue:hover {
+  background-color: #0056b3 !important;
+}
+
+.btn--green {
+  background-color: #28a745 !important;
+  color: #fff !important;
+  border-color: #28a745 !important;
+}
+.btn--green:hover {
+  background-color: #1e7e34 !important;
+}

@@ -1,0 +1,14 @@
+<div class="page__footer-follow">
+  <ul class="social-icons">
+    {% if site.footer.links %}
+      {% for link in site.footer.links %}
+        {% if link.label %}
+          <li><a href="{{ link.url }}" rel="nofollow noopener noreferrer"><i class="{{ link.icon | default: 'fas fa-link' }}" aria-hidden="true"></i> {{ link.label }}</a></li>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    <li><a href="/impressum"><i class="fas fa-file-contract" aria-hidden="true"></i> Impressum/Legal</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; {{ site.time | date: '%Y' }} {{ site.name | default: site.title }}. Made with passion <i class="fas fa-heart" style="color: #e25555;"></i> in Cologne.</div>

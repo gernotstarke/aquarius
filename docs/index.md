@@ -1,55 +1,54 @@
 ---
 layout: splash
-title: "Aquarius Documentation"
-excerpt: "A comprehensive swimming competition rating system combining desktop, web, and mobile applications with synchronized data management and real-time scoring."
+title: "<img src='/assets/images/aquarius-logo-wave.webp' alt='Arqua42' style='max-width: 600px; height: auto;' />"
+excerpt: "Ein umfassendes Bewertungssystem für Kunstschwimmen, das Desktop-, Web- und mobile Anwendungen mit synchronisierter Datenverwaltung und Echtzeit-Bewertung verbindet."
 header:
-
   overlay_image: /assets/images/aquarius-splash-dark.png
   actions:
-    - label: "View on GitHub"
+    - label: "Auf GitHub ansehen"
       url: "https://github.com/gernotstarke/aquarius"
 
 aquarius_sections:
-  - title: "Requirements"
+  - title: "Anforderungen"
     excerpt: "![requirements](/assets/images/aquarius-requirements-logo.jpeg)<br> 
-  User stories, use cases, and functional requirements for Aquarius, the figure-swimming competition management system.
-    Comprehensive and req42-based documentation of stakeholder needs."
+    User Stories, Use Cases und funktionale Anforderungen für Aquarius, das Wettkampf-Management-System für Kunstschwimmen.
+    Umfassende und req42-basierte Dokumentation der Stakeholder-Bedürfnisse."
     url: "/requirements/"
-    btn_label: "Read more..."
-    btn_class: "btn--primary"
+    btn_label: "Mehr lesen..."
+    btn_class: "btn--blue"
 
-  - title: "Architecture"
+  - title: "Architektur"
     excerpt: "![architecture](/assets/images/aquarius-architecture-logo.jpeg)<br>
-    Technical architecture, design decisions, and solution approach following arc42 template.
-    Building blocks, runtime views, and deployment scenarios."
+    Technische Architektur, Designentscheidungen und Lösungsansatz nach dem arc42-Template.
+    Bausteine, Laufzeitsichten und Deployment-Szenarien."
     url: "/architecture/"
-    btn_label: "Read more..."
-    btn_class: "btn--primary"
+    btn_label: "Mehr lesen..."
+    btn_class: "btn--green"
 
-  - title: "Application"
-    excerpt: "![application](/assets/images/aquarius-application-logo.jpeg)<br>Deployment guide, API documentation, and user guides for the Aquarius application.
-    Everything you need to run and use the system."
+  - title: "Anwendung"
+    excerpt: "![application](/assets/images/aquarius-application-logo.jpeg)<br>Deployment-Guide, API-Dokumentation und Benutzerhandbücher für die Aquarius-Anwendung.
+    Alles, was Sie für den Betrieb und die Nutzung des Systems benötigen."
     url: "/app/"
-    btn_label: "Read more..."
-    btn_class: "btn--primary"
+    btn_label: "Mehr lesen..."
+    btn_class: "btn--violet"
 ---
 
-# Welcome to Aquarius
+# Willkommen bei Arqua42
 
-Aquarius is a modern swimming competition rating system designed for synchronized swimming competitions.
-The system supports desktop/web applications for organizers and administrators, mobile apps for judges,
-and provides real-time scoring and synchronized data management.
+Arqua42 ist ein modernes Bewertungssystem für Kunstschwimm-Wettkämpfe (Synchron-Schwimmen).
+Das System unterstützt Desktop-/Web-Anwendungen für Organisatoren und Administratoren sowie mobile Apps für Wertungsrichter
+und bietet Echtzeit-Bewertung und synchronisierte Datenverwaltung.
 
 {% include feature_row id="aquarius_sections" %}
 
 ---
 
-## About This Documentation
+## Über diese Dokumentation
 
-This documentation is organized into three main sections:
+Diese Dokumentation ist in drei Hauptbereiche unterteilt:
 
-- **Requirements**: Understanding what the system does and why
-- **Architecture**: How the system is built and structured
-- **Application**: How to deploy, configure, and use the system
+- **Anforderungen**: Verstehen, was das System tut und warum
+- **Architektur**: Wie das System aufgebaut und strukturiert ist
+- **Anwendung**: Wie man das System deployt, konfiguriert und nutzt
 
-Navigate using the sections above or explore the menu.
+Navigieren Sie über die oben stehenden Bereiche oder nutzen Sie das Menü.
