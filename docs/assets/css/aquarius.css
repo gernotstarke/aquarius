@@ -1,21 +1,7 @@
-/* ==========================================================================
+/* ===
    AQUARIUS CUSTOM STYLES
-   ========================================================================== */
+  === */
 
-/* --- Custom Button Styles (General) --- */
-.btn {
-  display: inline-block !important;
-  margin-top: 10px !important;
-  padding: 0.75em 1.5em !important;
-  border: 1px solid transparent !important;
-  border-radius: 4px !important;
-  text-decoration: none !important;
-  cursor: pointer !important;
-  font-weight: bold !important;
-  text-align: center !important;
-  line-height: 1.5 !important;
-  transition: all 0.2s ease-in-out !important;
-}
 
 /* --- Section Buttons (Colored) --- */
 .btn--blue {
@@ -51,70 +37,6 @@
   background-color: #5a32a3 !important;
   transform: translateY(-2px);
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  text-decoration: none !important;
-}
-
-/* --- Header Action Button (Wobble Effect) --- */
-/* Target: .page__hero-actions .btn or .header__actions .btn */
-
-.btn-header-action {
-  font-size: 0.7rem !important;
-  padding: 6px 14px !important;
-  margin-top: 5px !important;
-  line-height: 1.2 !important;
-  min-height: auto !important;
-  display: inline-block !important;
-  width: auto !important;
-  border: 1px solid rgba(255,255,255,0.7) !important; /* Visible border for outline look */
-  background-color: transparent !important;
-  color: #fff !important;
-}
-
-/* Wobble Animation Keyframes */
-@keyframes wobble-ver {
-  16.65% { transform: translateY(6px); }
-  33.3% { transform: translateY(-4px); }
-  49.95% { transform: translateY(3px); }
-  66.6% { transform: translateY(-2px); }
-  83.25% { transform: translateY(1px); }
-  100% { transform: translateY(0); }
-}
-
-.btn-header-action:hover {
-  animation-name: wobble-ver;
-  animation-duration: 0.8s;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: 1;
-  background-color: rgba(255,255,255,0.1) !important;
-  text-decoration: none !important;
-}
-
-/* Override Theme Selectors specifically for the header actions */
-.page__hero-actions .btn, 
-.header__actions .btn,
-.page__header-actions .btn {
-  /* Apply custom button styles for header actions */
-  font-size: 0.7rem !important;
-  padding: 6px 14px !important;
-  margin-top: 5px !important;
-  line-height: 1.2 !important;
-  min-height: auto !important;
-  display: inline-block !important;
-  width: auto !important;
-  border: 2px solid rgba(255,255,255,0.9) !important; /* More visible border */
-  background-color: rgba(255,255,255,0.15) !important; /* Light background */
-  color: #fff !important;
-}
-
-.page__hero-actions .btn:hover, 
-.header__actions .btn:hover,
-.page__header-actions .btn:hover {
-  animation-name: wobble-ver;
-  animation-duration: 0.8s;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: 1;
-  background-color: rgba(255,255,255,0.25) !important;
-  border-color: rgba(255,255,255,1) !important;
   text-decoration: none !important;
 }
 

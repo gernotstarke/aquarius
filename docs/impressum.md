@@ -2,9 +2,10 @@
 permalink: /impressum/
 title: "Impressum"
 layout: single
+toc: true
+toc_label: "Inhalt"
 ---
 
-# Impressum
 
 ## Verantwortlich für den Inhalt
 
@@ -15,7 +16,8 @@ Deutschland
 
 ## Zweck dieser Website
 
-Diese Website ist eine **Fallstudie zu didaktischen Zwecken bei der Ausbildung im Bereich Software-Architektur**. Sie dient ausschließlich zu Demonstrations- und Lehrzwecken und ist nicht für den produktiven Einsatz bestimmt.
+>Diese Website ist eine **Fallstudie zu didaktischen Zwecken bei der Ausbildung im Bereich Software-Architektur**. 
+>Sie dient ausschließlich zu Demonstrations- und Lehrzwecken und ist nicht für den produktiven Einsatz bestimmt.
 
 ## Datenschutzhinweise (DSGVO)
 
