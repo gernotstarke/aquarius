@@ -85,7 +85,7 @@ const Home: React.FC = () => {
       {/* Footer */}
       <div className="border-t border-neutral-200 py-6">
         <p className="text-center text-sm text-neutral-500">
-          made with passion in Cologne · <Link to="/impressum" className="hover:text-neutral-700 underline">Impressum</Link>
+          made with passion in Cologne
         </p>
       </div>
     </div>
