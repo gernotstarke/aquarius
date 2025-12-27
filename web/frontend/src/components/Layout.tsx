@@ -17,7 +17,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex flex-col">
+    <div className="min-h-screen bg-neutral-50">
       <nav className="bg-white border-b border-neutral-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-8 py-6">
           <div className="flex items-center justify-between mb-6">
@@ -46,24 +46,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </div>
       </nav>
-      <main className="max-w-7xl mx-auto px-8 py-12 flex-1">
+      <main className="max-w-7xl mx-auto px-8 py-12">
         {children}
       </main>
-      <footer className="bg-neutral-100 border-t border-neutral-200 mt-auto py-4 px-8">
-        <div className="max-w-7xl mx-auto text-center text-neutral-600 text-sm">
-          <p>
-            Made with 🏊 in Cologne | 
-            <a 
-              href="https://github.com/gernotstarke/aquarius/blob/main/LICENSE" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="ml-1 text-primary-600 hover:text-primary-700 hover:underline"
-            >
-              MIT License
-            </a>
-          </p>
-        </div>
-      </footer>
     </div>
   );
 };
