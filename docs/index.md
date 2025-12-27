@@ -8,8 +8,6 @@ header:
     - label: "Auf GitHub ansehen"
       url: "https://github.com/gernotstarke/aquarius"
 
-
-
 aquarius_sections:
   - title: "Anforderungen"
     excerpt: "![requirements](/assets/images/aquarius-requirements-logo.jpeg)<br> 
