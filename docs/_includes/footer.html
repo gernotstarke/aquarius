@@ -7,8 +7,8 @@
         {% endif %}
       {% endfor %}
     {% endif %}
-    <li><a href="/license"><i class="fas fa-balance-scale" aria-hidden="true"></i> License</a></li>
-    <li><a href="/impressum"><i class="fas fa-file-contract" aria-hidden="true"></i> Impressum/Legal</a></li>
+    
+  
     <li class="footer-badges">
       <a href="https://github.com/{{ site.repository }}/issues" target="_blank" rel="noopener noreferrer">
         <img src="https://img.shields.io/github/issues/{{ site.repository }}?color=blue&style=flat-square" alt="GitHub issues">
@@ -24,7 +24,7 @@
 <div class="page__footer-copyright">
   &copy; {{ site.time | date: '%Y' }} {{ site.name | default: site.title }}. Made with passion <i class="fas fa-heart" style="color: #e25555;"></i> in Cologne.
   <br>
-  Supported by <a href="https://www.innoq.com" target="_blank" rel="noopener noreferrer">
-    <img src="{{ '/assets/images/innoq.svg' | relative_url }}" alt="INNOQ" style="height: 24px; vertical-align: middle; margin-left: 5px;">
+ <a href="https://www.innoq.com" target="_blank" rel="noopener noreferrer" style="vertical-align: middle; margin-left: 5px;">
+    <img src="/assets/images/supported-by-innoq.svg" alt="Supported by INNOQ (with logo) " height: 50px;>
   </a>
 </div>
