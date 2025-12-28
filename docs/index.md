@@ -3,7 +3,11 @@ layout: splash
 title: "Aquarius"
 excerpt: "Methodische Architektur in Aktion.<br>Von und mit [arc42](https://arc42.org)."
 header:
-  overlay_image: /assets/images/aquarius-splash-dark.png
+  overlay_image: /assets/images/splash/aquarius-splash-dark.png
+  overlay_color: "#000"
+  overlay_filter: "0.3"
+  caption: "Basiert auf einer Idee von [Dr. Peter Hruschka](https://b-agile.de)"
+
   actions:
     - label: "Auf GitHub ansehen"
       url: "https://github.com/gernotstarke/aquarius"
