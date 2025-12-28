@@ -1,17 +1,8 @@
----
-permalink: /requirements/
-title: "Anforderungen"
-layout: single
-toc: true
-toc_label: "Inhalt"
-toc_icon: "list"
----
-
 # Aquarius - Anforderungsdokument
 ## Bewertungssystem für Kunstschwimmen-Wettkämpfe
 
-**Version:** 1.0  
-**Datum:** 2025-12-17  
+**Version:** 1.0
+**Datum:** 2025-12-17
 **Status:** Initial Draft
 
 ---
