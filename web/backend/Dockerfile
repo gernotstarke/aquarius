@@ -5,6 +5,7 @@ WORKDIR /app
 # Install build dependencies for psutil and others
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    cmake \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
