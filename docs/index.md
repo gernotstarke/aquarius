@@ -3,7 +3,8 @@ layout: splash
 title: "Aquarius Documentation"
 excerpt: "A comprehensive swimming competition rating system combining desktop, web, and mobile applications with synchronized data management and real-time scoring."
 header:
-
+  overlay_color: "#000"
+  overlay_filter: "0.3"
   overlay_image: /assets/images/aquarius-splash-dark.png
   actions:
     - label: "View on GitHub"
