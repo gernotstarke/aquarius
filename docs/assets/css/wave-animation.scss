@@ -46,17 +46,17 @@
 .page__hero--overlay::before {
   filter: url(#turbulence-gentle);
   -webkit-mask: linear-gradient(to bottom,
-    rgba(0,0,0,0.6) 0%,
-    rgba(0,0,0,0.4) 33%,
+    rgba(0,0,0,0.8) 0%,
+    rgba(0,0,0,0.6) 33%,
     rgba(0,0,0,0) 35%
   );
   mask: linear-gradient(to bottom,
-    rgba(0,0,0,0.6) 0%,
-    rgba(0,0,0,0.4) 33%,
+    rgba(0,0,0,0.8) 0%,
+    rgba(0,0,0,0.6) 33%,
     rgba(0,0,0,0) 35%
   );
   animation: wave-flow-1 12s ease-in-out infinite;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 /* Layer 2 (::after) - Middle third - Medium turbulence */
@@ -64,19 +64,19 @@
   filter: url(#turbulence-medium);
   -webkit-mask: linear-gradient(to bottom,
     rgba(0,0,0,0) 30%,
-    rgba(0,0,0,0.5) 35%,
-    rgba(0,0,0,0.5) 65%,
+    rgba(0,0,0,0.7) 35%,
+    rgba(0,0,0,0.7) 65%,
     rgba(0,0,0,0) 70%
   );
   mask: linear-gradient(to bottom,
     rgba(0,0,0,0) 30%,
-    rgba(0,0,0,0.5) 35%,
-    rgba(0,0,0,0.5) 65%,
+    rgba(0,0,0,0.7) 35%,
+    rgba(0,0,0,0.7) 65%,
     rgba(0,0,0,0) 70%
   );
   animation: wave-flow-2 15s ease-in-out infinite;
   animation-delay: -4s;
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
 /* Layer 3 - Bottom third - Strong turbulence */
@@ -84,17 +84,17 @@
   filter: url(#turbulence-strong);
   -webkit-mask: linear-gradient(to bottom,
     rgba(0,0,0,0) 65%,
-    rgba(0,0,0,0.4) 70%,
-    rgba(0,0,0,0.6) 100%
+    rgba(0,0,0,0.6) 70%,
+    rgba(0,0,0,0.8) 100%
   );
   mask: linear-gradient(to bottom,
     rgba(0,0,0,0) 65%,
-    rgba(0,0,0,0.4) 70%,
-    rgba(0,0,0,0.6) 100%
+    rgba(0,0,0,0.6) 70%,
+    rgba(0,0,0,0.8) 100%
   );
   animation: wave-flow-3 18s ease-in-out infinite;
   animation-delay: -8s;
-  opacity: 0.6;
+  opacity: 0.8;
 }
 
 /* ============================================
@@ -103,42 +103,42 @@
 
 @keyframes wave-flow-1 {
   0%, 100% {
-    transform: translateX(0) scale(1.05);
+    transform: translateX(0) scale(1.08);
     filter: url(#turbulence-gentle) brightness(1);
   }
   50% {
-    transform: translateX(-20px) scale(1.08);
-    filter: url(#turbulence-gentle) brightness(1.1);
+    transform: translateX(-40px) scale(1.12);
+    filter: url(#turbulence-gentle) brightness(1.12);
   }
 }
 
 @keyframes wave-flow-2 {
   0%, 100% {
-    transform: translateX(0) translateY(0) scale(1.06);
+    transform: translateX(0) translateY(0) scale(1.08);
     filter: url(#turbulence-medium) brightness(1);
   }
   33% {
-    transform: translateX(15px) translateY(-10px) scale(1.08);
-    filter: url(#turbulence-medium) brightness(1.05);
+    transform: translateX(30px) translateY(-20px) scale(1.12);
+    filter: url(#turbulence-medium) brightness(1.08);
   }
   66% {
-    transform: translateX(-15px) translateY(10px) scale(1.07);
-    filter: url(#turbulence-medium) brightness(1.08);
+    transform: translateX(-30px) translateY(20px) scale(1.1);
+    filter: url(#turbulence-medium) brightness(1.1);
   }
 }
 
 @keyframes wave-flow-3 {
   0%, 100% {
-    transform: translateX(0) scale(1.07);
+    transform: translateX(0) scale(1.1);
     filter: url(#turbulence-strong) brightness(0.95);
   }
   40% {
-    transform: translateX(25px) scale(1.1);
-    filter: url(#turbulence-strong) brightness(1);
+    transform: translateX(50px) scale(1.15);
+    filter: url(#turbulence-strong) brightness(1.05);
   }
   80% {
-    transform: translateX(-25px) scale(1.09);
-    filter: url(#turbulence-strong) brightness(0.98);
+    transform: translateX(-50px) scale(1.13);
+    filter: url(#turbulence-strong) brightness(1);
   }
 }
 
