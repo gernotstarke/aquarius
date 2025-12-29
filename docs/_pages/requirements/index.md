@@ -30,3 +30,6 @@ header:
     <h3>Req42 Framework</h3>
   </a>
 </div>
+
+
+>Die _Story_ von Aquarius basiert auf einer Idee von [Dr. Peter Hruschka](https://b-agile.de).
