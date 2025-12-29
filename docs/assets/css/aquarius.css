@@ -103,40 +103,40 @@
   text-align: center;
 }
 
-/* Tile Variations - All Blueish */
+/* Tile Variations - Distinct Blues */
 
-/* Story: Standard Blue */
+/* Story: Azure */
 .req-tile--blue-1 {
-  background-color: #e3f2fd;
-  border: 1px solid #bbdefb;
+  background-color: #F0FFFF;
+  border: 1px solid #B2EBF2;
 }
 .req-tile--blue-1:hover {
-  background-color: #bbdefb;
+  background-color: #E0F7FA;
 }
 
-/* BMC: Cyan/Turquoise */
+/* BMC: Baby Blue */
 .req-tile--blue-2 {
-  background-color: #e0f7fa;
-  border: 1px solid #b2ebf2;
+  background-color: #E1F5FE;
+  border: 1px solid #B3E5FC;
 }
 .req-tile--blue-2:hover {
-  background-color: #b2ebf2;
+  background-color: #B3E5FC;
 }
 
-/* AIC: Indigo */
+/* AIC: Bright Blue */
 .req-tile--blue-3 {
-  background-color: #e8eaf6;
-  border: 1px solid #c5cae9;
+  background-color: #D1F2EB;
+  border: 1px solid #A3E4D7;
 }
 .req-tile--blue-3:hover {
-  background-color: #c5cae9;
+  background-color: #A3E4D7;
 }
 
-/* Req42: Light Azure */
+/* Req42: Standard Blue */
 .req-tile--blue-4 {
-  background-color: #e1f5fe;
-  border: 1px solid #b3e5fc;
+  background-color: #E3F2FD;
+  border: 1px solid #90CAF9;
 }
 .req-tile--blue-4:hover {
-  background-color: #b3e5fc;
+  background-color: #90CAF9;
 }
