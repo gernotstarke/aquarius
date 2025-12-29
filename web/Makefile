@@ -12,9 +12,9 @@ dev: ## Start development servers (backend + frontend)
 dev-down: ## Stop development servers
 	@docker compose down
 
-test: ## Run tests
+test: ## Run tests (auto-discovers all tests in tests/ directory)
 	@echo "🧪 Running tests..."
-	@docker compose exec backend pytest
+	@docker compose run --rm backend pytest
 
 clean: ## Clean build artifacts and caches
 	@echo "🧹 Cleaning web app..."
