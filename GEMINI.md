@@ -77,3 +77,6 @@ Located in `backend/`:
 - `docs/src/`: Source files for architecture documentation (ADRs, diagrams, text).
 - `docs/build/`: Generated output for documentation (ignored by git).
 - `.crush/`: System logs and artifacts.
+
+## Project Conventions
+- **Custom Stylesheet:** The main custom stylesheet for the project website is located at `docs/assets/css/aquarius.css`. Do NOT move or rename this file.
