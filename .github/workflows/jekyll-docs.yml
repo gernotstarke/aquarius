@@ -35,6 +35,21 @@ jobs:
           bundler-cache: true
           working-directory: docs
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Obfuscate password protection JavaScript
+        working-directory: docs
+        run: |
+          npm install -g terser
+          terser assets/js/password-protect.js \
+            --compress --mangle \
+            --mangle-props regex=/^_/ \
+            --output assets/js/password-protect.min.js
+          echo "✅ Obfuscated password-protect.js"
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4

@@ -5,3 +5,10 @@ services:
       - .:/site
     ports:
       - '4000:4000'
+
+  obfuscate:
+    image: node:20-alpine
+    volumes:
+      - .:/site
+    working_dir: /site
+    command: ["sh", "-c", "npm install -g terser && terser assets/js/password-protect.js --compress --mangle --mangle-props regex=/^_/ --output assets/js/password-protect.min.js && echo '✅ Obfuscated password-protect.js'"]
