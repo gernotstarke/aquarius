@@ -1,0 +1,20 @@
+---
+layout: splash
+---
+
+{{ content }}
+
+<!-- Password Protection Configuration -->
+<script>
+window.protectedPageConfig = {
+  // SHA-256 hash of the password - generate with: echo -n "yourpassword" | sha256sum
+  // Default: "training2024" -> hash below. CHANGE THIS in _config.yml or page front matter!
+  passwordHash: '{{ page.password_hash | default: site.protected_password_hash | default: "a82edd3a28d6c6e5e821f8696544270986a8a0cc0490de467985a3c4d87fac1c" }}',
+  storageKey: '{{ page.storage_key | default: "aquarius_arch_auth" }}',
+  redirectUrl: '{{ page.redirect_url | default: "/" }}',
+  maxAttempts: {{ page.max_attempts | default: 3 }},
+  lockoutDuration: {{ page.lockout_duration | default: 300000 }}
+};
+</script>
+<!-- Use minified version in production, fallback to source for development -->
+<script src="{{ '/assets/js/password-protect.min.js' | relative_url }}" onerror="this.onerror=null; this.src='{{ '/assets/js/password-protect.js' | relative_url }}';"></script>

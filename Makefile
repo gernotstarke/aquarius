@@ -153,6 +153,60 @@ clean: ## Clean all build artifacts
 	@cd documentation && make clean
 	@echo "✅ Cleanup complete!"
 
+##@ Password Protection
+
+protect-obfuscate: ## Obfuscate the password protection JavaScript
+	@echo "🔐 Obfuscating password-protect.js..."
+	@if command -v npx >/dev/null 2>&1; then \
+		npx terser docs/assets/js/password-protect.js \
+			--compress --mangle \
+			--mangle-props regex=/^_/ \
+			--output docs/assets/js/password-protect.min.js && \
+		echo "✅ Created docs/assets/js/password-protect.min.js"; \
+	else \
+		echo "❌ npx not found. Install Node.js or run: npm install -g terser"; \
+		exit 1; \
+	fi
+
+protect-hash: ## Generate SHA-256 hash for a password (usage: make protect-hash PASSWORD=mypassword)
+	@if [ -z "$(PASSWORD)" ]; then \
+		echo "Usage: make protect-hash PASSWORD=yourpassword"; \
+		echo ""; \
+		echo "Example:"; \
+		echo "  make protect-hash PASSWORD=training2024"; \
+		echo ""; \
+		echo "The generated hash can be set in:"; \
+		echo "  - docs/_config.yml as 'protected_password_hash'"; \
+		echo "  - Page front matter as 'password_hash'"; \
+	else \
+		echo "🔑 Generating SHA-256 hash for password..."; \
+		HASH=$$(echo -n "$(PASSWORD)" | sha256sum | cut -d' ' -f1); \
+		echo ""; \
+		echo "Password: $(PASSWORD)"; \
+		echo "SHA-256:  $$HASH"; \
+		echo ""; \
+		echo "Add to docs/_config.yml:"; \
+		echo "  protected_password_hash: \"$$HASH\""; \
+	fi
+
+protect-setup: protect-obfuscate ## Full setup: obfuscate JS and show instructions
+	@echo ""
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "🔐 Password Protection Setup Complete"
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo ""
+	@echo "Next steps:"
+	@echo "1. Generate a password hash:"
+	@echo "   make protect-hash PASSWORD=your-secure-password"
+	@echo ""
+	@echo "2. Add the hash to docs/_config.yml:"
+	@echo "   protected_password_hash: \"<hash>\""
+	@echo ""
+	@echo "3. Deploy the site"
+	@echo ""
+	@echo "Default password (CHANGE THIS!): training2024"
+	@echo ""
+
 ##@ Git & Repository
 
 status: ## Show git status and branch info
