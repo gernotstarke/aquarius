@@ -103,35 +103,40 @@
   text-align: center;
 }
 
-/* Tile Variations */
-.req-tile--blue {
+/* Tile Variations - All Blueish */
+
+/* Story: Standard Blue */
+.req-tile--blue-1 {
   background-color: #e3f2fd;
   border: 1px solid #bbdefb;
 }
-.req-tile--blue:hover {
+.req-tile--blue-1:hover {
   background-color: #bbdefb;
 }
 
-.req-tile--green {
-  background-color: #e8f5e9;
-  border: 1px solid #c8e6c9;
+/* BMC: Cyan/Turquoise */
+.req-tile--blue-2 {
+  background-color: #e0f7fa;
+  border: 1px solid #b2ebf2;
 }
-.req-tile--green:hover {
-  background-color: #c8e6c9;
-}
-
-.req-tile--orange {
-  background-color: #fff3e0;
-  border: 1px solid #ffe0b2;
-}
-.req-tile--orange:hover {
-  background-color: #ffe0b2;
+.req-tile--blue-2:hover {
+  background-color: #b2ebf2;
 }
 
-.req-tile--purple {
-  background-color: #f3e5f5;
-  border: 1px solid #e1bee7;
+/* AIC: Indigo */
+.req-tile--blue-3 {
+  background-color: #e8eaf6;
+  border: 1px solid #c5cae9;
 }
-.req-tile--purple:hover {
-  background-color: #e1bee7;
+.req-tile--blue-3:hover {
+  background-color: #c5cae9;
+}
+
+/* Req42: Light Azure */
+.req-tile--blue-4 {
+  background-color: #e1f5fe;
+  border: 1px solid #b3e5fc;
+}
+.req-tile--blue-4:hover {
+  background-color: #b3e5fc;
 }
