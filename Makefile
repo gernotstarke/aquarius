@@ -17,7 +17,7 @@ help: ## Show all available targets
 	@echo "  make web-dev        - Start web app development servers"
 	@echo "  make mobile-ios     - Run iOS simulator"
 	@echo "  make docs-build     - Generate documentation"
-	@echo "  make docs-jekyll    - Start Jekyll site (http://localhost:4000)"
+	@echo "  make website-dev    - Start Jekyll website (http://localhost:4000)"
 	@echo ""
 	@echo "For project-specific help:"
 	@echo "  cd web && make help"
