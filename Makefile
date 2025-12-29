@@ -155,18 +155,14 @@ clean: ## Clean all build artifacts
 
 ##@ Password Protection
 
-protect-obfuscate: ## Obfuscate the password protection JavaScript
+protect-obfuscate: ## Obfuscate the password protection JavaScript (runs in Docker)
 	@echo "🔐 Obfuscating password-protect.js..."
-	@if command -v npx >/dev/null 2>&1; then \
-		npx terser docs/assets/js/password-protect.js \
-			--compress --mangle \
-			--mangle-props regex=/^_/ \
-			--output docs/assets/js/password-protect.min.js && \
-		echo "✅ Created docs/assets/js/password-protect.min.js"; \
-	else \
-		echo "❌ npx not found. Install Node.js or run: npm install -g terser"; \
-		exit 1; \
-	fi
+	@docker run --rm \
+		-v "$(PWD)/docs/assets/js:/work" \
+		-w /work \
+		node:20-alpine \
+		sh -c "npm install -g terser && terser password-protect.js --compress --mangle --mangle-props regex=/^_/ --output password-protect.min.js"
+	@echo "✅ Created docs/assets/js/password-protect.min.js"
 
 protect-hash: ## Generate SHA-256 hash for a password (usage: make protect-hash PASSWORD=mypassword)
 	@if [ -z "$(PASSWORD)" ]; then \
