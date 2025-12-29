@@ -3,7 +3,11 @@ layout: splash
 title: "Aquarius"
 excerpt: "Methodische Architektur in Aktion.<br>Von und mit [arc42](https://arc42.org)."
 header:
-  overlay_image: /assets/images/aquarius-splash-dark.png
+  overlay_image: /assets/images/splash/aquarius-splash-dark.png
+  overlay_color: "#000"
+  overlay_filter: "0.3"
+  caption: "Basiert auf einer Idee von [Dr. Peter Hruschka](https://b-agile.de)"
+
   actions:
     - label: "Auf GitHub ansehen"
       url: "https://github.com/gernotstarke/aquarius"
@@ -37,12 +41,6 @@ aquarius_sections:
 
 
 Aquarius, ein umfassendes Bewertungssystem für Kunstschwimmen, bietet trotz der überschaubaren Aufgabenstellung einige architektonische Herausforderungen.
-Das System unterstützt 
-
-* Desktop-/Web-Anwendungen für Organisation und Administration, 
-* Echtzeit-Auswwertung (geplant) und 
-* synchronisierte Datenverwaltung,
-* mobile Apps für die Bewertung vor-Ort 
 
 {% include feature_row id="aquarius_sections" %}
 
@@ -50,17 +48,24 @@ Das System unterstützt
 
 ## Über diese Fallstudie
 
-- **Die Herausforderung**: Wettkämpfe im Figurenschwimmen erfordern sofortige, präzise Bewertungen von mehreren Offiziellen gleichzeitig - doch ausgerechnet Schwimmbäder haben notorisch schlechtes WLAN. Gleichzeitig müssen Startnummern eindeutig vergeben, persönliche Daten der teilnehmenden Kinder geschützt und alle Bewertungen nachvollziehbar dokumentiert werden.
+**Die Herausforderung**: Wettkämpfe im Figurenschwimmen erfordern sofortige, präzise Bewertungen von mehreren Offiziellen gleichzeitig - doch ausgerechnet Schwimmbäder haben notorisch schlechtes WLAN. Gleichzeitig müssen Startnummern eindeutig vergeben, persönliche Daten der teilnehmenden Kinder geschützt und alle Bewertungen nachvollziehbar dokumentiert werden.
 
-- **Die Lösung**: Aquarius kombiniert offline-fähige Mobile Apps für Kampfrichter mit einem cloud-synchronisierten Wettkampf-Management-System. Kampfrichter können auch ohne Netzverbindung bewerten, die Daten werden automatisch synchronisiert sobald Konnektivität besteht. Die Web-Anwendung ermöglicht Organisatoren die zentrale Verwaltung von Teilnehmern, Figuren-Katalogen und Ergebnissen.
+<hr>
 
+**Die Lösung**: Aquarius kombiniert offline-fähige Mobile-Apps für Kampfrichter mit einem cloud-synchronisierten Wettkampf-Management-System. Kampfrichter können auch ohne Netzverbindung bewerten, die Daten werden automatisch synchronisiert sobald Konnektivität besteht. Die Web-Anwendung ermöglicht Organisatoren die zentrale Verwaltung von Teilnehmern, Figuren-Katalogen und Ergebnissen.
 
-- **Reale Komplexität**: Aquarius adressiert typische Herausforderungen verteilter und interaktiver Systeme: 
-  - GDPR-Compliance für Kinder-Daten, 
-  - atomare Startnummern-Vergabe unter Nebenläufigkeit, 
-  - Historisierung trotz evolvierender Figuren-Kataloge, 
-  - Split-Brain Problem bei Netzwerk-Partitionierung der Kampfrichter-Apps 
-  - Benutzbarkeit auch für Laien, selbsterklärende Workflows, fehlertolerante Eingaben sind essentiell für den Einsatz in der Praxis.
+<hr>
 
 
-- **Didaktischer Wert**: Aquarius dient als umfassende Fallstudie für Software-Architektur-Schulungen und demonstriert praxisnahe Herausforderungen moderner Systeme.
+**Reale Komplexität**: Aquarius adressiert typische Herausforderungen verteilter und interaktiver Systeme: 
+
+* Desktop-/Web-Anwendungen für Organisation und Administration, 
+* GDPR-Compliance für Kinder-Daten, 
+* atomare Startnummern-Vergabe unter Nebenläufigkeit, 
+* Historisierung trotz evolvierender Figuren-Kataloge, 
+* Split-Brain Problem bei Netzwerk-Partitionierung der Kampfrichter-Apps 
+* Benutzbarkeit auch für Laien, selbsterklärende Workflows, fehlertolerante Eingaben sind essentiell für den Einsatz in der Praxis.
+
+<hr>
+
+**Didaktischer Wert**: Aquarius dient als umfassende Fallstudie für Software-Architektur-Schulungen und demonstriert praxisnahe Herausforderungen moderner Systeme.

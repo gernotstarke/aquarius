@@ -7,7 +7,8 @@
         {% endif %}
       {% endfor %}
     {% endif %}
-    <li><a href="/impressum"><i class="fas fa-file-contract" aria-hidden="true"></i> Impressum/Legal</a></li>
+    
+  
     <li class="footer-badges">
       <a href="https://github.com/{{ site.repository }}/issues" target="_blank" rel="noopener noreferrer">
         <img src="https://img.shields.io/github/issues/{{ site.repository }}?color=blue&style=flat-square" alt="GitHub issues">
@@ -15,8 +16,16 @@
       <a href="https://github.com/{{ site.repository }}/pulls" target="_blank" rel="noopener noreferrer">
         <img src="https://img.shields.io/github/issues-pr/{{ site.repository }}?color=orange&style=flat-square" alt="GitHub pull requests">
       </a>
+      <img src="https://img.shields.io/badge/last_build-{{ site.time | date: '%Y--%m--%d' }}-green?style=flat-square" alt="Last Build Date">
     </li>
   </ul>
 </div>
 
-<div class="page__footer-copyright">&copy; {{ site.time | date: '%Y' }} {{ site.name | default: site.title }}. Made with passion <i class="fas fa-heart" style="color: #e25555;"></i> in Cologne.</div>
+<div class="page__footer-copyright">
+  &copy; {{ site.time | date: '%Y' }} {{ site.name | default: site.title }}. Made with passion <i class="fas fa-heart" style="color: #e25555;"></i> in Cologne.
+  <div style="margin-top: 10px">
+    <a href="https://www.innoq.com" target="_blank" rel="noopener noreferrer">
+      <img src="{{ '/assets/images/supported-by-innoq.svg' | relative_url }}" alt="Supported by INNOQ" style="height: 30px;">
+    </a>
+  </div>
+</div>

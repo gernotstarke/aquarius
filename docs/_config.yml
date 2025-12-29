@@ -53,13 +53,10 @@ keep_files:
 
 # Outputting
 permalink: /:categories/:title/
-paginate: 5
-paginate_path: /page:num/
 timezone: Europe/Berlin
 
 # Plugins
 plugins:
-  - jekyll-paginate
   - jekyll-sitemap
   - jekyll-gist
   - jekyll-feed
@@ -100,3 +97,10 @@ footer:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/gernotstarke/aquarius"
+    - label: "License"
+      icon: "fas fa-balance-scale"
+      url:  "/license"
+    - label: "Impressum"
+      icon: "fas fa-file-contract"  
+      url: "/impressum"
+    
