@@ -60,3 +60,78 @@
 .page__hero-excerpt a:hover {
   color: #eee;
 }
+
+/* --- Requirements Tiles (Kacheln) --- */
+.req-tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.req-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  border-radius: 12px;
+  text-decoration: none !important;
+  color: #333 !important;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  height: 100%;
+  min-height: 200px;
+}
+
+.req-tile:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+}
+
+.req-tile i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #555;
+}
+
+.req-tile h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Tile Variations */
+.req-tile--blue {
+  background-color: #e3f2fd;
+  border: 1px solid #bbdefb;
+}
+.req-tile--blue:hover {
+  background-color: #bbdefb;
+}
+
+.req-tile--green {
+  background-color: #e8f5e9;
+  border: 1px solid #c8e6c9;
+}
+.req-tile--green:hover {
+  background-color: #c8e6c9;
+}
+
+.req-tile--orange {
+  background-color: #fff3e0;
+  border: 1px solid #ffe0b2;
+}
+.req-tile--orange:hover {
+  background-color: #ffe0b2;
+}
+
+.req-tile--purple {
+  background-color: #f3e5f5;
+  border: 1px solid #e1bee7;
+}
+.req-tile--purple:hover {
+  background-color: #e1bee7;
+}

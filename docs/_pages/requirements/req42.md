@@ -1,6 +1,6 @@
 ---
-permalink: /requirements/
-title: "Aquarius: Anforderungen"
+permalink: /requirements/req42/
+title: "Req42 Framework"
 layout: splash
 header:
   overlay_image: /assets/images/splash/aquarius-requirements-header-1500.webp
