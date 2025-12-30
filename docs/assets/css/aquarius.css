@@ -140,3 +140,41 @@
 .req-tile--blue-4:hover {
   background-color: #fae0e0;
 }
+
+/* --- Architecture Tiles (Green Variations) --- */
+
+/* ACC: Light Sage Green */
+.arch-tile--green-1 {
+  background-color: #c8e6c9;
+  border: 1px solid #2e7d32;
+}
+.arch-tile--green-1:hover {
+  background-color: #fff3e0;
+}
+
+/* Tech-Stack: Mint Green */
+.arch-tile--green-2 {
+  background-color: #b2dfdb;
+  border: 1px solid #00695c;
+}
+.arch-tile--green-2:hover {
+  background-color: #fff3e0;
+}
+
+/* ADRs: Fresh Green */
+.arch-tile--green-3 {
+  background-color: #a5d6a7;
+  border: 1px solid #388e3c;
+}
+.arch-tile--green-3:hover {
+  background-color: #fff3e0;
+}
+
+/* arc42: Deep Green */
+.arch-tile--green-4 {
+  background-color: #81c784;
+  border: 1px solid #1b5e20;
+}
+.arch-tile--green-4:hover {
+  background-color: #fff3e0;
+}
