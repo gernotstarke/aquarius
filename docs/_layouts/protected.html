@@ -4,6 +4,37 @@ layout: splash
 
 {{ content }}
 
+<!-- Logout Button for Protected Pages -->
+<style>
+.protected-logout {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: background 0.2s;
+}
+.protected-logout:hover {
+  background: rgba(0,0,0,0.8);
+}
+.protected-logout i {
+  font-size: 0.9rem;
+}
+</style>
+
+<button class="protected-logout" onclick="logoutProtected()" title="Abmelden">
+  <i class="fas fa-sign-out-alt"></i> Abmelden
+</button>
+
 <!-- Password Protection Configuration -->
 <script>
 window.protectedPageConfig = {
@@ -15,6 +46,13 @@ window.protectedPageConfig = {
   maxAttempts: {{ page.max_attempts | default: 3 }},
   lockoutDuration: {{ page.lockout_duration | default: 300000 }}
 };
+
+function logoutProtected() {
+  sessionStorage.removeItem(window.protectedPageConfig.storageKey);
+  sessionStorage.removeItem(window.protectedPageConfig.storageKey + '_attempts');
+  sessionStorage.removeItem(window.protectedPageConfig.storageKey + '_lockout');
+  window.location.href = window.protectedPageConfig.redirectUrl;
+}
 </script>
 <!-- Use minified version in production, fallback to source for development -->
 <script src="{{ '/assets/js/password-protect.min.js' | relative_url }}" onerror="this.onerror=null; this.src='{{ '/assets/js/password-protect.js' | relative_url }}';"></script>
