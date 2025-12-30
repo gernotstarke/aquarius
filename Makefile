@@ -8,16 +8,25 @@ help: ## Show all available targets
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	@echo ""
 	@echo "Projects:"
-	@echo "  web/         - Desktop/Web Application (Backend + Frontend)"
-	@echo "  mobile/      - Mobile Application (iOS/Android)"
+	@echo "  web/           - Desktop/Web Application (Backend + Frontend)"
+	@echo "  mobile/        - Mobile Application (iOS/Android)"
 	@echo "  documentation/ - Architecture & Requirements Documentation"
-	@echo "  docs/        - Jekyll Static Website (GitHub Pages)"
+	@echo "  docs/          - Jekyll Static Website (GitHub Pages)"
 	@echo ""
 	@echo "Quick Start:"
 	@echo "  make web-dev        - Start web app development servers"
 	@echo "  make mobile-ios     - Run iOS simulator"
 	@echo "  make docs-build     - Generate documentation"
 	@echo "  make website-dev    - Start Jekyll website (http://localhost:4000)"
+	@echo ""
+	@echo "Website (Jekyll + Docker):"
+	@echo "  make website-dev    - Obfuscate JS, start Jekyll server"
+	@echo "  make website-clean  - Stop server and clean _site directory"
+	@echo ""
+	@echo "Password Protection (Architecture Section):"
+	@echo "  make protect-obfuscate              - Obfuscate password-protect.js"
+	@echo "  make protect-hash PASSWORD=xxx      - Generate SHA-256 hash for password"
+	@echo "  make protect-setup                  - Full setup with instructions"
 	@echo ""
 	@echo "For project-specific help:"
 	@echo "  cd web && make help"
@@ -85,10 +94,12 @@ mobile-test: ## Run mobile app tests
 ##@ Project Website (Jekyll)
 
 website-dev: ## Start project website locally (http://localhost:4000)
+	@echo "🔐 Obfuscating protected JavaScript..."
+	@cd docs && docker compose run --rm obfuscate
 	@echo "🌐 Starting Jekyll website..."
-	@cd docs && docker compose up
+	@cd docs && docker compose up jekyll
 
-website-clean: ## Stop project website
+website-clean: ## Stop project website and clean up
 	@cd docs && docker compose down
 	@rm -rf docs/_site
 	@echo "✅ Removed docs/_site directory"
@@ -110,12 +121,15 @@ docs-clean: ## Clean documentation build artifacts
 ##@ Jekyll Documentation Site
 
 docs-jekyll: ## Start Jekyll documentation site (http://localhost:4000)
+	@echo "🔐 Obfuscating protected JavaScript..."
+	@cd docs && docker compose run --rm obfuscate
 	@echo "🚀 Starting Jekyll documentation site..."
 	@echo "📖 Visit: http://localhost:4000"
-	@cd docs && docker compose up
+	@cd docs && docker compose up jekyll
 
 docs-jekyll-bg: ## Start Jekyll in background
-	@cd docs && docker compose up -d
+	@cd docs && docker compose run --rm obfuscate
+	@cd docs && docker compose up -d jekyll
 	@echo "✅ Jekyll running in background"
 	@echo "📖 Visit: http://localhost:4000"
 
@@ -152,6 +166,50 @@ clean: ## Clean all build artifacts
 	@if [ -d "mobile" ]; then cd mobile && make clean; fi
 	@cd documentation && make clean
 	@echo "✅ Cleanup complete!"
+
+##@ Password Protection
+
+protect-obfuscate: ## Obfuscate the password protection JavaScript (runs in Docker)
+	@cd docs && docker compose run --rm obfuscate
+
+protect-hash: ## Generate SHA-256 hash for a password (usage: make protect-hash PASSWORD=mypassword)
+	@if [ -z "$(PASSWORD)" ]; then \
+		echo "Usage: make protect-hash PASSWORD=yourpassword"; \
+		echo ""; \
+		echo "Example:"; \
+		echo "  make protect-hash PASSWORD=training2024"; \
+		echo ""; \
+		echo "The generated hash can be set in:"; \
+		echo "  - docs/_config.yml as 'protected_password_hash'"; \
+		echo "  - Page front matter as 'password_hash'"; \
+	else \
+		echo "🔑 Generating SHA-256 hash for password..."; \
+		HASH=$$(echo -n "$(PASSWORD)" | sha256sum | cut -d' ' -f1); \
+		echo ""; \
+		echo "Password: $(PASSWORD)"; \
+		echo "SHA-256:  $$HASH"; \
+		echo ""; \
+		echo "Add to docs/_config.yml:"; \
+		echo "  protected_password_hash: \"$$HASH\""; \
+	fi
+
+protect-setup: protect-obfuscate ## Full setup: obfuscate JS and show instructions
+	@echo ""
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "🔐 Password Protection Setup Complete"
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo ""
+	@echo "Next steps:"
+	@echo "1. Generate a password hash:"
+	@echo "   make protect-hash PASSWORD=your-secure-password"
+	@echo ""
+	@echo "2. Add the hash to docs/_config.yml:"
+	@echo "   protected_password_hash: \"<hash>\""
+	@echo ""
+	@echo "3. Deploy the site"
+	@echo ""
+	@echo "Default password (CHANGE THIS!): training2024"
+	@echo ""
 
 ##@ Git & Repository
 
