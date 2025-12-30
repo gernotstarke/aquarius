@@ -26,7 +26,7 @@ header:
   </a>
 
   <a href="/architecture/arc42/" class="req-tile arch-tile--green-4">
-    <i class="fas fa-table-cells"></i>
+    <i class="fas fa-th"></i>
     <h3>arc42</h3>
   </a>
 </div>
