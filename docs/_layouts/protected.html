@@ -5,39 +5,35 @@ layout: splash
 {{ content }}
 
 <!-- Logout Button for Protected Pages -->
+<div style="text-align: right; margin-top: 3rem; padding-right: 1rem;">
+  <button class="protected-logout" onclick="logoutProtected()" title="Abmelden vom geschützten Bereich">
+    <i class="fas fa-sign-out-alt"></i> Abmelden
+  </button>
+</div>
+
 <style>
 .protected-logout {
-  position: fixed;
-  top: 85px;
-  right: 15px;
-  z-index: 9999;
-  background: #dc3545;
+  background: #6c757d;
   color: #fff !important;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  font-size: 0.85rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.3rem;
   transition: all 0.2s;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  text-decoration: none !important;
+  opacity: 0.7;
 }
 .protected-logout:hover {
-  background: #c82333;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  background: #5a6268;
+  opacity: 1;
 }
 .protected-logout i {
-  font-size: 0.9rem;
+  font-size: 0.7rem;
 }
 </style>
-
-<button class="protected-logout" onclick="logoutProtected()" title="Abmelden vom geschützten Bereich">
-  <i class="fas fa-sign-out-alt"></i> Abmelden
-</button>
 
 <!-- Password Protection Configuration -->
 <script>
