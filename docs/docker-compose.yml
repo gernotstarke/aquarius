@@ -12,3 +12,11 @@ services:
       - .:/site
     working_dir: /site
     command: ["sh", "-c", "npm install -g terser && terser assets/js/password-protect.js --compress --mangle --mangle-props regex=/^_/ --output assets/js/password-protect.min.js && echo '✅ Obfuscated password-protect.js'"]
+
+  compile-adrs:
+    image: alpine:latest
+    volumes:
+      - ../documentation/adr:/source:ro
+      - ./_adrs:/output
+      - ./scripts:/scripts:ro
+    command: ["sh", "/scripts/compile-adrs.sh"]

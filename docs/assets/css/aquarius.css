@@ -178,3 +178,68 @@
 .arch-tile--green-4:hover {
   background-color: #fff3e0;
 }
+
+/* --- ADR List Styles --- */
+.adr-list {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+.adr-list th,
+.adr-list td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.adr-list th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+.adr-list tr:hover {
+  background-color: #f5f5f5;
+}
+
+.adr-list td:first-child {
+  width: 60px;
+}
+
+.adr-list td:nth-child(2) {
+  width: 50px;
+  text-align: center;
+}
+
+.adr-list a {
+  text-decoration: none;
+}
+
+.adr-list a:hover {
+  text-decoration: underline;
+}
+
+/* --- ADR Status Icons --- */
+.adr-status-accepted {
+  color: #28a745;
+}
+
+.adr-status-proposed {
+  color: #17a2b8;
+}
+
+.adr-status-deprecated {
+  color: #fd7e14;
+}
+
+.adr-status-superseded {
+  color: #6c757d;
+}
+
+.adr-status-rejected {
+  color: #dc3545;
+}
+
+.adr-status-unknown {
+  color: #adb5bd;
+}
