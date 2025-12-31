@@ -1,131 +1,206 @@
-# Plan: ADRs on Jekyll Website
+# Plan: ADRs on Jekyll Website (Revised)
 
 ## Goal
-Display ADRs from `/documentation/adr/` on the Jekyll website under `/architecture/adrs/`, maintaining the source files as the "single source of truth".
+Display ADRs from `/documentation/adr/` on the Jekyll website under `/architecture/adrs/`, using Jekyll Collections for simplified handling.
 
 ## Current State
-- 18 ADRs exist in `/documentation/adr/ADR-XXX-*.md`
-- ADR format: Standard markdown with YAML-like header (Status, Datum, Entscheider)
-- Architecture section uses `protected` layout (password protection)
+- 18 ADRs in `/documentation/adr/ADR-XXX-*.md`
+- All currently have status "Accepted" or "Akzeptiert"
+- Architecture section uses `protected` layout
 
-## Proposed Solution
+## Revised Approach: Jekyll Collections
 
-### 1. Compile Script (`docs/scripts/compile-adrs.sh`)
+### 1. Jekyll Collection Configuration
 
-A shell script that:
-- Reads all ADR files from `/documentation/adr/`
-- Converts each to Jekyll format by adding YAML front matter
-- Generates an index page listing all ADRs
-- Outputs to `docs/_pages/architecture/adrs/`
+Add to `docs/_config.yml`:
+```yaml
+collections:
+  adrs:
+    output: true
+    permalink: /architecture/adrs/:name/
 
-**Conversion logic:**
+defaults:
+  - scope:
+      path: ""
+      type: adrs
+    values:
+      layout: protected
 ```
-Input:  /documentation/adr/ADR-001-vite-build-tool.md
-Output: /docs/_pages/architecture/adrs/001-vite-build-tool.md
+
+### 2. ADR Status Convention
+
+Standardize status in ADR source files (first few lines):
+```markdown
+# ADR-001: Title Here
+
+**Status:** Accepted | Deprecated | Rejected | Proposed | Superseded
+**Datum:** 2025-12-17
 ```
 
-**Front matter to add:**
+**Status Icon Mapping:**
+
+| Status | Icon | Color | FA Class |
+|--------|------|-------|----------|
+| Accepted / Akzeptiert | ✓ | Green | `fa-check-circle` + `text-success` |
+| Proposed / Vorgeschlagen | ? | Blue | `fa-question-circle` + `text-info` |
+| Deprecated / Veraltet | ⚠ | Orange | `fa-exclamation-triangle` + `text-warning` |
+| Superseded / Ersetzt | → | Gray | `fa-arrow-right` + `text-muted` |
+| Rejected / Abgelehnt | ✗ | Red | `fa-times-circle` + `text-danger` |
+
+### 3. Compile Script (`docs/scripts/compile-adrs.sh`)
+
+Simplified script that:
+1. Reads each ADR from `/documentation/adr/`
+2. Extracts title and status from content
+3. Generates YAML front matter
+4. Copies to `docs/_adrs/` (collection folder)
+
+**Input:** `/documentation/adr/ADR-001-vite-build-tool.md`
+**Output:** `/docs/_adrs/ADR-001-vite-build-tool.md`
+
+**Generated front matter:**
 ```yaml
 ---
-permalink: /architecture/adrs/001/
-title: "ADR-001: Vite als Build-Tool"
-layout: protected
+title: "ADR-001: Vite als Build-Tool für Frontend"
+adr_number: "001"
+adr_status: "accepted"
+adr_date: "2025-12-17"
+permalink: /architecture/adrs/ADR-001/
 ---
 ```
 
-### 2. Generated Files Structure
+### 4. Directory Structure
 
 ```
-docs/_pages/architecture/adrs/
-├── index.md          (generated - list of all ADRs)
-├── 001-vite-build-tool.md
-├── 002-react-router.md
-├── ...
-└── 018-domain-driven-design.md
+docs/
+├── _adrs/                          # Jekyll collection (generated, gitignored)
+│   ├── ADR-001-vite-build-tool.md
+│   ├── ADR-002-react-router.md
+│   └── ...
+├── _pages/architecture/adrs/
+│   └── index.md                    # Hand-crafted index with Liquid loop
+└── scripts/
+    └── compile-adrs.sh
 ```
 
-### 3. Index Page Format
+### 5. Index Page (`docs/_pages/architecture/adrs/index.md`)
 
 ```markdown
-# Architecture Decision Records
+---
+permalink: /architecture/adrs/
+title: "Architecture Decision Records"
+layout: protected
+---
 
-| Nr. | Titel | Status | Datum |
-|-----|-------|--------|-------|
-| [ADR-001](/architecture/adrs/001/) | Vite als Build-Tool | Akzeptiert | 2025-12-17 |
-| [ADR-002](/architecture/adrs/002/) | React Router | Akzeptiert | 2025-12-17 |
-...
+# Architecture Decision Records (ADRs)
+
+<table class="adr-list">
+  <thead>
+    <tr><th>Nr.</th><th>Status</th><th>Titel</th></tr>
+  </thead>
+  <tbody>
+{% assign sorted_adrs = site.adrs | sort: "adr_number" %}
+{% for adr in sorted_adrs %}
+  <tr>
+    <td>{{ adr.adr_number }}</td>
+    <td>{% include adr-status-icon.html status=adr.adr_status %}</td>
+    <td><a href="{{ adr.url }}">{{ adr.title }}</a></td>
+  </tr>
+{% endfor %}
+  </tbody>
+</table>
 ```
 
-### 4. Integration Points
+### 6. Status Icon Include (`docs/_includes/adr-status-icon.html`)
 
-#### Development (`make website-dev`)
-```makefile
-website-dev:
-    @cd docs && docker compose run --rm compile-adrs  # NEW
-    @cd docs && docker compose run --rm obfuscate
-    @cd docs && docker compose up jekyll
+```liquid
+{% case include.status %}
+  {% when "accepted" or "akzeptiert" %}
+    <i class="fas fa-check-circle text-success" title="Accepted"></i>
+  {% when "proposed" or "vorgeschlagen" %}
+    <i class="fas fa-question-circle text-info" title="Proposed"></i>
+  {% when "deprecated" or "veraltet" %}
+    <i class="fas fa-exclamation-triangle text-warning" title="Deprecated"></i>
+  {% when "superseded" or "ersetzt" %}
+    <i class="fas fa-arrow-right text-muted" title="Superseded"></i>
+  {% when "rejected" or "abgelehnt" %}
+    <i class="fas fa-times-circle text-danger" title="Rejected"></i>
+  {% else %}
+    <i class="fas fa-circle text-muted" title="{{ include.status }}"></i>
+{% endcase %}
 ```
 
-#### Production (GitHub Actions)
-Add step before Jekyll build:
-```yaml
-- name: Compile ADRs for Jekyll
-  run: |
-    chmod +x docs/scripts/compile-adrs.sh
-    ./docs/scripts/compile-adrs.sh
-```
+### 7. Integration
 
-### 5. Docker Compose Addition
-
-New service for ADR compilation:
+#### Docker Compose (`docs/docker-compose.yml`)
 ```yaml
 compile-adrs:
   image: alpine:latest
   volumes:
     - ../documentation/adr:/source:ro
-    - ./_pages/architecture/adrs:/output
+    - ./_adrs:/output
     - ./scripts:/scripts:ro
   command: sh /scripts/compile-adrs.sh
 ```
 
-### 6. Security Consideration
-
-- All generated ADR pages use `layout: protected`
-- Index page (`adrs/index.md`) also uses `protected` layout
-- No bypass possible via direct URL
-
-### 7. .gitignore Update
-
-Add generated ADR files to `.gitignore`:
-```
-docs/_pages/architecture/adrs/*.md
-!docs/_pages/architecture/adrs/.gitkeep
+#### Makefile
+```makefile
+website-dev:
+    @echo "📄 Compiling ADRs..."
+    @cd docs && docker compose run --rm compile-adrs
+    @echo "🔐 Obfuscating JS..."
+    @cd docs && docker compose run --rm obfuscate
+    @echo "🌐 Starting Jekyll..."
+    @cd docs && docker compose up jekyll
 ```
 
-This ensures:
-- Generated files not committed
-- Source remains in `/documentation/adr/`
-- Fresh compilation on each build
+#### GitHub Actions
+```yaml
+- name: Compile ADRs for Jekyll
+  run: |
+    mkdir -p docs/_adrs
+    chmod +x docs/scripts/compile-adrs.sh
+    ./docs/scripts/compile-adrs.sh
+```
 
-## Alternative Considered
+### 8. Files to .gitignore
 
-**Jekyll Collections**: Could use Jekyll's collection feature to auto-generate pages from markdown. Rejected because:
-- Requires copying files anyway
-- Less control over URL structure
-- More complex configuration
+```
+docs/_adrs/
+```
+
+### 9. CSS Addition (`docs/assets/css/aquarius.css`)
+
+```css
+/* ADR Status Colors */
+.text-success { color: #28a745 !important; }
+.text-info { color: #17a2b8 !important; }
+.text-warning { color: #ffc107 !important; }
+.text-danger { color: #dc3545 !important; }
+.text-muted { color: #6c757d !important; }
+
+.adr-list { width: 100%; }
+.adr-list td, .adr-list th { padding: 0.5rem; }
+.adr-list i { font-size: 1.1rem; }
+```
 
 ## Implementation Steps
 
-1. Create `docs/scripts/compile-adrs.sh`
-2. Update `docs/docker-compose.yml` with compile-adrs service
-3. Update Makefile targets
-4. Update GitHub Actions workflow
-5. Update `.gitignore`
-6. Remove static `adrs.md` placeholder
-7. Test locally and in CI
+1. Update `_config.yml` with collection
+2. Create `docs/scripts/compile-adrs.sh`
+3. Create `docs/_includes/adr-status-icon.html`
+4. Update `docs/_pages/architecture/adrs/index.md`
+5. Add CSS for status colors
+6. Update `docker-compose.yml`
+7. Update Makefile
+8. Update GitHub Actions workflow
+9. Update `.gitignore`
+10. Test locally
 
-## Questions for Review
+## Benefits of Collections Approach
 
-1. Should ADR URLs be `/architecture/adrs/001/` or `/architecture/adrs/ADR-001/`?
-2. Should we include the full ADR content or just summaries on the index page?
-3. Any preference for the table format vs. tile/card format for the index?
+- Jekyll handles URL generation automatically
+- Liquid templates for iteration
+- Front matter enables sorting/filtering
+- Less custom code needed
+- Standard Jekyll pattern
