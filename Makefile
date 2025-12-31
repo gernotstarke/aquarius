@@ -96,6 +96,7 @@ mobile-test: ## Run mobile app tests
 
 website-compile: ## Compile content for Jekyll (ADRs, etc.)
 	@echo "📄 Compiling ADRs for Jekyll..."
+	@mkdir -p docs/_adrs
 	@cd docs && docker compose run --rm compile-adrs
 
 website-dev: website-compile ## Start project website locally (http://localhost:4000)
