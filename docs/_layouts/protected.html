@@ -56,3 +56,7 @@ function logoutProtected() {
 </script>
 <!-- Use minified version in production, fallback to source for development -->
 <script src="{{ '/assets/js/password-protect.min.js' | relative_url }}" onerror="this.onerror=null; this.src='{{ '/assets/js/password-protect.js' | relative_url }}';"></script>
+
+<!-- Architecture Search (Lunr.js) -->
+<script src="https://unpkg.com/lunr/lunr.js"></script>
+<script src="{{ '/assets/js/arch-search.js' | relative_url }}"></script>

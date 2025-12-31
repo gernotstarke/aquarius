@@ -1,0 +1,18 @@
+---
+layout: null
+---
+[
+  {% assign arch_pages = site.pages | where_exp: "page", "page.url contains '/architecture/'" %}
+  {% assign adr_pages = site.adrs %}
+  {% assign all_pages = arch_pages | concat: adr_pages %}
+  {% for page in all_pages %}
+  {
+    "title": {{ page.title | jsonify }},
+    "url": {{ page.url | jsonify }},
+    "content": {{ page.content | strip_html | normalize_whitespace | truncate: 5000 | jsonify }},
+    "type": {% if page.collection == "adrs" %}"adr"{% else %}"page"{% endif %},
+    "adr_number": {{ page.adr_number | default: "" | jsonify }},
+    "adr_status": {{ page.adr_status | default: "" | jsonify }}
+  }{% unless forloop.last %},{% endunless %}
+  {% endfor %}
+]

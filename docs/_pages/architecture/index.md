@@ -9,6 +9,14 @@ header:
   caption: "Der Einstieg in die Architektur"
 ---
 
+<div class="arch-search-container">
+  <div class="arch-search-box">
+    <i class="fas fa-search arch-search-icon"></i>
+    <input type="text" id="arch-search-input" placeholder="Architektur durchsuchen..." autocomplete="off">
+  </div>
+  <div id="arch-search-results" class="arch-search-results"></div>
+</div>
+
 <div class="req-tile-grid">
   <a href="/architecture/acc/" class="req-tile arch-tile--green-1">
     <i class="fas fa-comments"></i>

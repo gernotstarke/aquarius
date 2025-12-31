@@ -243,3 +243,123 @@
 .adr-status-unknown {
   color: #adb5bd;
 }
+
+/* --- Architecture Search --- */
+.arch-search-container {
+  position: relative;
+  max-width: 500px;
+  margin: 1.5rem 0 2rem 0;
+}
+
+.arch-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.arch-search-box .arch-search-icon {
+  position: absolute;
+  left: 12px;
+  color: #6c757d;
+  pointer-events: none;
+}
+
+#arch-search-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  font-size: 1rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#arch-search-input:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.15);
+}
+
+#arch-search-input::placeholder {
+  color: #aaa;
+}
+
+.arch-search-results {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-top: 4px;
+}
+
+.arch-search-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.arch-search-item {
+  border-bottom: 1px solid #eee;
+}
+
+.arch-search-item:last-child {
+  border-bottom: none;
+}
+
+.arch-search-item a {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  color: #333;
+  transition: background-color 0.15s;
+}
+
+.arch-search-item:hover a,
+.arch-search-item.selected a {
+  background-color: #f0f7f0;
+}
+
+.arch-search-item .arch-search-icon {
+  width: 24px;
+  color: #6c757d;
+  flex-shrink: 0;
+}
+
+.arch-search-title {
+  flex: 1;
+}
+
+.arch-search-title mark {
+  background-color: #fff3cd;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+.arch-search-status {
+  margin-left: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.arch-search-no-results,
+.arch-search-loading {
+  padding: 1rem;
+  text-align: center;
+  color: #6c757d;
+}
+
+.arch-search-more {
+  padding: 0.5rem 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #6c757d;
+  background: #f8f9fa;
+  border-top: 1px solid #eee;
+}
