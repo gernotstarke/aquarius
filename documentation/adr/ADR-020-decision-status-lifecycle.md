@@ -133,7 +133,7 @@ Alle bestehenden ADRs mit `Accepted` oder `Akzeptiert` behalten ihren Status. Ke
 Die Jekyll-Website zeigt Status-Icons in der ADR-Liste:
 
 ```liquid
-{% include adr-status-icon.html status=adr.adr_status %}
+{% raw %}{% include adr-status-icon.html status=adr.adr_status %}{% endraw %}
 ```
 
 ### Validierung (optional, zukünftig)
