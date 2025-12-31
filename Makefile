@@ -20,8 +20,9 @@ help: ## Show all available targets
 	@echo "  make website-dev    - Start Jekyll website (http://localhost:4000)"
 	@echo ""
 	@echo "Website (Jekyll + Docker):"
-	@echo "  make website-dev    - Obfuscate JS, start Jekyll server"
-	@echo "  make website-clean  - Stop server and clean _site directory"
+	@echo "  make website-compile - Compile ADRs and other content for Jekyll"
+	@echo "  make website-dev     - Compile, obfuscate, start Jekyll server"
+	@echo "  make website-clean   - Stop server and clean generated files"
 	@echo ""
 	@echo "Password Protection (Architecture Section):"
 	@echo "  make protect-obfuscate              - Obfuscate password-protect.js"
@@ -93,7 +94,11 @@ mobile-test: ## Run mobile app tests
 
 ##@ Project Website (Jekyll)
 
-website-dev: ## Start project website locally (http://localhost:4000)
+website-compile: ## Compile content for Jekyll (ADRs, etc.)
+	@echo "📄 Compiling ADRs for Jekyll..."
+	@cd docs && docker compose run --rm compile-adrs
+
+website-dev: website-compile ## Start project website locally (http://localhost:4000)
 	@echo "🔐 Obfuscating protected JavaScript..."
 	@cd docs && docker compose run --rm obfuscate
 	@echo "🌐 Starting Jekyll website..."
@@ -101,8 +106,8 @@ website-dev: ## Start project website locally (http://localhost:4000)
 
 website-clean: ## Stop project website and clean up
 	@cd docs && docker compose down
-	@rm -rf docs/_site
-	@echo "✅ Removed docs/_site directory"
+	@rm -rf docs/_site docs/_adrs
+	@echo "✅ Removed docs/_site and docs/_adrs directories"
 
 ##@ Documentation
 
@@ -120,14 +125,14 @@ docs-clean: ## Clean documentation build artifacts
 
 ##@ Jekyll Documentation Site
 
-docs-jekyll: ## Start Jekyll documentation site (http://localhost:4000)
+docs-jekyll: website-compile ## Start Jekyll documentation site (http://localhost:4000)
 	@echo "🔐 Obfuscating protected JavaScript..."
 	@cd docs && docker compose run --rm obfuscate
 	@echo "🚀 Starting Jekyll documentation site..."
 	@echo "📖 Visit: http://localhost:4000"
 	@cd docs && docker compose up jekyll
 
-docs-jekyll-bg: ## Start Jekyll in background
+docs-jekyll-bg: website-compile ## Start Jekyll in background
 	@cd docs && docker compose run --rm obfuscate
 	@cd docs && docker compose up -d jekyll
 	@echo "✅ Jekyll running in background"

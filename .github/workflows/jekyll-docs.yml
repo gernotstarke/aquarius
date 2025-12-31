@@ -5,8 +5,9 @@ on:
     branches:
       - main
     paths:
-      - 'docs/**'  # Only trigger when docs/ folder changes
-      - '.github/workflows/jekyll-docs.yml'  # Also trigger when workflow itself changes
+      - 'docs/**'  # Trigger when docs/ folder changes
+      - 'documentation/adr/**'  # Trigger when ADRs change
+      - '.github/workflows/jekyll-docs.yml'  # Trigger when workflow itself changes
   workflow_dispatch:  # Allow manual triggering
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
@@ -39,6 +40,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      - name: Compile ADRs for Jekyll
+        run: |
+          mkdir -p docs/_adrs
+          chmod +x docs/scripts/compile-adrs.sh
+          ./docs/scripts/compile-adrs.sh documentation/adr docs/_adrs
 
       - name: Obfuscate password protection JavaScript
         working-directory: docs

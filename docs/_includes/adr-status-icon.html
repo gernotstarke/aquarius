@@ -1,0 +1,14 @@
+{% case include.status %}
+  {% when "accepted" or "akzeptiert" %}
+    <i class="fas fa-check-circle adr-status-accepted" title="Accepted"></i>
+  {% when "proposed" or "vorgeschlagen" %}
+    <i class="fas fa-question-circle adr-status-proposed" title="Proposed"></i>
+  {% when "deprecated" or "veraltet" %}
+    <i class="fas fa-exclamation-triangle adr-status-deprecated" title="Deprecated"></i>
+  {% when "superseded" or "ersetzt" %}
+    <i class="fas fa-arrow-right adr-status-superseded" title="Superseded"></i>
+  {% when "rejected" or "abgelehnt" %}
+    <i class="fas fa-times-circle adr-status-rejected" title="Rejected"></i>
+  {% else %}
+    <i class="fas fa-circle adr-status-unknown" title="{{ include.status }}"></i>
+{% endcase %}
