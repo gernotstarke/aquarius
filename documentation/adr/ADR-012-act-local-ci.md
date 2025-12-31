@@ -1,6 +1,6 @@
 # ADR-012: Act für lokale GitHub Actions Ausführung
 
-**Status:** Accepted
+**Status:** Vorgeschlagen.
 **Datum:** 2025-12-17
 **Kontext:** Lokale CI/CD-Pipeline-Ausführung
 **Entscheider:** Architekt, Team
