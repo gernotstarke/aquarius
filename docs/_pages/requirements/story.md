@@ -21,6 +21,14 @@ Gewertet wird sowohl im Figuren- als auch im Synchronschwimmen;
 
 
 Die Kinder müssen bei der **Anmeldung** zum Wettkampf ihren Namen, ihr Alter, ihre Adresse und den Namen des Teams angeben. 
+
+>Für die Wettkämpfe besteht für alle teilnehmenden Kinder unbedingte **Versicherungspflicht**:
+>Die muss zwingend über einen der folgenden Wege erfolgen:
+>
+>1. über die Mitgliedschaft in einem der beteilgten Vereine (denn die versichern alle ihre Mitglieder:innen), 
+>2. über die Eltern oder sogar eigene Sporthaftpflichtversicherung oder
+>3. über einen Sportverband (etwa einen der Landesverbände): Manche Kinder werden über einen Verband in so genannte _Kader_ berufen, und erhalten damit dann die notwendige Versicherung.
+
 Um die Bewertung zu erleichtern, erhält jeder Teilnehmer eine Startnummer.
 
 Bei einem **Wettkampf** werden mehrere **Durchgänge** für unterschiedliche Figuren an mehreren **Stationen** durchgeführt. 
