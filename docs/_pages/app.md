@@ -25,6 +25,7 @@ Wählen Sie den gewünschten Anwendungsbereich.
   </a>
 
   <a href="http://localhost:5173/admin" target="_blank" rel="noopener noreferrer" class="req-tile app-tile--red-1">
+    <span id="admin-app-status" class="status-indicator" title="Checking status..."></span>
     <i class="fas fa-skull"></i>
     <h3>Admin UI</h3>
   </a>
@@ -51,8 +52,7 @@ Die Mobile App erfordert einen separaten Start via Expo (siehe Mobile-Seite).
     const isLocalDocs = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
     const targetUrl = isLocalDocs ? localAppUrl : prodAppUrl;
     
-    // Update link href if in production (optional, if we want the tile to link to prod automatically)
-    // Currently the HTML has localhost hardcoded. Let's fix that too via JS for better UX.
+    // Update link href if in production
     const planungsTile = document.querySelector(".app-tile--violet-1");
     if (planungsTile && !isLocalDocs) {
         planungsTile.href = prodAppUrl;
@@ -62,19 +62,31 @@ Die Mobile App erfordert einen separaten Start via Expo (siehe Mobile-Seite).
         adminTile.href = prodAppUrl + "/admin";
     }
 
-    const indicator = document.getElementById("planungs-app-status");
-    if (!indicator) return;
+    const indicatorPlanung = document.getElementById("planungs-app-status");
+    const indicatorAdmin = document.getElementById("admin-app-status");
 
     // Check function using Image load (favicon hack)
     function checkStatus() {
       const img = new Image();
       img.onload = function() {
-        indicator.className = "status-indicator status-online";
-        indicator.title = "App is running";
+        if (indicatorPlanung) {
+            indicatorPlanung.className = "status-indicator status-online";
+            indicatorPlanung.title = "App is running";
+        }
+        if (indicatorAdmin) {
+            indicatorAdmin.className = "status-indicator status-online";
+            indicatorAdmin.title = "App is running";
+        }
       };
       img.onerror = function() {
-        indicator.className = "status-indicator status-offline";
-        indicator.title = "App unreachable";
+        if (indicatorPlanung) {
+            indicatorPlanung.className = "status-indicator status-offline";
+            indicatorPlanung.title = "App unreachable";
+        }
+        if (indicatorAdmin) {
+            indicatorAdmin.className = "status-indicator status-offline";
+            indicatorAdmin.title = "App unreachable";
+        }
       };
       // Use logo with cache buster (favicon.ico might not exist in dev)
       img.src = targetUrl + "/aquarius-logo.png?t=" + new Date().getTime();
@@ -83,7 +95,7 @@ Die Mobile App erfordert einen separaten Start via Expo (siehe Mobile-Seite).
     // Initial check
     checkStatus();
     
-    // Check every 30 seconds
-    setInterval(checkStatus, 30000);
+    // Check every 10 seconds
+    setInterval(checkStatus, 10000);
   });
 </script>
