@@ -1,0 +1,208 @@
+:imagesdir: images
+
+== Wave-Animation Konzept
+
+=== Überblick
+
+Der Aquarius Splash-Header verwendet einen anspruchsvollen Mehrschicht-Wasserfluss-Animationseffekt unter Verwendung von SVG-Turbulenzfiltern, CSS-Masken und geschichteten Pseudo-Elementen.
+
+=== Technische Architektur
+
+==== Drei-Schichten-System
+
+[plantuml, wave-layers, svg]
+----
+@startuml
+rectangle "Layer 1 (::before)\nOberste 33%" as L1 {
+  note right: Sanfte Turbulenz\n12s Animation\nMaske: Fade 60% -> 0%
+}
+
+rectangle "Layer 2 (::after)\nMittlere 33%" as L2 {
+  note right: Mittlere Turbulenz\n15s Animation (-4s Delay)\nMaske: Fade In/Out
+}
+
+rectangle "Layer 3 (wrapper)\nUntere 33%" as L3 {
+  note right: Starke Turbulenz\n18s Animation (-8s Delay)\nMaske: Fade 0% -> 60%
+}
+
+L1 -[hidden]-> L2
+L2 -[hidden]-> L3
+@enduml
+----
+
+==== SVG Turbulenz-Filter
+
+Drei verschiedene Filter erzeugen den fließenden Wassereffekt:
+
+1.  **turbulence-gentle (Oberste Ebene)**
+    *   `baseFrequency`: 0.008-0.016 (animiert)
+    *   `numOctaves`: 3
+    *   `displacement`: 15-20px
+    *   *Effekt:* Subtile Wellenbewegung
+
+2.  **turbulence-medium (Mittlere Ebene)**
+    *   `baseFrequency`: 0.01-0.02 (animiert)
+    *   `numOctaves`: 4
+    *   `displacement`: 25-35px
+    *   *Effekt:* Mittlere Verzerrung + Seed-Animation
+
+3.  **turbulence-strong (Untere Ebene)**
+    *   `baseFrequency`: 0.015-0.025 (animiert)
+    *   `numOctaves`: 5
+    *   `displacement`: 35-50px
+    *   *Effekt:* Starke Wellenbewegung + Farbverschiebung (Blautönung)
+
+==== CSS Masken (Horizontale Zonen)
+
+Jede Ebene ist durch CSS Linear Gradients auf eine bestimmte vertikale Zone beschränkt:
+
+[source,css]
+----
+/* Oberes Drittel */
+mask: linear-gradient(to bottom,
+  rgba(0,0,0,0.6) 0%,     /* Start sichtbar */
+  rgba(0,0,0,0.4) 33%,    /* Mitte verblassen */
+  rgba(0,0,0,0) 35%       /* Unten unsichtbar */
+);
+
+/* Mittleres Drittel */
+mask: linear-gradient(to bottom,
+  rgba(0,0,0,0) 30%,      /* Oben unsichtbar */
+  rgba(0,0,0,0.5) 35%,    /* Einblenden */
+  rgba(0,0,0,0.5) 65%,    /* Sichtbar bleiben */
+  rgba(0,0,0,0) 70%       /* Ausblenden */
+);
+
+/* Unteres Drittel */
+mask: linear-gradient(to bottom,
+  rgba(0,0,0,0) 65%,      /* Oben unsichtbar */
+  rgba(0,0,0,0.4) 70%,    /* Einblenden */
+  rgba(0,0,0,0.6) 100%    /* Voll sichtbar */
+);
+----
+
+=== Animations-Timing
+
+Unterschiedliche Animationsgeschwindigkeiten erzeugen eine organische, sich nicht wiederholende Bewegung:
+
+[cols="1,1,1,2,2"]
+|===
+| Ebene | Dauer | Verzögerung | Transformation | Effekt
+
+
+| Layer 1
+| 12s
+| 0s
+| translateX(±20px), scale(1.05-1.08)
+| Sanftes horizontales Wiegen
+
+| Layer 2
+| 15s
+| -4s
+| translateX(±15px), translateY(±10px), scale(1.06-1.08)
+| Diagonale Welle
+
+| Layer 3
+| 18s
+| -8s
+| translateX(±25px), scale(1.07-1.10)
+| Starker horizontaler Fluss
+|===
+
+*LCM (Kleinstes gemeinsames Vielfaches):* 180s = Voller Zyklus bis zur Wiederholung
+
+=== Performance Optimierungen
+
+[source,css]
+----
+/* GPU Beschleunigung */
+will-change: transform, filter;
+backface-visibility: hidden;
+perspective: 1000px;
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  animation: none;
+  transform: none;
+}
+----
+
+=== Dateistruktur
+
+[source]
+----
+docs/
+├── assets/css/
+│   └── wave-animation.scss          # Haupt-CSS (kompiliert durch Jekyll)
+├── _includes/
+│   ├── wave-filters.html            # SVG Filter-Definitionen
+│   ├── head/custom.html             # Injeziert CSS in <head>
+│   └── footer/custom.html           # Injeziert SVG vor </body>
+└── index.md                         # Nutzt .page__hero--overlay
+----
+
+=== Funktionsweise
+
+1.  **Jekyll Build** kompiliert `wave-animation.scss` → `wave-animation.css`
+2.  **Head Include** lädt das CSS Stylesheet
+3.  **Footer Include** injeziert SVG-Filter in das DOM
+4.  **Pseudo-Elemente** (::before, ::after) duplizieren das Hintergrundbild
+5.  **SVG-Filter** verzerren jede Ebene unterschiedlich
+6.  **CSS Masken** begrenzen jede Ebene auf ihre horizontale Zone
+7.  **Animationen** erzeugen die fließende Bewegung mit unterschiedlichen Geschwindigkeiten
+
+=== Browser-Support
+
+*   ✅ Chrome/Edge 88+
+*   ✅ Firefox 90+
+*   ✅ Safari 14.1+
+*   ⚠️ iOS Safari (teilweise Performance-Probleme mit SVG-Filtern auf älteren Geräten)
+
+**Fallback:** Ohne SVG-Filter-Support animieren die Ebenen trotzdem mittels Transformationen (Graceful Degradation).
+
+=== Anpassung
+
+==== Animationsgeschwindigkeit
+In `wave-animation.scss`:
+[source,scss]
+----
+animation: wave-flow-1 12s ease-in-out infinite;  // Langsamer: 20s
+----
+
+==== Turbulenz-Intensität
+In `wave-filters.html`:
+[source,html]
+----
+<feDisplacementMap in="SourceGraphic" scale="15">  <!-- Höher für mehr Verzerrung -->
+----
+
+==== Zonen-Grenzen
+In `wave-animation.scss`:
+[source,scss]
+----
+mask: linear-gradient(to bottom,
+  rgba(0,0,0,0.6) 0%,
+  rgba(0,0,0,0.4) 50%,   /* Änderung des Split-Points */
+  rgba(0,0,0,0) 55%
+);
+----
+
+=== Tests & Probleme
+
+**Lokal testen:**
+```bash
+cd docs
+docker compose up
+# Öffne http://localhost:4000
+```
+
+**Bekannte Probleme:**
+*   **Mobile Safari:** Ruckeln auf iPhone 11 und älter möglich.
+*   **Firefox:** Leichter Performance-Abfall bei schwachen GPUs.
+*   **Edge:** Gelegentliche Masken-Rendering-Fehler (Refresh behebt es).
+
+=== Credits
+
+Inspiriert von:
+*   SVG Turbulence: https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feTurbulence[MDN Web Docs]
+*   CSS Masks: https://css-tricks.com/almanac/properties/m/mask/[CSS-Tricks]
