@@ -14,7 +14,7 @@ Wählen Sie den gewünschten Anwendungsbereich.
 
 <div class="req-tile-grid">
   <a href="http://localhost:5173" target="_blank" rel="noopener noreferrer" class="req-tile app-tile--violet-1">
-    <i class="fas fa-laptop-code"></i>
+    <img src="/assets/images/aquarius-wave-logo-highres-freigestellt.webp" alt="Aquarius Wave" style="height: 5rem; margin-bottom: 1rem;">
     <h3>Planungs-App</h3>
   </a>
 
