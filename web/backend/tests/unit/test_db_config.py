@@ -38,7 +38,9 @@ def test_libsql_configuration():
 def test_default_configuration():
     """Verify default fallback to local sqlite."""
     # Ensure DATABASE_URL is unset
-    with mock.patch.dict(os.environ, {}, clear=True):
+    # We must also mock load_dotenv to prevent it from reading the real .env file
+    with mock.patch.dict(os.environ, {}, clear=True), \
+         mock.patch("dotenv.load_dotenv"):
         from app import database
         importlib.reload(database)
         
