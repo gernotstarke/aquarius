@@ -1,0 +1,105 @@
+:jbake-title: Persistenz & Datenbank-Replikation (Turso)
+:jbake-type: page
+:jbake-status: published
+
+== Persistenzkonzept: Verteilte Datenhaltung mit Turso
+
+=== Übersicht
+
+Das Persistenzkonzept von Aquarius basiert auf **Turso (libSQL)**, einer verteilten Datenbanktechnologie, die auf SQLite aufbaut. Dies ermöglicht eine hybride Architektur, die sowohl die Vorteile zentraler Cloud-Datenbanken als auch lokaler Offline-Fähigkeit vereint.
+
+=== Architektur
+
+Das System unterscheidet zwischen zwei primären Laufzeitumgebungen:
+
+1.  **Backend / API (Cloud)**:
+    *   Verbindet sich als Client (`libsql://`) mit der zentralen Turso-Datenbank.
+    *   Nutzt Edge-Replikation für niedrige Latenz.
+    *   Dient als "Source of Truth" für Stammdaten.
+
+2.  **Mobile App (Tablet/Offline)**:
+    *   Nutzt eine **Embedded Replica** (lokale SQLite-Datei).
+    *   Funktioniert vollständig offline (Lesen & Schreiben).
+    *   Synchronisiert sich automatisch mit der Cloud, sobald eine Verbindung besteht.
+
+[plantuml, turso-architecture, png]
+----
+cloud "Turso Cloud" {
+  [Primary DB] as Primary
+  [Edge Replica] as Edge
+}
+
+node "Backend Server" {
+  [FastAPI App] --> Edge : "libsql:// (HTTP)"
+}
+
+node "Tablet (Schwimmbad)" {
+  database "Local DB\n(Embedded)" as LocalDB
+  [Mobile App] --> LocalDB : "file:// (Direct)"
+  LocalDB <..> Edge : "Sync Protocol"
+}
+
+Primary -right-> Edge : "Replication"
+----
+
+=== Betriebsmodi
+
+==== 1. Lokale Entwicklung (Dev)
+Für die lokale Entwicklung wird keine Cloud-Infrastruktur benötigt.
+*   **Treiber**: Standard Python SQLite (`sqlite3`) oder `libsql-experimental`.
+*   **URL**: `sqlite:///./arqua42.db`
+*   **Vorteil**: Einfaches Setup, kein Netzwerk nötig, File-basiert.
+
+==== 2. Produktion (Cloud)
+In der Produktionsumgebung verbindet sich die Anwendung mit dem Turso-Cluster.
+*   **Treiber**: `libsql-client` / `sqlalchemy-libsql`.
+*   **URL**: `libsql://aquarius-db.turso.io`
+*   **Auth**: Token-basiert.
+
+=== CLI-Befehle (Cheat Sheet)
+
+Die Verwaltung der Datenbank erfolgt primär über die `turso` CLI.
+
+.Datenbank erstellen
+[source,bash]
+----
+turso db create aquarius --location fra
+----
+
+.Verbindungsdaten abrufen
+[source,bash]
+----
+# URL anzeigen
+turso db show aquarius --url
+
+# Auth-Token erstellen (gültig für immer)
+turso db tokens create aquarius --expiration none
+----
+
+.Lokale Shell öffnen
+[source,bash]
+----
+turso db shell aquarius
+----
+
+.Datenbank inspizieren
+[source,bash]
+----
+# Größe und Statistiken
+turso db show aquarius
+----
+
+=== Umsetzung in der Anwendung
+
+Die Umschaltung erfolgt transparent über Umgebungsvariablen in `app/database.py`:
+
+[source,python]
+----
+# Automatische Erkennung des Modus anhand der URL
+if DATABASE_URL.startswith("libsql://"):
+    # Cloud Mode (Turso)
+    engine = create_engine(DATABASE_URL, connect_args={"auth_token": TOKEN})
+else:
+    # Local Mode (File)
+    engine = create_engine(DATABASE_URL)
+----
