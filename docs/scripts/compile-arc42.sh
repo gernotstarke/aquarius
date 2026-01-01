@@ -30,9 +30,9 @@ echo "   Output: $OUTPUT_FILE"
 # Create output directory
 mkdir -p "$OUTPUT_DIR"
 
-# Create temporary combined file
-TEMP_ADOC=$(mktemp /tmp/arc42-combined.XXXXXX.adoc)
-TEMP_HTML=$(mktemp /tmp/arc42-output.XXXXXX.html)
+# Create temporary files (using fixed names since container is ephemeral)
+TEMP_ADOC="/tmp/arc42-combined.adoc"
+TEMP_HTML="/tmp/arc42-output.html"
 
 # Add document header
 cat > "$TEMP_ADOC" << 'HEADER'
