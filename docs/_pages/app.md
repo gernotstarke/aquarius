@@ -9,7 +9,9 @@ header:
 
 app_actions:
   - title: "Planungs-App"
-    excerpt: "Startet die Web-Anwendung für Saisonplanung, Anmeldung und Verwaltung.<br><br><small>(Entwicklungsserver muss laufen)</small>"
+    excerpt: "![web-app](/assets/images/aquarius-application-logo.jpeg)<br>
+    Startet die Web-Anwendung für Saisonplanung, Anmeldung und Verwaltung.<br>
+    <small>(Entwicklungsserver muss laufen)</small>"
     url: "http://localhost:5173"
     btn_label: "App starten 🚀"
     btn_class: "btn btn--info"
@@ -18,13 +20,16 @@ app_actions:
       rel: "noopener noreferrer"
 
   - title: "Mobile App"
-    excerpt: "Informationen zur mobilen App für Kampfrichter und Simulator-Start."
+    excerpt: "![mobile-app](/assets/images/aquarius-wave-logo-highres-freigestellt.webp)<br>
+    Informationen zur mobilen App für Kampfrichter und Simulator-Start."
     url: "/app/mobile/"
     btn_label: "Simulator Info 📱"
     btn_class: "btn btn--success"
 
   - title: "Admin UI"
-    excerpt: "Verwaltung von Benutzern, Rechten und Systemkonfiguration.<br><br><small>Nur für Administratoren</small>"
+    excerpt: "![admin-ui](/assets/images/aquarius-architecture-logo.jpeg)<br>
+    Verwaltung von Benutzern, Rechten und Systemkonfiguration.<br>
+    <small>(Nur für Administratoren)</small>"
     url: "http://localhost:5173/admin"
     btn_label: "Admin Console ☠️"
     btn_class: "btn btn--danger"
