@@ -38,9 +38,9 @@ TEMP_HTML="/tmp/arc42-output.html"
 cat > "$TEMP_ADOC" << 'HEADER'
 = Aquarius: arc42 Architekturdokumentation
 :toc: macro
-:toclevels: 3
+:toclevels: 2
 :sectnums:
-:sectnumlevels: 3
+:sectnumlevels: 2
 :icons: font
 :source-highlighter: rouge
 
