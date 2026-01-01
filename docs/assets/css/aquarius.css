@@ -374,3 +374,25 @@
 .arch-search-hint i {
   margin-right: 0.25rem;
 }
+
+/* --- arc42 Back to TOC Link --- */
+.text-right {
+  text-align: right;
+}
+
+.small {
+  font-size: 0.85rem;
+}
+
+.text-right.small a {
+  color: #6c757d;
+  text-decoration: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.text-right.small a:hover {
+  color: #28a745;
+  background-color: #f0f7f0;
+}

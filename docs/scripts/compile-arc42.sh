@@ -57,7 +57,16 @@ for adoc_file in $(ls "$SOURCE_DIR"/*.adoc 2>/dev/null | sort); do
     # Add file content with a blank line separator
     cat "$adoc_file" >> "$TEMP_ADOC"
     echo "" >> "$TEMP_ADOC"
-    echo "" >> "$TEMP_ADOC"
+
+    # Add "back to TOC" link after each chapter
+    cat >> "$TEMP_ADOC" << 'BACKTOTOC'
+
+[.text-right.small]
+link:#toc[↑ Zum Inhaltsverzeichnis]
+
+'''
+
+BACKTOTOC
 done
 
 # Convert to HTML using asciidoctor
