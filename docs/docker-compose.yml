@@ -20,3 +20,11 @@ services:
       - ./_adrs:/output
       - ./scripts:/scripts:ro
     command: ["sh", "/scripts/compile-adrs.sh"]
+
+  compile-arc42:
+    image: asciidoctor/docker-asciidoctor
+    volumes:
+      - ../documentation/architecture:/source:ro
+      - ./_pages/architecture:/output
+      - ./scripts:/scripts:ro
+    command: ["sh", "/scripts/compile-arc42.sh"]

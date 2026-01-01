@@ -1,5 +1,6 @@
 _site
 _adrs
+_pages/architecture/arc42.html
 .sass-cache
 .jekyll-cache
 .jekyll-metadata
