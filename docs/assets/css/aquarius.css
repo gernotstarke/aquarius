@@ -179,6 +179,36 @@
   background-color: #fff3e0;
 }
 
+/* --- Application Tiles (Violet/Red Variations) --- */
+
+/* Planungs-App: Light Violet */
+.app-tile--violet-1 {
+  background-color: #d1c4e9;
+  border: 1px solid #512da8;
+}
+.app-tile--violet-1:hover {
+  background-color: #fff3e0;
+}
+
+/* Mobile App: Medium Violet */
+.app-tile--violet-2 {
+  background-color: #b39ddb;
+  border: 1px solid #4527a0;
+}
+.app-tile--violet-2:hover {
+  background-color: #fff3e0;
+}
+
+/* Admin UI: Red (Danger) */
+.app-tile--red-1 {
+  background-color: #ffcdd2;
+  border: 1px solid #c62828;
+}
+.app-tile--red-1:hover {
+  background-color: #fff3e0;
+}
+
+
 /* --- ADR List Styles --- */
 .adr-list {
   width: 100%;
@@ -353,6 +383,7 @@
   padding: 1rem;
   text-align: center;
   color: #6c757d;
+  background: #fff;
 }
 
 .arch-search-more {
