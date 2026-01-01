@@ -2,7 +2,7 @@
 
 **Status:** Accepted
 **Datum:** 2025-12-31
-**Entscheider:** Architektur-Team
+**Entscheider:** Gernot Starke
 
 ## Kontext
 
