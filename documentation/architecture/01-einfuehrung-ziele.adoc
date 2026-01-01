@@ -4,7 +4,8 @@
 [[_aufgabenstellung]]
 === Aufgabenstellung
 
-Arqua42 ist ein webbasiertes Bewertungssystem für regionale Kunstschwimmen-Wettkämpfe in der Kinderliga. Das System unterstützt den gesamten Wettkampfzyklus von der Saisonplanung über die Anmeldung bis zur Live-Bewertung und Ergebnisauswertung.
+AQUARIUS ist ein webbasiertes Bewertungssystem für regionale Kunstschwimmen-Wettkämpfe in der Kinderliga. 
+Das System unterstützt den gesamten Wettkampfzyklus von der Saisonplanung über die Anmeldung bis zur Live-Bewertung und Ergebnisauswertung.
 
 *Wesentliche Features:*
 
