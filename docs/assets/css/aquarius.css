@@ -206,7 +206,8 @@
   border: 1px solid #c62828;
 }
 .app-tile--red-1:hover {
-  background-color: #fff3e0;
+  background-color: #fd3030;
+  border: 3px solid #090000;
 }
 
 /* --- Status Indicators --- */
