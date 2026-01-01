@@ -8,6 +8,7 @@
   var searchData = null;
   var searchInput = null;
   var resultsContainer = null;
+  var searchScope = 'all'; // 'all' or 'adr'
 
   // Initialize search when DOM is ready
   document.addEventListener('DOMContentLoaded', init);
@@ -18,6 +19,12 @@
 
     if (!searchInput || !resultsContainer) {
       return; // Search elements not on this page
+    }
+
+    // Check for ADR-only mode
+    var container = searchInput.closest('.arch-search-container');
+    if (container && container.dataset.scope === 'adr') {
+      searchScope = 'adr';
     }
 
     // Load search index
@@ -97,7 +104,18 @@
   }
 
   function displayResults(results, query) {
-    if (results.length === 0) {
+    // Filter results by scope
+    var filteredResults = [];
+    results.forEach(function(result) {
+      var doc = findDoc(result.ref);
+      if (doc) {
+        if (searchScope === 'all' || (searchScope === 'adr' && doc.type === 'adr')) {
+          filteredResults.push({ result: result, doc: doc });
+        }
+      }
+    });
+
+    if (filteredResults.length === 0) {
       resultsContainer.innerHTML = '<div class="arch-search-no-results">Keine Ergebnisse für "' + escapeHtml(query) + '"</div>';
       resultsContainer.style.display = 'block';
       return;
@@ -106,26 +124,24 @@
     var html = '<ul class="arch-search-list">';
 
     // Limit to top 10 results
-    results.slice(0, 10).forEach(function(result, index) {
-      var doc = findDoc(result.ref);
-      if (doc) {
-        var icon = getTypeIcon(doc);
-        var statusBadge = doc.adr_status ? getStatusBadge(doc.adr_status) : '';
+    filteredResults.slice(0, 10).forEach(function(item, index) {
+      var doc = item.doc;
+      var icon = getTypeIcon(doc);
+      var statusBadge = doc.adr_status ? getStatusBadge(doc.adr_status) : '';
 
-        html += '<li class="arch-search-item' + (index === 0 ? ' selected' : '') + '" data-url="' + escapeHtml(doc.url) + '">';
-        html += '<a href="' + escapeHtml(doc.url) + '">';
-        html += '<span class="arch-search-icon">' + icon + '</span>';
-        html += '<span class="arch-search-title">' + highlightMatch(doc.title, query) + '</span>';
-        html += statusBadge;
-        html += '</a>';
-        html += '</li>';
-      }
+      html += '<li class="arch-search-item' + (index === 0 ? ' selected' : '') + '" data-url="' + escapeHtml(doc.url) + '">';
+      html += '<a href="' + escapeHtml(doc.url) + '">';
+      html += '<span class="arch-search-icon">' + icon + '</span>';
+      html += '<span class="arch-search-title">' + highlightMatch(doc.title, query) + '</span>';
+      html += statusBadge;
+      html += '</a>';
+      html += '</li>';
     });
 
     html += '</ul>';
 
-    if (results.length > 10) {
-      html += '<div class="arch-search-more">' + (results.length - 10) + ' weitere Treffer...</div>';
+    if (filteredResults.length > 10) {
+      html += '<div class="arch-search-more">' + (filteredResults.length - 10) + ' weitere Treffer...</div>';
     }
 
     resultsContainer.innerHTML = html;

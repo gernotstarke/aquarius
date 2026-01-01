@@ -12,6 +12,15 @@ header:
 
 ADRs dokumentieren wichtige Architekturentscheidungen mit ihrem Kontext, den betrachteten Alternativen und den Begründungen.
 
+<div class="arch-search-container" data-scope="adr">
+  <div class="arch-search-box">
+    <i class="fas fa-search arch-search-icon"></i>
+    <input type="text" id="arch-search-input" placeholder="ADRs durchsuchen..." autocomplete="off">
+  </div>
+  <div id="arch-search-results" class="arch-search-results"></div>
+  <small class="arch-search-hint"><i class="fas fa-info-circle"></i> Suche ist auf ADRs beschränkt</small>
+</div>
+
 <table class="adr-list">
   <thead>
     <tr>
