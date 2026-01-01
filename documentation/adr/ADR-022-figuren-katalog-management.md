@@ -18,6 +18,56 @@ Wir verwenden einen dateibasierten Ansatz für die Verwaltung von Stammdaten:
 *   **Positiv:** Einfache Versionierung der Daten via Git. Performante Auslieferung der Bilder. Geringe Datenbankgröße.
 *   **Negativ:** Änderungen erfordern einen Deployment/Seed-Schritt. Referenzielle Integrität zwischen JSON und Bildern wird nur beim Seeding geprüft.
 
+## Vorgehen: Figurenbilder hinzufügen
+
+### Schritt 1: Bilder vorbereiten
+
+Ihre gezeichneten Bilder sollten:
+- **Format**: PNG mit transparentem Hintergrund (empfohlen) oder JPG
+- **Auflösung**: Mindestens 512x512 Pixel, ideal 1024x1024 Pixel
+- **Dateigröße**: Max. 500 KB pro Bild
+- **Dateiname**: Kleinbuchstaben mit Bindestrichen (z.B. `ballettbein.png`)
+
+### Schritt 2: Bilder in Verzeichnis legen
+
+Kopieren Sie Ihre Bilder nach:
+```
+backend/static/figuren/
+```
+
+Beispiel:
+```bash
+cp meine-zeichnungen/ballettbein.png backend/static/figuren/
+cp meine-zeichnungen/vertikale.png backend/static/figuren/
+```
+
+### Schritt 3: Datenbank neu seeden
+
+Führen Sie im Backend-Container das Seeding-Script aus:
+
+```bash
+# Container starten (falls noch nicht gestartet)
+docker-compose up -d
+
+# Seed-Script ausführen
+docker-compose exec backend python seed_db.py
+```
+
+Das Script:
+- Lädt den JSON-Katalog
+- Prüft, welche Bilder vorhanden sind
+- Zeigt Statistiken über gefundene/fehlende Bilder
+- Importiert alle Figuren in die Datenbank
+
+Ausgabe:
+```
+🎯 Creating figuren from JSON catalog...
+   ℹ️  Katalog geladen: Version 1.0, Saison 2024/2025
+   ⚠️  Bild nicht gefunden: figuren/ballettbein.png
+   ✓ Created 26 Figuren
+   ✓ 5 Bilder gefunden, 21 fehlen noch
+```
+
 ## Troubleshooting
 
 ### "Bild nicht gefunden" beim Seeding
