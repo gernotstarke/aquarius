@@ -76,8 +76,8 @@ Die Mobile App erfordert einen separaten Start via Expo (siehe Mobile-Seite).
         indicator.className = "status-indicator status-offline";
         indicator.title = "App unreachable";
       };
-      // Use favicon with cache buster to prevent caching of old status
-      img.src = targetUrl + "/favicon.ico?t=" + new Date().getTime();
+      // Use logo with cache buster (favicon.ico might not exist in dev)
+      img.src = targetUrl + "/aquarius-logo.png?t=" + new Date().getTime();
     }
 
     // Initial check
