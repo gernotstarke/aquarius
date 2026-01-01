@@ -21,21 +21,19 @@ def test_libsql_configuration():
     """Verify Turso/libSQL configuration."""
     turso_url = "libsql://database.turso.io"
     auth_token = "secret-token"
-    
+
     with mock.patch.dict(os.environ, {
         "DATABASE_URL": turso_url,
         "TURSO_AUTH_TOKEN": auth_token
     }):
         from app import database
         importlib.reload(database)
-        
-        # URL should be converted to sqlite+libsql and include authToken
-        expected_url = f"sqlite+libsql://database.turso.io?authToken={auth_token}"
-        assert str(database.engine.url) == expected_url
-        
-        # connect_args should NOT contain authToken anymore
-        assert "authToken" not in database.connect_args
-        assert database.connect_args["check_same_thread"] is False
+
+        # URL should be converted to sqlite+libsql with secure=true
+        assert str(database.engine.url) == "sqlite+libsql://database.turso.io?secure=true"
+
+        # check connect_args for token (snake_case)
+        assert database.connect_args["auth_token"] == auth_token
 
 def test_default_configuration():
     """Verify default fallback to local sqlite."""

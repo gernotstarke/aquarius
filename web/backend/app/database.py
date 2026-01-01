@@ -1,4 +1,4 @@
-"""Database configuration with SQLite for CRUD prototype."""
+"""Database configuration supporting SQLite and Turso/libSQL."""
 import os
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker, declarative_base
@@ -6,26 +6,22 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Database URL - defaults to local SQLite for prototype
+# Database URL - defaults to local SQLite for development
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./arqua42.db")
 TURSO_AUTH_TOKEN = os.getenv("TURSO_AUTH_TOKEN")
 
 connect_args = {}
 
-if DATABASE_URL.startswith("sqlite"):
-    connect_args["check_same_thread"] = False
-
-# Support for Turso/libSQL
+# Determine database type and configure accordingly
 if DATABASE_URL.startswith("libsql://"):
-    DATABASE_URL = DATABASE_URL.replace("libsql://", "sqlite+libsql://")
-
-if "libsql" in DATABASE_URL and TURSO_AUTH_TOKEN:
-    # Pass authToken via URL query string for better driver compatibility
-    separator = "&" if "?" in DATABASE_URL else "?"
-    DATABASE_URL = f"{DATABASE_URL}{separator}authToken={TURSO_AUTH_TOKEN}"
-    
-    # libSQL driver also benefits from check_same_thread=False in some contexts, 
-    # ensuring consistent behavior with threads in FastAPI
+    # Turso/libSQL remote connection
+    # Extract hostname and build proper SQLAlchemy URL
+    hostname = DATABASE_URL.replace("libsql://", "")
+    DATABASE_URL = f"sqlite+libsql://{hostname}?secure=true"
+    if TURSO_AUTH_TOKEN:
+        connect_args["auth_token"] = TURSO_AUTH_TOKEN
+elif DATABASE_URL.startswith("sqlite"):
+    # Local SQLite
     connect_args["check_same_thread"] = False
 
 # Create engine
@@ -35,6 +31,7 @@ engine = create_engine(
     echo=False  # Set to True for debugging
 )
 
+
 # Enable foreign keys for SQLite
 @event.listens_for(engine, "connect")
 def set_sqlite_pragma(dbapi_conn, connection_record):
@@ -43,8 +40,9 @@ def set_sqlite_pragma(dbapi_conn, connection_record):
         cursor.execute("PRAGMA foreign_keys=ON")
         cursor.close()
     except Exception:
-        # Some drivers or remote connections might not support this pragma directly
+        # Remote connections may not support this pragma
         pass
+
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
