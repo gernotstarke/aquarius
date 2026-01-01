@@ -5,12 +5,10 @@ layout: splash
 header:
   overlay_image: /assets/images/splash/aquarius-app-header-1500x400.webp
   overlay_filter: "0.4"
-  caption: "Planung und Durchführung von Wettkämpfen"
+  caption: ""
 ---
 
-# Aquarius Anwendungen
 
-Wählen Sie den gewünschten Anwendungsbereich.
 
 <div class="req-tile-grid">
   <a href="http://localhost:5173" target="_blank" rel="noopener noreferrer" class="req-tile app-tile--violet-1">
@@ -24,7 +22,7 @@ Wählen Sie den gewünschten Anwendungsbereich.
   </a>
 
   <a href="http://localhost:5173/admin" target="_blank" rel="noopener noreferrer" class="req-tile app-tile--red-1">
-    <i class="fas fa-skull"></i>
+    <i class="fas fa-skull-crossbones"></i>
     <h3>Admin UI</h3>
   </a>
 </div>
