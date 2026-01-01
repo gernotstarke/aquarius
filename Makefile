@@ -94,10 +94,12 @@ mobile-test: ## Run mobile app tests
 
 ##@ Project Website (Jekyll)
 
-website-compile: ## Compile content for Jekyll (ADRs, etc.)
+website-compile: ## Compile content for Jekyll (ADRs, arc42)
 	@echo "📄 Compiling ADRs for Jekyll..."
 	@mkdir -p docs/_adrs
 	@cd docs && docker compose run --rm compile-adrs
+	@echo "📄 Compiling arc42 documentation for Jekyll..."
+	@cd docs && docker compose run --rm compile-arc42
 
 website-dev: website-compile ## Start project website locally (http://localhost:4000)
 	@echo "🔐 Obfuscating protected JavaScript..."
@@ -107,8 +109,8 @@ website-dev: website-compile ## Start project website locally (http://localhost:
 
 website-clean: ## Stop project website and clean up
 	@cd docs && docker compose down
-	@rm -rf docs/_site docs/_adrs
-	@echo "✅ Removed docs/_site and docs/_adrs directories"
+	@rm -rf docs/_site docs/_adrs docs/_pages/architecture/arc42.html
+	@echo "✅ Removed docs/_site, docs/_adrs, and generated arc42 content"
 
 ##@ Documentation
 
