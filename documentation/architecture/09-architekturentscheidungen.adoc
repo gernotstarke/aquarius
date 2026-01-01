@@ -99,6 +99,10 @@ Alle ADRs befinden sich in: `docs/src/adrs/`
 | ADR-018
 | link:../adrs/ADR-018-domain-driven-design.html[Domain-Driven Design mit Bounded Contexts]
 | Akzeptiert
+
+| ADR-021
+| link:../adrs/ADR-021-client-side-search.html[Client-seitige Suche für Architektur-Dokumentation]
+| Akzeptiert
 |===
 
 [[_entscheidungsprozess]]
