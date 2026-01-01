@@ -2,7 +2,7 @@
 
 **Status:** Accepted
 **Datum:** 2025-12-31
-**Entscheider:** Architektur-Team
+**Entscheider:** Gernot Starke
 
 ## Kontext
 
@@ -14,6 +14,7 @@ ADRs dokumentieren **wichtige Architekturentscheidungen** mit:
 - **Kontext**: Warum stand eine Entscheidung an?
 - **Entscheidung**: Was wurde beschlossen?
 - **Konsequenzen**: Welche Auswirkungen hat das?
+
 
 Siehe: [Michael Nygard: Documenting Architecture Decisions](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions)
 

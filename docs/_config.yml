@@ -7,9 +7,9 @@ minimal_mistakes_skin: "air" # clean, light theme like arc42.org
 
 # Site Settings
 title: "Aquarius"
-subtitle: "Swimming Competition Rating System"
-name: "Aquarius Team"
-description: "Documentation for the Aquarius swimming competition rating system"
+subtitle: "Organisation und Bewertung von Wettkämpfen im Kinder-Figurenschwimmen"
+name: "Gernot Starke"
+description: "Dokumentation von Aquarius - der Fallstudie für Softwarearchitektur"
 url: "https://aquarius.arc42.org"
 baseurl: ""
 repository: "gernotstarke/aquarius"
