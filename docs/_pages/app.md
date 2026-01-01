@@ -26,7 +26,7 @@ Wählen Sie den gewünschten Anwendungsbereich.
 
   <a href="http://localhost:5173/admin" target="_blank" rel="noopener noreferrer" class="req-tile app-tile--red-1">
     <span id="admin-app-status" class="status-indicator" title="Checking status..."></span>
-    <i class="fas fa-skull"></i>
+    <i class="fas fa-skull-crossbones"></i>
     <h3>Admin UI</h3>
   </a>
 </div>
