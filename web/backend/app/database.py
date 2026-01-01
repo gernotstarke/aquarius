@@ -20,7 +20,10 @@ if DATABASE_URL.startswith("libsql://"):
     DATABASE_URL = DATABASE_URL.replace("libsql://", "sqlite+libsql://")
 
 if "libsql" in DATABASE_URL and TURSO_AUTH_TOKEN:
-    connect_args["authToken"] = TURSO_AUTH_TOKEN
+    # Pass authToken via URL query string for better driver compatibility
+    separator = "&" if "?" in DATABASE_URL else "?"
+    DATABASE_URL = f"{DATABASE_URL}{separator}authToken={TURSO_AUTH_TOKEN}"
+    
     # libSQL driver also benefits from check_same_thread=False in some contexts, 
     # ensuring consistent behavior with threads in FastAPI
     connect_args["check_same_thread"] = False

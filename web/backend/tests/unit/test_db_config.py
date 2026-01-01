@@ -29,11 +29,12 @@ def test_libsql_configuration():
         from app import database
         importlib.reload(database)
         
-        # URL should be converted to sqlite+libsql
-        assert str(database.engine.url) == "sqlite+libsql://database.turso.io"
+        # URL should be converted to sqlite+libsql and include authToken
+        expected_url = f"sqlite+libsql://database.turso.io?authToken={auth_token}"
+        assert str(database.engine.url) == expected_url
         
-        # check connect_args for token
-        assert database.connect_args["authToken"] == auth_token
+        # connect_args should NOT contain authToken anymore
+        assert "authToken" not in database.connect_args
         assert database.connect_args["check_same_thread"] is False
 
 def test_default_configuration():

@@ -31,10 +31,15 @@ def verify_turso_connection():
     sa_url = database_url.replace("libsql://", "sqlite+libsql://") if database_url.startswith("libsql://") else database_url
     
     connect_args = {}
-    if auth_token:
-        connect_args["authToken"] = auth_token
+    
+    # Pass authToken via URL query string which is more universally supported by drivers
+    if auth_token and "libsql" in sa_url:
+        if "?" in sa_url:
+            sa_url += f"&authToken={auth_token}"
+        else:
+            sa_url += f"?authToken={auth_token}"
         
-    print(f"   Target: {database_url}")
+    print(f"   Target: {database_url} (Auth token injected via URL)")
     print(f"   Driver: {sa_url.split('://')[0]}")
     
     try:
