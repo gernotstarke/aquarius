@@ -1,24 +1,52 @@
 ---
 permalink: /app/
-title: "Application"
-layout: single
-toc: true
-toc_label: "Contents"
-toc_icon: "rocket"
+title: "Aquarius Anwendung"
+layout: splash
+header:
+  overlay_image: /assets/images/splash/aquarius-app-header-1500x400.webp
+  overlay_filter: "0.4"
+  caption: "Planung und Durchführung von Wettkämpfen"
+
+app_actions:
+  - title: "Planungs-App"
+    excerpt: "Startet die Web-Anwendung für Saisonplanung, Anmeldung und Verwaltung.<br><br><small>(Entwicklungsserver muss laufen)</small>"
+    url: "http://localhost:5173"
+    btn_label: "App starten 🚀"
+    btn_class: "btn btn--info"
+    link_attributes:
+      target: "_blank"
+      rel: "noopener noreferrer"
+
+  - title: "Mobile App"
+    excerpt: "Informationen zur mobilen App für Kampfrichter und Simulator-Start."
+    url: "/app/mobile/"
+    btn_label: "Simulator Info 📱"
+    btn_class: "btn btn--success"
+
+  - title: "Admin UI"
+    excerpt: "Verwaltung von Benutzern, Rechten und Systemkonfiguration.<br><br><small>Nur für Administratoren</small>"
+    url: "http://localhost:5173/admin"
+    btn_label: "Admin Console ☠️"
+    btn_class: "btn btn--danger"
+    icon: "fas fa-skull"
+    link_attributes:
+      target: "_blank"
+      rel: "noopener noreferrer"
 ---
 
-# Application Documentation
+# Aquarius Anwendungen
 
-Deployment, operation, and usage documentation for the Aquarius application.
+Wählen Sie den gewünschten Anwendungsbereich.
 
-## Coming Soon
-
-- Deployment Guide
-- API Documentation
-- User Guides
-- Administrator Guide
-- Development Setup
+{% include feature_row id="app_actions" %}
 
 ---
 
-*This page is currently under construction.*
+## Entwicklungshinweise
+
+Um die Anwendungen lokal zu starten, führen Sie bitte `make dev` im Root-Verzeichnis aus.
+Dies startet:
+* Backend API auf Port 8000
+* Frontend Web-App auf Port 5173
+
+Die Mobile App erfordert einen separaten Start via Expo (siehe Mobile-Seite).
