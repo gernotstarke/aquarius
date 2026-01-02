@@ -8,7 +8,6 @@ header:
   overlay_filter: "0.3"
 ---
 
-# Architecture Communication Canvas
 
 <div id="interactive-acc-container"></div>
 
