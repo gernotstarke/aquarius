@@ -8,17 +8,19 @@ Person(verein, "Verein", "Meldet Kinder an")
 Person(punktrichter, "Punktrichter", "Verwaltet Wettkampf vor Ort")
 Person(kampfrichter, "Kampfrichter", "Bewertet Starts")
 Person(kind, "Kind", "Nimmt am Wettkampf teil")
+Person(kind, "Kind", "meldet sich an")
 
-System(arqua42, "Arqua42", "Bewertungssystem für Kunstschwimmen-Wettkämpfe")
+System(aquarius, "Aquarius", "Bewertungssystem für Kunds- und Figurenschwimmen")
 
 System_Ext(schwimmverband, "Schwimmverband", "Figuren und Regeln")
 
-Rel(praesident, arqua42, "Plant Saison, verwaltet Stammdaten", "HTTPS")
-Rel(verein, arqua42, "Meldet Kinder an", "HTTPS")
-Rel(punktrichter, arqua42, "Führt Wettkampf durch", "HTTPS/Offline")
-Rel(kampfrichter, arqua42, "Erfasst Punkte", "HTTPS/Offline")
-Rel(kind, arqua42, "Sieht Ergebnisse", "HTTPS")
+Rel(praesident, aquarius, "Plant Saison, verwaltet Stammdaten")
+Rel_U(verein, aquarius, "organisiert Teams" )
+Rel_U(Eltern, aquarius, "Melden Kinder an")
+Rel(punktrichter, aquarius, "Führt Wettkampf durch", "offline")
+Rel(kampfrichter, aquarius, "Erfasst Punkte", "offline")
+Rel_R(kind, aquarius, "Sieht Ergebnisse")
 
-Rel(schwimmverband, arqua42, "Figurenkatalog, Regeln", "Manuell")
+Rel_L(schwimmverband, aquarius, "Figurenkatalog, Regeln", "Manuell")
 
 @enduml
