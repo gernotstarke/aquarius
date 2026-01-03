@@ -23,16 +23,6 @@ echo "Downloading iTerm2 color schemes..."
 BASE_URL="https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/schemes"
 
 # Download each color scheme
-declare -A COLOR_SCHEMES
-COLOR_SCHEMES=(
-  ["Blue Dolphin"]="BlueDolphin.itermcolors"
-  ["Catppuccin Macchiato"]="catppuccin-macchiato.itermcolors"
-  ["Atom One Dark"]="AtomOneLight.itermcolors"
-  ["Belafonte Day"]="Belafonte Day.itermcolors"
-)
-
-# Note: Atom One Dark file name in the repo
-# Correcting the file names based on actual repository structure
 curl -sL "$BASE_URL/BlueDolphin.itermcolors" -o "$COLORS_DIR/Blue Dolphin.itermcolors"
 curl -sL "$BASE_URL/catppuccin-macchiato.itermcolors" -o "$COLORS_DIR/Catppuccin Macchiato.itermcolors"
 curl -sL "$BASE_URL/AtomOneDark.itermcolors" -o "$COLORS_DIR/Atom One Dark.itermcolors"
