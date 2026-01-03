@@ -8,10 +8,20 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from typing import List
 import os
+import logging
 
 from app.database import get_db, engine, Base
 from app import models, schemas
 from app.routers import auth, users, health
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Log database configuration at startup
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./arqua42.db")
+logger.info(f"🔧 DATABASE_URL: {DATABASE_URL}")
+logger.info(f"🔧 TURSO_AUTH_TOKEN present: {bool(os.getenv('TURSO_AUTH_TOKEN'))}")
 
 # Create tables
 Base.metadata.create_all(bind=engine)

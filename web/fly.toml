@@ -11,10 +11,10 @@ primary_region = "fra"  # Frankfurt, Germany
 [env]
   ENVIRONMENT = "production"
   LOG_LEVEL = "info"
-  PORT = "8000"
+  PORT = "8080"
 
 [http_service]
-  internal_port = 8000
+  internal_port = 8080
   force_https = true
   auto_stop_machines = true   # On-demand: Schläft bei Inaktivität (spart Kosten)
   auto_start_machines = true  # Startet automatisch bei Request
