@@ -35,36 +35,31 @@ if ! [ -d "/Applications/iTerm.app" ]; then
   exit 1
 fi
 
-# Generate AppleScript to open windows
-osascript <<EOF
+# Rectangle Pro positions for each window
+POSITIONS=("top-left" "top-right" "bottom-left" "bottom-right")
+
+# Create each window, then position it with Rectangle Pro
+for i in 0 1 2 3; do
+  profile="${PROFILES[$i]}"
+  position="${POSITIONS[$i]}"
+
+  # Create window with this profile
+  osascript <<EOF
 tell application "iTerm"
   activate
-
-  -- Open first window with Blue Dolphin profile
-  create window with profile "Blue Dolphin"
+  create window with profile "$profile"
   tell current session of current window
     write text "cd \"$TARGET_DIR\" && clear"
   end tell
-
-  -- Open second window with Catppuccin Macchiato profile
-  create window with profile "Catppuccin Macchiato"
-  tell current session of current window
-    write text "cd \"$TARGET_DIR\" && clear"
-  end tell
-
-  -- Open third window with Atom One Dark profile
-  create window with profile "Atom One Dark"
-  tell current session of current window
-    write text "cd \"$TARGET_DIR\" && clear"
-  end tell
-
-  -- Open fourth window with Belafonte Day profile
-  create window with profile "Belafonte Day"
-  tell current session of current window
-    write text "cd \"$TARGET_DIR\" && clear"
-  end tell
-
 end tell
 EOF
+
+  sleep 0.5
+
+  # Position the window with Rectangle Pro while it's focused
+  open "rectangle-pro://execute-action?name=$position"
+
+  sleep 0.3
+done
 
 echo "Opened 4 iTerm windows with different color profiles in: $TARGET_DIR"
