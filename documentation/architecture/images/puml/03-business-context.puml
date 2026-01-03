@@ -1,7 +1,6 @@
 @startuml
 !include <C4/C4_Context>
 
-LAYOUT_WITH_LEGEND()
 
 Person(praesident, "Präsident", "Plant Saison und Wettkämpfe")
 Person(verein, "Verein", "Meldet Kinder an")

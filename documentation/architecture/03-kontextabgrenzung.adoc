@@ -4,10 +4,10 @@
 [[_fachlicher_kontext]]
 === Fachlicher Kontext
 
-.System-Kontext Arqua42
+.System-Kontext Aquarius
 [plantuml, context-diagram, svg]
 ----
-include::images/puml/context-diagram.puml[]
+include::images/puml/03-business-context.puml[]
 ----
 
 *Kommunikationsbeziehungen:*
