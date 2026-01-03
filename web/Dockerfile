@@ -12,7 +12,9 @@ WORKDIR /app/frontend
 COPY frontend/package*.json ./
 
 # Install dependencies
-RUN npm ci
+# Using npm install instead of npm ci due to npm bug with optional dependencies
+# See: https://github.com/npm/cli/issues/4828
+RUN npm install
 
 # Copy frontend source
 COPY frontend/ ./
