@@ -1,5 +1,5 @@
 """
-FastAPI main application for Arqua42 CRUD prototype.
+FastAPI main application for Aquarius CRUD prototype.
 Simple CRUD operations for Kind, Wettkampf, Schwimmbad, and Saison.
 """
 from fastapi import FastAPI, Depends, HTTPException
@@ -17,7 +17,7 @@ from app.routers import auth, users, health
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="Arqua42 CRUD API",
+    title="Aquarius CRUD API",
     description="Simple CRUD API for testing the tech stack",
     version="0.1.0"
 )
@@ -44,7 +44,7 @@ app.include_router(health.router)
 
 @app.get("/")
 def read_root():
-    return {"message": "Arqua42 CRUD API", "version": "0.1.0"}
+    return {"message": "Aquarius CRUD API", "version": "0.1.0"}
 
 
 @app.get("/api/health")
