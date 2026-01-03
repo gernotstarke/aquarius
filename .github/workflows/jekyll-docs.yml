@@ -7,6 +7,7 @@ on:
     paths:
       - 'docs/**'  # Trigger when docs/ folder changes
       - 'documentation/adr/**'  # Trigger when ADRs change
+      - 'documentation/architecture/**'  # Trigger when arc42 changes
       - '.github/workflows/jekyll-docs.yml'  # Trigger when workflow itself changes
   workflow_dispatch:  # Allow manual triggering
 
@@ -41,11 +42,20 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install Asciidoctor
+        run: gem install asciidoctor
+
       - name: Compile ADRs for Jekyll
         run: |
           mkdir -p docs/_adrs
           chmod +x docs/scripts/compile-adrs.sh
           ./docs/scripts/compile-adrs.sh documentation/adr docs/_adrs
+
+      - name: Compile arc42 for Jekyll
+        run: |
+          mkdir -p docs/_pages/architecture
+          chmod +x docs/scripts/compile-arc42.sh
+          ./docs/scripts/compile-arc42.sh documentation/architecture docs/_pages/architecture/arc42.html
 
       - name: Obfuscate password protection JavaScript
         working-directory: docs
