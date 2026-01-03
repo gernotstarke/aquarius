@@ -1,5 +1,5 @@
 """
-Database seeding script for Arqua42 CRUD prototype.
+Database seeding script for Aquarius CRUD prototype.
 Populates the database with sample data for testing.
 """
 import json
@@ -312,7 +312,7 @@ def seed_data():
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("Arqua42 Database Seeding")
+    print("Aquarius Database Seeding")
     print("=" * 60)
     reset_database()
     seed_data()

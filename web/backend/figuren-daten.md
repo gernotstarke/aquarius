@@ -1,4 +1,4 @@
-# Schwimmfiguren für Arqua42
+# Schwimmfiguren für Aquarius
 
 Bitte füge hier die Figuren im folgenden Format ein:
 
@@ -29,4 +29,3 @@ Beispiel:
 ---
 
 **Hier deine Figuren eintragen:**
-

@@ -1,5 +1,5 @@
 """
-SQLAlchemy models for Arqua42 CRUD prototype.
+SQLAlchemy models for Aquarius CRUD prototype.
 """
 from sqlalchemy import Column, Integer, String, Date, ForeignKey, Table, Boolean, DateTime
 from sqlalchemy.orm import relationship
