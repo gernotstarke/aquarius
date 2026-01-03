@@ -14,6 +14,7 @@ import logging
 from app.database import get_db, engine, Base
 from app import models, schemas
 from app.routers import auth, users, health
+from app.version import AQUARIUS_BACKEND_VERSION
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -30,7 +31,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="Aquarius CRUD API",
     description="Simple CRUD API for testing the tech stack",
-    version="0.1.0"
+    version=AQUARIUS_BACKEND_VERSION
 )
 
 # CORS middleware for frontend
@@ -55,7 +56,7 @@ app.include_router(health.router)
 
 @app.get("/")
 def read_root():
-    return {"message": "Aquarius CRUD API", "version": "0.1.0"}
+    return {"message": "Aquarius CRUD API", "version": AQUARIUS_BACKEND_VERSION}
 
 
 @app.get("/api/health")
@@ -71,7 +72,7 @@ def health_check(db: Session = Depends(get_db)):
     return {
         "status": "healthy",
         "database": db_status,
-        "version": "0.1.0"
+        "version": AQUARIUS_BACKEND_VERSION
     }
 
 
