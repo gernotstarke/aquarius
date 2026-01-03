@@ -52,7 +52,8 @@ COPY backend/ ./backend/
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
 # Create necessary directories
-RUN mkdir -p /app/data /app/static
+# Note: static dir is created relative to backend working directory
+RUN mkdir -p /app/backend/data /app/backend/static
 
 # Expose port (fly.io will map this internally)
 EXPOSE 8080
@@ -62,5 +63,6 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/api/health').read()" || exit 1
 
 # Start application
-# Note: We use port 8080 as configured in fly.toml
-CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Set working directory to backend so imports like "from app.database" work correctly
+WORKDIR /app/backend
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
