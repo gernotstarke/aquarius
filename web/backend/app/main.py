@@ -6,6 +6,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from typing import List
 import os
 import logging
@@ -62,7 +63,7 @@ def health_check(db: Session = Depends(get_db)):
     """Health check endpoint for monitoring and fly.io health checks."""
     try:
         # Test database connection
-        db.execute("SELECT 1")
+        db.execute(text("SELECT 1"))
         db_status = "healthy"
     except Exception as e:
         db_status = f"unhealthy: {str(e)}"
