@@ -22,7 +22,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="max-w-7xl mx-auto px-8 py-6">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-h2 font-bold text-neutral-900">
-              Arqua42 CRUD
+              Aquarius CRUD
             </h1>
           </div>
           <div className="flex gap-4 flex-wrap">

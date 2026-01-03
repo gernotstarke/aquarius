@@ -42,7 +42,7 @@ const Home: React.FC = () => {
         {/* Logo and Title */}
         <div className="text-center space-y-6">
           <h1 className="text-display font-bold text-neutral-900">
-            Arqua42
+            Aquarius
           </h1>
           <p className="text-body-lg text-neutral-600 max-w-2xl mx-auto">
             Struktur, Konzepte, Wasser
