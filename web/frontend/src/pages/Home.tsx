@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../components/Card';
 import Button from '../components/Button';
-import axios from 'axios';
+import apiClient from '../api/client';
 
 const Home: React.FC = () => {
   const [backendVersion, setBackendVersion] = useState<string>('0.0.0');
   useEffect(() => {
-    // Fetch backend version from root endpoint
-    axios.get('/')
+    // Fetch backend version from health endpoint
+    apiClient.get('/health')
       .then(response => {
         if (response.data.version) {
           setBackendVersion(response.data.version);
