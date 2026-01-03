@@ -8,11 +8,12 @@ FROM node:20 AS frontend-builder
 
 WORKDIR /app/frontend
 
-# Copy package files
-COPY frontend/package*.json ./
+# Copy package files (only package.json, not package-lock.json)
+# package-lock.json can cause issues with optional dependencies during Docker builds
+COPY frontend/package.json ./
 
 # Install dependencies
-# Using npm install instead of npm ci due to npm bug with optional dependencies
+# Using npm install without lock file to avoid optional dependencies bug
 # See: https://github.com/npm/cli/issues/4828
 RUN npm install
 
