@@ -1,9 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import axios from 'axios';
 
 const Home: React.FC = () => {
+  const [backendVersion, setBackendVersion] = useState<string>('0.0.0');
+  useEffect(() => {
+    // Fetch backend version from root endpoint
+    axios.get('/')
+      .then(response => {
+        if (response.data.version) {
+          setBackendVersion(response.data.version);
+        }
+      })
+      .catch(error => {
+        console.error('Failed to fetch backend version:', error);
+      });
+  }, []);
+
   const mainSections = [
     {
       name: 'Anmeldung',
@@ -84,9 +99,16 @@ const Home: React.FC = () => {
 
       {/* Footer */}
       <div className="border-t border-neutral-200 py-6">
-        <p className="text-center text-sm text-neutral-500">
-          made with passion in Cologne
-        </p>
+        <div className="flex items-center justify-center gap-4 flex-wrap">
+          <p className="text-sm text-neutral-500">
+            made with passion in Cologne
+          </p>
+          <img
+            src={`https://img.shields.io/badge/version-${backendVersion}-blue`}
+            alt={`Version ${backendVersion}`}
+            className="h-5"
+          />
+        </div>
       </div>
     </div>
   );
