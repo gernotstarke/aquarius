@@ -1,13 +1,24 @@
-.PHONY: help dev dev-down test db-reset db-seed db-import-figures deploy deploy-status deploy-logs deploy-ssh deploy-rollback deploy-setup clean
+.PHONY: help dev dev-with-turso dev-down test db-reset db-seed db-import-figures deploy deploy-status deploy-logs deploy-ssh deploy-rollback deploy-setup clean
 
 ##@ Web App Development
 
 help: ## Display this help message
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
-dev: ## Start development servers (backend + frontend)
-	@echo "🚀 Starting web app development servers..."
-	@docker compose up
+dev: ## Start development servers with local SQLite database
+	@echo "🚀 Starting web app development servers (local SQLite)..."
+	@echo "📁 Database: backend/database/arqua42.db"
+	@ENV_FILE=.env.local docker compose up
+
+dev-with-turso: ## Start development servers with Turso cloud database
+	@echo "🚀 Starting web app development servers (Turso cloud DB)..."
+	@echo "☁️  Database: Turso (from backend/.env)"
+	@if [ ! -f backend/.env ]; then \
+		echo "❌ Error: backend/.env not found"; \
+		echo "   Please ensure DATABASE_URL and TURSO_AUTH_TOKEN are configured"; \
+		exit 1; \
+	fi
+	@ENV_FILE=.env docker compose up
 
 dev-down: ## Stop development servers
 	@docker compose down

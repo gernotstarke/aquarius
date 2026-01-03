@@ -37,8 +37,11 @@ help: ## Show all available targets
 
 ##@ Web App
 
-web-dev: ## Start web app development servers (backend + frontend)
+web-dev: ## Start web app development servers with local SQLite
 	@cd web && make dev
+
+web-dev-turso: ## Start web app development servers with Turso cloud database
+	@cd web && make dev-with-turso
 
 web-test: ## Run web app tests
 	@cd web && make test

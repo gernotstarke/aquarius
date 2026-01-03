@@ -39,8 +39,9 @@ dist/
 
 # Environment variables
 .env
-.env.local
 .env.*.local
+# Allow .env.local for local SQLite development template
+!web/backend/.env.local
 
 # Database
 *.db
