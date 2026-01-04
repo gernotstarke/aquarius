@@ -2,7 +2,7 @@
 FastAPI main application for Aquarius CRUD prototype.
 Simple CRUD operations for Kind, Wettkampf, Schwimmbad, and Saison.
 """
-from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -104,6 +104,38 @@ def health_check(db: Session = Depends(get_db)):
         "status": "healthy",
         "database": db_status,
         "version": AQUARIUS_BACKEND_VERSION
+    }
+
+@app.get("/api/status")
+def status_overview(db: Session = Depends(get_db)):
+    """Public status overview for the documentation dashboard."""
+    database_url = os.getenv("DATABASE_URL", "sqlite:///./arqua42.db")
+    db_type = "turso" if database_url.startswith(("libsql://", "sqlite+libsql://")) else "sqlite"
+
+    fly_region = os.getenv("FLY_REGION")
+    fly_app = os.getenv("FLY_APP_NAME")
+    environment = "fly" if (fly_region or fly_app) else "local"
+    region = fly_region or ("unknown" if environment == "fly" else "local")
+
+    table_count = db.execute(
+        text("SELECT count(*) FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
+    ).scalar() or 0
+
+    return {
+        "version": AQUARIUS_BACKEND_VERSION,
+        "app": {
+            "environment": environment,
+            "region": region,
+        },
+        "database": {
+            "type": db_type,
+            "table_count": table_count,
+        },
+        "counts": {
+            "kind": db.query(models.Kind).count(),
+            "anmeldung": db.query(models.Anmeldung).count(),
+            "wettkampf": db.query(models.Wettkampf).count(),
+        },
     }
 
 

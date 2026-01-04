@@ -33,12 +33,28 @@ header:
 
 ## Hinweise
 
-Um die Anwendungen lokal zu starten, führen Sie bitte `make dev` im Root-Verzeichnis aus.
-Dies startet:
-* Backend API auf Port 8000
-* Frontend Web-App auf Port 5173
+<div id="local-hinweise" hidden>
+  <p>Um die Anwendungen lokal zu starten, führen Sie bitte <code>make dev</code> im Root-Verzeichnis aus.</p>
+  <p>Dies startet:</p>
+  <ul>
+    <li>Backend API auf Port 8000</li>
+    <li>Frontend Web-App auf Port 5173</li>
+  </ul>
+  <p>Die Mobile App erfordert einen separaten Start via Expo (siehe Mobile-Seite).</p>
+</div>
 
-Die Mobile App erfordert einen separaten Start via Expo (siehe Mobile-Seite).
+<div id="app-dashboard">
+  <p id="dashboard-status">Lade System-Status...</p>
+  <ul>
+    <li><strong>App-Umgebung:</strong> <span id="dashboard-location">-</span></li>
+    <li><strong>Datenbank:</strong> <span id="dashboard-db-type">-</span></li>
+    <li><strong>Tabellen:</strong> <span id="dashboard-table-count">-</span></li>
+    <li><strong>Kind-Einträge:</strong> <span id="dashboard-kind-count">-</span></li>
+    <li><strong>Anmeldungen:</strong> <span id="dashboard-anmeldung-count">-</span></li>
+    <li><strong>Wettkämpfe:</strong> <span id="dashboard-wettkampf-count">-</span></li>
+    <li><strong>Backend-Version:</strong> <span id="dashboard-backend-version">-</span></li>
+  </ul>
+</div>
 
 <script>
   document.addEventListener("DOMContentLoaded", function() {
@@ -50,6 +66,11 @@ Die Mobile App erfordert einen separaten Start via Expo (siehe Mobile-Seite).
     const isLocalDocs = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
     const targetUrl = isLocalDocs ? localAppUrl : prodAppUrl;
     
+    const localHinweise = document.getElementById("local-hinweise");
+    if (localHinweise) {
+      localHinweise.hidden = !isLocalDocs;
+    }
+
     // Update link href if in production
     const planungsTile = document.querySelector(".app-tile--violet-1");
     if (planungsTile && !isLocalDocs) {
@@ -101,5 +122,52 @@ Die Mobile App erfordert einen separaten Start via Expo (siehe Mobile-Seite).
     
     // Check every 10 seconds
     setInterval(checkStatus, 10000);
+
+    const dashboardStatus = document.getElementById("dashboard-status");
+    const dashboardLocation = document.getElementById("dashboard-location");
+    const dashboardDbType = document.getElementById("dashboard-db-type");
+    const dashboardTableCount = document.getElementById("dashboard-table-count");
+    const dashboardKindCount = document.getElementById("dashboard-kind-count");
+    const dashboardAnmeldungCount = document.getElementById("dashboard-anmeldung-count");
+    const dashboardWettkampfCount = document.getElementById("dashboard-wettkampf-count");
+    const dashboardBackendVersion = document.getElementById("dashboard-backend-version");
+
+    function updateText(node, value) {
+      if (node) {
+        node.textContent = value;
+      }
+    }
+
+    fetch(targetUrl + "/api/status", {
+      method: 'GET',
+      mode: 'cors',
+      cache: 'no-cache'
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Status endpoint returned error');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (dashboardStatus) {
+        dashboardStatus.textContent = "System-Status verfügbar";
+      }
+      const environment = data?.app?.environment || "unbekannt";
+      const region = data?.app?.region || "";
+      const locationLabel = environment === "fly" ? `fly.io (${region || "unbekannt"})` : "lokal";
+      updateText(dashboardLocation, locationLabel);
+      updateText(dashboardDbType, data?.database?.type || "unbekannt");
+      updateText(dashboardTableCount, String(data?.database?.table_count ?? "-"));
+      updateText(dashboardKindCount, String(data?.counts?.kind ?? "-"));
+      updateText(dashboardAnmeldungCount, String(data?.counts?.anmeldung ?? "-"));
+      updateText(dashboardWettkampfCount, String(data?.counts?.wettkampf ?? "-"));
+      updateText(dashboardBackendVersion, data?.version || "-");
+    })
+    .catch(() => {
+      if (dashboardStatus) {
+        dashboardStatus.textContent = "System-Status nicht erreichbar";
+      }
+    });
   });
 </script>
