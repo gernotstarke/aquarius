@@ -7,7 +7,7 @@ help: ## Display this help message
 
 dev: ## Start development servers with local SQLite database
 	@echo "🚀 Starting web app development servers (local SQLite)..."
-	@echo "📁 Database: backend/database/arqua42.db"
+	@echo "📁 Database: backend/database/aquarius.db"
 	@ENV_FILE=.env.local docker compose up
 
 dev-with-turso: ## Start development servers with Turso cloud database

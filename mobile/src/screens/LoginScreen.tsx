@@ -76,7 +76,7 @@ export const LoginScreen = () => {
               style={styles.logo}
               resizeMode="contain"
             />
-            <Text style={styles.title}>Arqua42</Text>
+            <Text style={styles.title}>Aquarius</Text>
             <Text style={styles.subtitle}>Bewertungs-App</Text>
           </View>
 

@@ -8,7 +8,7 @@ Das Aquarius-System wird als Cloud-Native-Anwendung auf **fly.io** bereitgestell
 
 ----
 ┌─────────────────────────────────────────────────────────┐
-│                  arqua42.arc42.org                       │
+│                  aquarius.arc42.org                      │
 │                    (Custom Domain)                       │
 └────────────────────┬────────────────────────────────────┘
                      │ HTTPS
@@ -77,7 +77,7 @@ Das Aquarius-System wird als Cloud-Native-Anwendung auf **fly.io** bereitgestell
 
 |Domain & SSL
 |**Custom Domain + fly.io SSL**
-|• arqua42.arc42.org
+|• aquarius.arc42.org
 • Automatische TLS-Zertifikate (Let's Encrypt)
 |===
 
@@ -173,7 +173,7 @@ from sqlalchemy.orm import sessionmaker
 # Local: SQLite File
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "sqlite:///./database/arqua42.db"  # Fallback für lokale Entwicklung
+    "sqlite:///./database/aquarius.db"  # Fallback für lokale Entwicklung
 )
 
 # Turso Format: libsql://[db-name]-[org].turso.io?authToken=...
@@ -490,10 +490,10 @@ turso db restore aquarius-production --from staging-backup.sql
 [source,bash]
 ----
 # Staging
-flyctl certs create staging.arqua42.arc42.org --app aquarius-staging
+flyctl certs create staging.aquarius.arc42.org --app aquarius-staging
 
 # Production
-flyctl certs create arqua42.arc42.org --app aquarius-production
+flyctl certs create aquarius.arc42.org --app aquarius-production
 
 # Status prüfen
 flyctl certs list --app aquarius-staging
