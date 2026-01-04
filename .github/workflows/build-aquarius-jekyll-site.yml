@@ -1,4 +1,4 @@
-name: Deploy Documentation Site
+name: Build Aquarius Jekyll Site
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
       - 'docs/**'  # Trigger when docs/ folder changes
       - 'documentation/adr/**'  # Trigger when ADRs change
       - 'documentation/architecture/**'  # Trigger when arc42 changes
-      - '.github/workflows/jekyll-docs.yml'  # Trigger when workflow itself changes
+      - '.github/workflows/build-aquarius-jekyll-site.yml'  # Trigger when workflow itself changes
   workflow_dispatch:  # Allow manual triggering
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages

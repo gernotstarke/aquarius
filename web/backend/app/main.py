@@ -2,9 +2,10 @@
 FastAPI main application for Aquarius CRUD prototype.
 Simple CRUD operations for Kind, Wettkampf, Schwimmbad, and Saison.
 """
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from typing import List
@@ -43,20 +44,45 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files
+# Mount static files for backend use
 static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
 if not os.path.exists(static_dir):
     os.makedirs(static_dir)
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
-# Register routers
+# Register routers BEFORE mounting frontend to ensure API routes take precedence
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(health.router)
 
+# Mount frontend static files (built React app)
+# In production: /app/frontend/dist
+# __file__ = /app/backend/app/main.py, so we go up 3 levels to /app
+frontend_dist = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "frontend", "dist")
+if os.path.exists(frontend_dist):
+    # Mount assets directory for CSS, JS, images
+    assets_dir = os.path.join(frontend_dist, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+    logger.info(f"✓ Frontend static files mounted from {frontend_dist}")
+else:
+    logger.warning(f"⚠️  Frontend dist directory not found at {frontend_dist}")
+
 @app.get("/")
 def read_root():
-    return {"message": "Aquarius CRUD API", "version": AQUARIUS_BACKEND_VERSION}
+    """Serve the frontend application or API info."""
+    # Check if frontend is available
+    # In production: /app/frontend/dist
+    # __file__ = /app/backend/app/main.py, so we go up 3 levels to /app
+    frontend_dist = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "frontend", "dist")
+    index_html = os.path.join(frontend_dist, "index.html")
+
+    if os.path.exists(index_html):
+        return FileResponse(index_html)
+    else:
+        # Fallback to JSON response if frontend not available (development mode)
+        return {"message": "Aquarius CRUD API", "version": AQUARIUS_BACKEND_VERSION}
 
 
 @app.get("/api/health")
@@ -592,3 +618,32 @@ def set_wettkampf_figuren(wettkampf_id: int, figur_ids: List[int], db: Session =
 
     db.commit()
     return {"message": f"{len(figur_ids)} figures set for Wettkampf"}
+
+
+# ============================================================================
+# SPA ROUTING - Catch-all route for React Router
+# ============================================================================
+# This must be the LAST route to act as a catch-all for frontend routes
+
+@app.get("/{full_path:path}")
+async def serve_spa(full_path: str):
+    """
+    Catch-all route to serve the React SPA for client-side routing.
+    First checks if a static file exists (e.g., vite.svg, favicon.ico).
+    If not, returns index.html for React Router to handle navigation.
+    """
+    # In production: /app/frontend/dist
+    # __file__ = /app/backend/app/main.py, so we go up 3 levels to /app
+    frontend_dist = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "frontend", "dist")
+
+    # Check if the requested path is a static file in dist root
+    requested_file = os.path.join(frontend_dist, full_path)
+    if os.path.isfile(requested_file):
+        return FileResponse(requested_file)
+
+    # Otherwise, serve index.html for SPA routing
+    index_html = os.path.join(frontend_dist, "index.html")
+    if os.path.exists(index_html):
+        return FileResponse(index_html)
+    else:
+        raise HTTPException(status_code=404, detail="Frontend not found")
