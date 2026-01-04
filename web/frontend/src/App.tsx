@@ -7,6 +7,8 @@ import SaisonList from './pages/SaisonList';
 import SaisonForm from './pages/SaisonForm';
 import SchwimmbadList from './pages/SchwimmbadList';
 import SchwimmbadForm from './pages/SchwimmbadForm';
+import VereinList from './pages/VereinList';
+import VereinForm from './pages/VereinForm';
 import WettkampfList from './pages/WettkampfList';
 import WettkampfForm from './pages/WettkampfForm';
 import WettkampfDetail from './pages/WettkampfDetail';
@@ -53,15 +55,31 @@ const App: React.FC = () => {
           <Route path="/" element={<NewLayout><Outlet /></NewLayout>}>
             <Route index element={<Home />} />
 
-            {/* Stammdaten */}
+            {/* Grunddaten */}
+            <Route path="/grunddaten/saisons" element={<SaisonList />} />
+            <Route path="/grunddaten/saisons/new" element={<SaisonForm />} />
+            <Route path="/grunddaten/saisons/:id" element={<SaisonForm />} />
+
+            <Route path="/grunddaten/schwimmbaeder" element={<SchwimmbadList />} />
+            <Route path="/grunddaten/schwimmbaeder/new" element={<SchwimmbadForm />} />
+            <Route path="/grunddaten/schwimmbaeder/:id" element={<SchwimmbadForm />} />
+
+            <Route path="/grunddaten/figuren" element={<FigurenList />} />
+            <Route path="/grunddaten/figuren/new" element={<FigurenForm />} />
+            <Route path="/grunddaten/figuren/:id/detail" element={<FigurDetail />} />
+            <Route path="/grunddaten/figuren/:id" element={<FigurenForm />} />
+
+            <Route path="/grunddaten/vereine" element={<VereinList />} />
+            <Route path="/grunddaten/vereine/new" element={<VereinForm />} />
+            <Route path="/grunddaten/vereine/:id" element={<VereinForm />} />
+
+            {/* Legacy stammdaten routes for backwards compatibility */}
             <Route path="/stammdaten/saisons" element={<SaisonList />} />
             <Route path="/stammdaten/saisons/new" element={<SaisonForm />} />
             <Route path="/stammdaten/saisons/:id" element={<SaisonForm />} />
-
             <Route path="/stammdaten/schwimmbaeder" element={<SchwimmbadList />} />
             <Route path="/stammdaten/schwimmbaeder/new" element={<SchwimmbadForm />} />
             <Route path="/stammdaten/schwimmbaeder/:id" element={<SchwimmbadForm />} />
-
             <Route path="/stammdaten/figuren" element={<FigurenList />} />
             <Route path="/stammdaten/figuren/new" element={<FigurenForm />} />
             <Route path="/stammdaten/figuren/:id/detail" element={<FigurDetail />} />

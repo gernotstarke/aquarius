@@ -37,6 +37,23 @@ class Schwimmbad(SchwimmbadBase):
     model_config = ConfigDict(from_attributes=True)
     id: int
 
+# Verein Schemas
+class VereinBase(BaseModel):
+    name: str
+    ort: str
+    register_id: str
+    contact: str
+
+class VereinCreate(VereinBase):
+    pass
+
+class VereinUpdate(VereinBase):
+    pass
+
+class Verein(VereinBase):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+
 # Figur Schemas
 class FigurBase(BaseModel):
     name: str
@@ -109,7 +126,7 @@ class KindBase(BaseModel):
     nachname: str
     geburtsdatum: date
     geschlecht: str | None = None
-    verein: str | None = None
+    verein_id: int | None = None
 
 class KindCreate(KindBase):
     pass
@@ -120,4 +137,5 @@ class KindUpdate(KindBase):
 class Kind(KindBase):
     model_config = ConfigDict(from_attributes=True)
     id: int
+    verein: Optional[Verein] = None
 

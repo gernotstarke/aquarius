@@ -50,6 +50,20 @@ class Schwimmbad(Base):
     wettkämpfe = relationship("Wettkampf", back_populates="schwimmbad")
 
 
+class Verein(Base):
+    """Club/Association model."""
+    __tablename__ = "verein"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False, index=True)
+    ort = Column(String, nullable=False)
+    register_id = Column(String, nullable=False)
+    contact = Column(String, nullable=False)
+
+    # Relationships
+    kinder = relationship("Kind", back_populates="verein")
+
+
 class Wettkampf(Base):
     """Competition model."""
     __tablename__ = "wettkampf"
@@ -77,9 +91,10 @@ class Kind(Base):
     nachname = Column(String, nullable=False, index=True)
     geburtsdatum = Column(Date, nullable=False)
     geschlecht = Column(String(1))  # M, W, D
-    verein = Column(String)
-    
+    verein_id = Column(Integer, ForeignKey("verein.id"), nullable=True)
+
     # Relationships
+    verein = relationship("Verein", back_populates="kinder")
     anmeldungen = relationship("Anmeldung", back_populates="kind")
 
 

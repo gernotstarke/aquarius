@@ -220,6 +220,62 @@ def delete_schwimmbad(schwimmbad_id: int, db: Session = Depends(get_db)):
 
 
 # ============================================================================
+# VEREIN CRUD ENDPOINTS
+# ============================================================================
+
+@app.get("/api/verein", response_model=List[schemas.Verein])
+def list_verein(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    """Get list of all clubs."""
+    return db.query(models.Verein).offset(skip).limit(limit).all()
+
+
+@app.get("/api/verein/{verein_id}", response_model=schemas.Verein)
+def get_verein(verein_id: int, db: Session = Depends(get_db)):
+    """Get a specific club by ID."""
+    verein = db.query(models.Verein).filter(models.Verein.id == verein_id).first()
+    if not verein:
+        raise HTTPException(status_code=404, detail="Verein not found")
+    return verein
+
+
+@app.post("/api/verein", response_model=schemas.Verein, status_code=201)
+def create_verein(verein: schemas.VereinCreate, db: Session = Depends(get_db)):
+    """Create a new club."""
+    db_verein = models.Verein(**verein.model_dump())
+    db.add(db_verein)
+    db.commit()
+    db.refresh(db_verein)
+    return db_verein
+
+
+@app.put("/api/verein/{verein_id}", response_model=schemas.Verein)
+def update_verein(verein_id: int, verein: schemas.VereinUpdate, db: Session = Depends(get_db)):
+    """Update a club."""
+    db_verein = db.query(models.Verein).filter(models.Verein.id == verein_id).first()
+    if not db_verein:
+        raise HTTPException(status_code=404, detail="Verein not found")
+
+    for key, value in verein.model_dump().items():
+        setattr(db_verein, key, value)
+
+    db.commit()
+    db.refresh(db_verein)
+    return db_verein
+
+
+@app.delete("/api/verein/{verein_id}", status_code=204)
+def delete_verein(verein_id: int, db: Session = Depends(get_db)):
+    """Delete a club."""
+    db_verein = db.query(models.Verein).filter(models.Verein.id == verein_id).first()
+    if not db_verein:
+        raise HTTPException(status_code=404, detail="Verein not found")
+
+    db.delete(db_verein)
+    db.commit()
+    return None
+
+
+# ============================================================================
 # WETTKAMPF CRUD ENDPOINTS
 # ============================================================================
 

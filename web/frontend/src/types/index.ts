@@ -26,6 +26,21 @@ export interface SchwimmbadCreate {
   manager?: string;
 }
 
+export interface Verein {
+  id: number;
+  name: string;
+  ort: string;
+  register_id: string;
+  contact: string;
+}
+
+export interface VereinCreate {
+  name: string;
+  ort: string;
+  register_id: string;
+  contact: string;
+}
+
 export interface Wettkampf {
   id: number;
   name: string;
@@ -49,7 +64,8 @@ export interface Kind {
   nachname: string;
   geburtsdatum: string;
   geschlecht?: string;
-  verein?: string;
+  verein_id?: number;
+  verein?: Verein;
 }
 
 export interface KindCreate {
@@ -57,7 +73,7 @@ export interface KindCreate {
   nachname: string;
   geburtsdatum: string;
   geschlecht?: string;
-  verein?: string;
+  verein_id?: number;
 }
 
 export interface Figur {

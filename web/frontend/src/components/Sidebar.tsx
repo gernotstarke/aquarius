@@ -15,13 +15,14 @@ interface NavSection {
 
 const navSections: NavSection[] = [
   {
-    title: 'Stammdaten',
+    title: 'Grunddaten',
     icon: '📅',
     defaultOpen: true,
     items: [
-      { to: '/stammdaten/saisons', label: 'Saisons' },
-      { to: '/stammdaten/schwimmbaeder', label: 'Schwimmbäder' },
-      { to: '/stammdaten/figuren', label: 'Figuren' },
+      { to: '/grunddaten/saisons', label: 'Saisons' },
+      { to: '/grunddaten/schwimmbaeder', label: 'Schwimmbäder' },
+      { to: '/grunddaten/figuren', label: 'Figuren' },
+      { to: '/grunddaten/vereine', label: 'Vereine' },
     ],
   },
   {

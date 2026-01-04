@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/client';
-import { Kind, KindCreate } from '../types';
+import { Kind, KindCreate, Verein } from '../types';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
@@ -18,7 +18,15 @@ const KindForm: React.FC = () => {
     nachname: '',
     geburtsdatum: '',
     geschlecht: '',
-    verein: '',
+    verein_id: undefined,
+  });
+
+  const { data: vereine } = useQuery<Verein[]>({
+    queryKey: ['vereine'],
+    queryFn: async () => {
+      const response = await apiClient.get('/verein');
+      return response.data;
+    },
   });
 
   const { data: kind } = useQuery<Kind>({
@@ -37,7 +45,7 @@ const KindForm: React.FC = () => {
         nachname: kind.nachname,
         geburtsdatum: kind.geburtsdatum,
         geschlecht: kind.geschlecht || '',
-        verein: kind.verein || '',
+        verein_id: kind.verein_id,
       });
     }
   }, [kind]);
@@ -118,13 +126,23 @@ const KindForm: React.FC = () => {
             </select>
           </div>
 
-          <Input
-            label="Verein (optional)"
-            type="text"
-            value={formData.verein}
-            onChange={(e) => setFormData({ ...formData, verein: e.target.value })}
-            placeholder="z.B. Schwimmverein Berlin"
-          />
+          <div className="space-y-2">
+            <label className="block text-body font-medium text-neutral-700">
+              Verein (optional)
+            </label>
+            <select
+              className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
+              value={formData.verein_id || ''}
+              onChange={(e) => setFormData({ ...formData, verein_id: e.target.value ? Number(e.target.value) : undefined })}
+            >
+              <option value="">Kein Verein</option>
+              {vereine?.map((verein) => (
+                <option key={verein.id} value={verein.id}>
+                  {verein.name} ({verein.ort})
+                </option>
+              ))}
+            </select>
+          </div>
 
           <div className="flex gap-4 pt-4">
             <Button type="submit" size="lg">

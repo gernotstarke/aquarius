@@ -2,25 +2,25 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/client';
-import { Kind } from '../types';
+import { Verein } from '../types';
 import Card from '../components/Card';
 import Button from '../components/Button';
 
-const KindList: React.FC = () => {
+const VereinList: React.FC = () => {
   const queryClient = useQueryClient();
 
-  const { data: kinder, isLoading } = useQuery<Kind[]>({
-    queryKey: ['kinder'],
+  const { data: vereine, isLoading } = useQuery<Verein[]>({
+    queryKey: ['vereine'],
     queryFn: async () => {
-      const response = await apiClient.get('/kind');
+      const response = await apiClient.get('/verein');
       return response.data;
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => apiClient.delete(`/kind/${id}`),
+    mutationFn: (id: number) => apiClient.delete(`/verein/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['kinder'] });
+      queryClient.invalidateQueries({ queryKey: ['vereine'] });
     },
   });
 
@@ -31,41 +31,35 @@ const KindList: React.FC = () => {
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h2 className="text-h1 font-bold text-neutral-900">Kinder</h2>
-        <Link to="/kind/new">
-          <Button size="lg">Neues Kind</Button>
+        <h2 className="text-h1 font-bold text-neutral-900">Vereine</h2>
+        <Link to="/grunddaten/vereine/new">
+          <Button size="lg">Neuer Verein</Button>
         </Link>
       </div>
 
       <div className="grid gap-6">
-        {kinder?.map((kind) => (
-          <Card key={kind.id}>
+        {vereine?.map((verein) => (
+          <Card key={verein.id}>
             <div className="flex items-center justify-between">
-              <Link to={`/kind/${kind.id}`} className="block flex-1 group">
+              <Link to={`/grunddaten/vereine/${verein.id}`} className="block flex-1 group">
                 <div className="space-y-2">
                   <h3 className="text-h3 font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">
-                    {kind.vorname} {kind.nachname}
+                    {verein.name}
                   </h3>
-                  <p className="text-body text-neutral-600">
-                    Geboren: {kind.geburtsdatum}
-                  </p>
-                  {kind.geschlecht && (
-                    <p className="text-body text-neutral-500">Geschlecht: {kind.geschlecht}</p>
-                  )}
-                  {kind.verein && (
-                    <p className="text-body text-neutral-500">Verein: {kind.verein.name} ({kind.verein.ort})</p>
-                  )}
+                  <p className="text-body text-neutral-600">{verein.ort}</p>
+                  <p className="text-body text-neutral-500">Register-ID: {verein.register_id}</p>
+                  <p className="text-body text-neutral-500">Kontakt: {verein.contact}</p>
                 </div>
               </Link>
               <div className="flex gap-4 ml-4">
-                <Link to={`/kind/${kind.id}`}>
+                <Link to={`/grunddaten/vereine/${verein.id}`}>
                   <Button variant="secondary">Bearbeiten</Button>
                 </Link>
                 <Button
                   variant="danger"
                   onClick={() => {
-                    if (confirm('Kind wirklich löschen?')) {
-                      deleteMutation.mutate(kind.id);
+                    if (confirm('Verein wirklich löschen?')) {
+                      deleteMutation.mutate(verein.id);
                     }
                   }}
                 >
@@ -76,10 +70,10 @@ const KindList: React.FC = () => {
           </Card>
         ))}
 
-        {(!kinder || kinder.length === 0) && (
+        {(!vereine || vereine.length === 0) && (
           <Card>
             <p className="text-center text-body-lg text-neutral-500 py-8">
-              Keine Kinder vorhanden
+              Keine Vereine vorhanden
             </p>
           </Card>
         )}
@@ -88,4 +82,4 @@ const KindList: React.FC = () => {
   );
 };
 
-export default KindList;
+export default VereinList;
