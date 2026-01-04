@@ -45,4 +45,4 @@ Reduce the scope of the Partition.
 *   **Cons:** Higher infrastructure complexity on-site.
 
 ==== Decision Recommendation
-For Arqua42, we recommend **Strategy 2 (Token Check-out)** combined with an **Admin Override**. This aligns with the "Stammdaten" workflow where judges are assigned to competitions beforehand. The "Check-out" happens when the device creates the offline cache.
+For Aquarius, we recommend **Strategy 2 (Token Check-out)** combined with an **Admin Override**. This aligns with the "Stammdaten" workflow where judges are assigned to competitions beforehand. The "Check-out" happens when the device creates the offline cache.

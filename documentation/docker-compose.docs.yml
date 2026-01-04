@@ -33,15 +33,15 @@ services:
     command: >
       bash -c "
       mkdir -p build &&
-      asciidoctor src/arqua42-architecture.adoc
-      -o build/arqua42-architecture.html
+      asciidoctor src/aquarius-architecture.adoc
+      -o build/aquarius-architecture.html
       -a toc=left
       -a toclevels=3
       -a sectnums
       -a icons=font
       -a imagesdir=images
       -r asciidoctor-diagram &&
-      echo '✓ HTML generated in build/arqua42-architecture.html'
+      echo '✓ HTML generated in build/aquarius-architecture.html'
       "
 
   # Service for generating PDF
@@ -53,12 +53,12 @@ services:
     command: >
       bash -c "
       mkdir -p build &&
-      asciidoctor-pdf src/arqua42-architecture.adoc
-      -o build/arqua42-architecture.pdf
+      asciidoctor-pdf src/aquarius-architecture.adoc
+      -o build/aquarius-architecture.pdf
       -a sectnums
       -a imagesdir=images
       -r asciidoctor-diagram &&
-      echo '✓ PDF generated in build/arqua42-architecture.pdf'
+      echo '✓ PDF generated in build/aquarius-architecture.pdf'
       "
 
   # Service for watching and rebuilding
@@ -74,8 +74,8 @@ services:
         inotifywait -r -e modify,create,delete src/ 2>/dev/null &&
         echo 'Change detected, rebuilding...' &&
         mkdir -p build &&
-        asciidoctor src/arqua42-architecture.adoc
-        -o build/arqua42-architecture.html
+        asciidoctor src/aquarius-architecture.adoc
+        -o build/aquarius-architecture.html
         -a toc=left
         -a toclevels=3
         -a sectnums

@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Database URL - defaults to local SQLite for development
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./arqua42.db")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./aquarius.db")
 TURSO_AUTH_TOKEN = os.getenv("TURSO_AUTH_TOKEN")
 
 connect_args = {}

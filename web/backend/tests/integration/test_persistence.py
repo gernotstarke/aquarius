@@ -52,7 +52,7 @@ def test_app_dependency_wiring():
     Verify that the app's get_db dependency yields a valid session
     that can execute queries, ensuring the global engine is configured correctly.
     """
-    # This uses the engine configured in app.database (which defaults to arqua42.db or env var)
+    # This uses the engine configured in app.database (which defaults to aquarius.db or env var)
     # We just want to check connectivity, not modify the real DB
     
     gen = database.get_db()

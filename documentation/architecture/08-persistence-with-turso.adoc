@@ -47,7 +47,7 @@ Primary -right-> Edge : "Replication"
 ==== 1. Lokale Entwicklung (Dev)
 Für die lokale Entwicklung wird keine Cloud-Infrastruktur benötigt.
 *   **Treiber**: Standard Python SQLite (`sqlite3`) oder `libsql-experimental`.
-*   **URL**: `sqlite:///./arqua42.db`
+*   **URL**: `sqlite:///./aquarius.db`
 *   **Vorteil**: Einfaches Setup, kein Netzwerk nötig, File-basiert.
 
 ==== 2. Produktion (Cloud)

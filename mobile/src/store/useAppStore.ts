@@ -34,7 +34,7 @@ export const useAppStore = create<AppState>()(
       selectFigur: (figur) => set({ selectedFigur: figur }),
     }),
     {
-      name: 'arqua42-storage',
+      name: 'aquarius-storage',
       storage: createJSONStorage(() => AsyncStorage),
     }
   )

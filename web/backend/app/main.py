@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Log database configuration at startup
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./arqua42.db")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./aquarius.db")
 logger.info(f"🔧 DATABASE_URL: {DATABASE_URL}")
 logger.info(f"🔧 TURSO_AUTH_TOKEN present: {bool(os.getenv('TURSO_AUTH_TOKEN'))}")
 
@@ -109,7 +109,7 @@ def health_check(db: Session = Depends(get_db)):
 @app.get("/api/status")
 def status_overview(db: Session = Depends(get_db)):
     """Public status overview for the documentation dashboard."""
-    database_url = os.getenv("DATABASE_URL", "sqlite:///./arqua42.db")
+    database_url = os.getenv("DATABASE_URL", "sqlite:///./aquarius.db")
     db_type = "turso" if database_url.startswith(("libsql://", "sqlite+libsql://")) else "sqlite"
 
     fly_region = os.getenv("FLY_REGION")

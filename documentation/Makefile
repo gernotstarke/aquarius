@@ -1,7 +1,7 @@
 .PHONY: help docs html pdf serve clean build-image
 
 # Docker configuration
-DOCKER_IMAGE := arqua42-docs:latest
+DOCKER_IMAGE := aquarius-docs:latest
 DOCKER_RUN := docker run --rm -v $(CURDIR):/docs -w /docs $(DOCKER_IMAGE)
 
 # Paths (relative to documentation/)
@@ -15,7 +15,7 @@ help: ## Display this help message
 
 docs: html ## Generate all documentation
 	@echo "✅ Documentation generated!"
-	@echo "   📄 View: $(BUILD_DIR)/arqua42-architecture.html"
+	@echo "   📄 View: $(BUILD_DIR)/aquarius-architecture.html"
 
 html: ## Generate HTML documentation from AsciiDoc
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
