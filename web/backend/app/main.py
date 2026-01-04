@@ -35,10 +35,15 @@ app = FastAPI(
     version=AQUARIUS_BACKEND_VERSION
 )
 
-# CORS middleware for frontend
+# CORS middleware for frontend and documentation site
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite default port
+    allow_origins=[
+        "http://localhost:5173",  # Local development
+        "https://aquarius.fly.dev",  # Production app
+        "https://aquarius.arc42.org",  # Documentation site
+        "http://localhost:4000",  # Local Jekyll docs
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -8,9 +8,7 @@ header:
   caption: "Planung und Durchführung von Wettkämpfen"
 ---
 
-# Aquarius Anwendungen
 
-Wählen Sie den gewünschten Anwendungsbereich.
 
 <div class="req-tile-grid">
   <a href="http://localhost:5173" target="_blank" rel="noopener noreferrer" class="req-tile app-tile--violet-1">
@@ -46,8 +44,8 @@ Die Mobile App erfordert einen separaten Start via Expo (siehe Mobile-Seite).
   document.addEventListener("DOMContentLoaded", function() {
     // Configuration
     const localAppUrl = "http://localhost:5173";
-    const prodAppUrl = "https://aquarius.arc42.org";
-    
+    const prodAppUrl = "https://aquarius.fly.dev";
+
     // Determine target URL based on where the docs are running
     const isLocalDocs = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
     const targetUrl = isLocalDocs ? localAppUrl : prodAppUrl;
@@ -65,31 +63,37 @@ Die Mobile App erfordert einen separaten Start via Expo (siehe Mobile-Seite).
     const indicatorPlanung = document.getElementById("planungs-app-status");
     const indicatorAdmin = document.getElementById("admin-app-status");
 
-    // Check function using Image load (favicon hack)
+    // Check function using fetch to health endpoint
     function checkStatus() {
-      const img = new Image();
-      img.onload = function() {
-        if (indicatorPlanung) {
+      fetch(targetUrl + "/api/health", {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-cache'
+      })
+      .then(response => {
+        if (response.ok) {
+          if (indicatorPlanung) {
             indicatorPlanung.className = "status-indicator status-online";
             indicatorPlanung.title = "App is running";
-        }
-        if (indicatorAdmin) {
+          }
+          if (indicatorAdmin) {
             indicatorAdmin.className = "status-indicator status-online";
             indicatorAdmin.title = "App is running";
+          }
+        } else {
+          throw new Error('App returned error');
         }
-      };
-      img.onerror = function() {
+      })
+      .catch(error => {
         if (indicatorPlanung) {
-            indicatorPlanung.className = "status-indicator status-offline";
-            indicatorPlanung.title = "App unreachable";
+          indicatorPlanung.className = "status-indicator status-offline";
+          indicatorPlanung.title = "App unreachable";
         }
         if (indicatorAdmin) {
-            indicatorAdmin.className = "status-indicator status-offline";
-            indicatorAdmin.title = "App unreachable";
+          indicatorAdmin.className = "status-indicator status-offline";
+          indicatorAdmin.title = "App unreachable";
         }
-      };
-      // Use logo with cache buster (favicon.ico might not exist in dev)
-      img.src = targetUrl + "/aquarius-logo.png?t=" + new Date().getTime();
+      });
     }
 
     // Initial check
