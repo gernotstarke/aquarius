@@ -44,4 +44,4 @@ def test_default_configuration():
         from app import database
         importlib.reload(database)
         
-        assert str(database.engine.url) == "sqlite:///./arqua42.db"
+        assert str(database.engine.url) == "sqlite:///./aquarius.db"
