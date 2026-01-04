@@ -31,7 +31,7 @@ header:
 
 ---
 
-## Entwicklungshinweise
+## Hinweise
 
 Um die Anwendungen lokal zu starten, führen Sie bitte `make dev` im Root-Verzeichnis aus.
 Dies startet:
