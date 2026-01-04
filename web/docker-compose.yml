@@ -11,11 +11,11 @@ services:
     env_file:
       - ./backend/${ENV_FILE:-.env.local}
     environment:
-      - DATABASE_URL=${DATABASE_URL:-sqlite:///./database/arqua42.db}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///./database/aquarius.db}
       - TURSO_AUTH_TOKEN=${TURSO_AUTH_TOKEN:-}
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     networks:
-      - arqua42-network
+      - aquarius-network
 
   frontend:
     build:
@@ -29,11 +29,11 @@ services:
     depends_on:
       - backend
     networks:
-      - arqua42-network
+      - aquarius-network
 
 volumes:
   sqlite-data:
 
 networks:
-  arqua42-network:
+  aquarius-network:
     driver: bridge
