@@ -1,6 +1,7 @@
 ---
 permalink: /app/
-title: "Aquarius Anwendung"
+title: "Aquarius Anwendungen"
+excerpt: "hier läuft's!"
 layout: splash
 header:
   overlay_image: /assets/images/splash/aquarius-app-header-1500x400.webp

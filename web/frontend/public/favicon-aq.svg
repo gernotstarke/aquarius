@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="AQ">
+  <title>AQ</title>
+  <defs>
+    <linearGradient id="aq-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f3b5f"/>
+      <stop offset="100%" stop-color="#1f6f8b"/>
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="50" r="46" fill="url(#aq-bg)" stroke="#5fb3b3" stroke-width="4"/>
+  <text x="50" y="58" text-anchor="middle" font-family="Trebuchet MS, Arial, sans-serif" font-size="42" font-weight="700" fill="#f9f6ef" letter-spacing="2">AQ</text>
+  <path d="M24 70 C35 66, 45 74, 56 70 C67 66, 75 72, 82 68" fill="none" stroke="#f4d35e" stroke-width="3" stroke-linecap="round"/>
+</svg>
