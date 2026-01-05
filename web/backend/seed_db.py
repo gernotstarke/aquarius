@@ -8,8 +8,9 @@ import shutil
 from datetime import date, timedelta
 from pathlib import Path
 from app.database import SessionLocal, engine, Base
-from app.models import Saison, Schwimmbad, Wettkampf, Kind, Figur, Anmeldung, User
+from app.models import Saison, Schwimmbad, Wettkampf, Kind, Figur, Anmeldung, User, Verein
 from app.auth import get_password_hash
+from app.seed_constants import ensure_verbaende
 
 # Pfad zum Figurenkatalog
 FIGUREN_KATALOG = "data/figuren/figuren-v1.0-saison-2024.json"
@@ -43,6 +44,11 @@ def seed_data():
         print(f"   ✓ Created user: admin (Role: ROOT)")
         if admin_password == "admin":
              print("   ⚠️  Using default password 'admin'. Change this in production!")
+
+        # Create Verbände (constant data)
+        print("\n🏢 Creating verbände...")
+        ensure_verbaende(db)
+        print("   ✓ Verbände loaded")
 
         # Create Saisons
         print("\n📅 Creating saisons...")
@@ -85,6 +91,33 @@ def seed_data():
         print(f"   ✓ Created: {schwimmbad1.name}")
         print(f"   ✓ Created: {schwimmbad2.name}")
         print(f"   ✓ Created: {schwimmbad3.name}")
+
+        # Create Vereine
+        print("\n🏊 Creating vereine...")
+        verein1 = Verein(
+            name="SC Neptun Berlin",
+            ort="Berlin",
+            register_id="VR 12345",
+            contact="info@neptun-berlin.de"
+        )
+        verein2 = Verein(
+            name="Schwimmclub Mitte",
+            ort="Berlin",
+            register_id="VR 67890",
+            contact="kontakt@sc-mitte.de"
+        )
+        verein3 = Verein(
+            name="Wassersportverein Berlin",
+            ort="Berlin",
+            register_id="VR 11223",
+            contact="buero@wsv-berlin.de"
+        )
+
+        db.add_all([verein1, verein2, verein3])
+        db.commit()
+        print(f"   ✓ Created: {verein1.name}")
+        print(f"   ✓ Created: {verein2.name}")
+        print(f"   ✓ Created: {verein3.name}")
 
         # Create Wettkämpfe
         print("\n🏆 Creating wettkämpfe...")
@@ -129,21 +162,21 @@ def seed_data():
             nachname="Schmidt",
             geburtsdatum=date(2012, 5, 15),
             geschlecht="W",
-            verein="SC Neptun Berlin"
+            verein=verein1
         )
         kind2 = Kind(
             vorname="Max",
             nachname="Müller",
             geburtsdatum=date(2013, 8, 22),
             geschlecht="M",
-            verein="Schwimmclub Mitte"
+            verein=verein2
         )
         kind3 = Kind(
             vorname="Sophie",
             nachname="Weber",
             geburtsdatum=date(2011, 3, 10),
             geschlecht="W",
-            verein="SC Neptun Berlin"
+            verein=verein1
         )
         kind4 = Kind(
             vorname="Leon",
@@ -156,14 +189,14 @@ def seed_data():
             nachname="Wagner",
             geburtsdatum=date(2012, 7, 18),
             geschlecht="W",
-            verein="Wassersportverein Berlin"
+            verein=verein3
         )
         kind6 = Kind(
             vorname="Tim",
             nachname="Hoffmann",
             geburtsdatum=date(2013, 2, 28),
             geschlecht="M",
-            verein="Schwimmclub Mitte"
+            verein=verein2
         )
         db.add_all([kind1, kind2, kind3, kind4, kind5, kind6])
         db.commit()
