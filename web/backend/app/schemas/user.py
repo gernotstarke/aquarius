@@ -7,6 +7,7 @@ class UserBase(BaseModel):
     full_name: Optional[str] = None
     role: str = "OFFIZIELLER"
     is_active: bool = True
+    totp_enabled: bool = False
 
 class UserCreate(UserBase):
     password: str

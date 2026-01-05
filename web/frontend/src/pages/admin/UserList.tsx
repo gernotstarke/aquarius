@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../../api/client';
-import { UserPlus, Trash2, User as UserIcon, Edit2 } from 'lucide-react';
+import { UserPlus, Trash2, User as UserIcon, Edit2, Shield } from 'lucide-react';
 
 interface User {
   id: number;
@@ -9,6 +9,7 @@ interface User {
   full_name: string;
   role: 'ROOT' | 'PLANER' | 'OFFIZIELLER';
   is_active: boolean;
+  totp_enabled: boolean;
   created_at: string;
 }
 
@@ -135,6 +136,7 @@ const UserList: React.FC = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">2FA</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
@@ -165,6 +167,15 @@ const UserList: React.FC = () => {
                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                     {user.is_active ? 'Active' : 'Inactive'}
                   </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex items-center space-x-2">
+                    <div className={`h-2.5 w-2.5 rounded-full ${user.totp_enabled ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                    <span className={`flex items-center text-sm ${user.totp_enabled ? 'text-green-700' : 'text-red-700'}`}>
+                      <Shield size={14} className="mr-1" />
+                      {user.totp_enabled ? 'Enabled' : 'Disabled'}
+                    </span>
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {new Date(user.created_at).toLocaleDateString()}
