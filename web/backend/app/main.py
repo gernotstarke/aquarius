@@ -7,14 +7,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
-from sqlalchemy import text, or_, asc, desc
+from sqlalchemy import text, or_, asc, desc, func
 from typing import List, Optional
 import os
 import logging
 
 from app.database import get_db, engine, Base
 from app import models, schemas
-from app.routers import auth, users, health
+from app.routers import auth, users, health, admin
 from app.version import AQUARIUS_BACKEND_VERSION
 
 # Configure logging
@@ -60,6 +60,7 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(health.router)
+app.include_router(admin.router)
 
 # Mount frontend static files (built React app)
 # In production: /app/frontend/dist
@@ -472,16 +473,46 @@ def delete_kind(kind_id: int, db: Session = Depends(get_db)):
 # VERBAND READ-ONLY ENDPOINTS
 # ============================================================================
 
-@app.get("/api/verband", response_model=List[schemas.Verband])
-def list_verbaende(skip: int = 0, limit: int = 200, db: Session = Depends(get_db)):
-    """Get list of all associations (read-only)."""
-    return (
-        db.query(models.Verband)
-        .order_by(models.Verband.land, models.Verband.name)
-        .offset(skip)
-        .limit(limit)
-        .all()
+@app.get("/api/verband", response_model=List[schemas.VerbandWithCount])
+def list_verbaende(
+    skip: int = 0,
+    limit: int = 200,
+    sort_by: str = "name",
+    sort_order: str = "asc",
+    db: Session = Depends(get_db),
+):
+    """Get list of all associations (read-only) with nomination counts."""
+    sort_fields = {
+        "name": models.Verband.name,
+        "nomination_count": "nomination_count",
+    }
+    sort_column = sort_fields.get(sort_by, models.Verband.name)
+    order_fn = desc if sort_order.lower() == "desc" else asc
+
+    nomination_count = func.count(models.Kind.id).label("nomination_count")
+    query = (
+        db.query(models.Verband, nomination_count)
+        .outerjoin(models.Kind, models.Kind.verband_id == models.Verband.id)
+        .group_by(models.Verband.id)
     )
+
+    if sort_column == "nomination_count":
+        query = query.order_by(order_fn(nomination_count), models.Verband.name)
+    else:
+        query = query.order_by(order_fn(sort_column), models.Verband.name)
+
+    rows = query.offset(skip).limit(limit).all()
+    return [
+        schemas.VerbandWithCount(
+            id=verband.id,
+            name=verband.name,
+            abkuerzung=verband.abkuerzung,
+            land=verband.land,
+            ort=verband.ort,
+            nomination_count=count,
+        )
+        for verband, count in rows
+    ]
 
 
 # ============================================================================

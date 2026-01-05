@@ -28,6 +28,7 @@ import AdminLogin from './pages/admin/Login';
 import AdminDashboard from './pages/admin/Dashboard';
 import UserList from './pages/admin/UserList';
 import SystemHealth from './pages/admin/SystemHealth';
+import DatabaseStats from './pages/admin/Database';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -132,6 +133,7 @@ const App: React.FC = () => {
               <Route index element={<AdminDashboard />} />
               <Route path="users" element={<UserList />} />
               <Route path="health" element={<SystemHealth />} />
+              <Route path="database" element={<DatabaseStats />} />
             </Route>
           </Route>
 

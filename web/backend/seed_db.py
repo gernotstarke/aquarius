@@ -4,16 +4,68 @@ Populates the database with sample data for testing.
 """
 import json
 import os
+import random
 import shutil
 from datetime import date, timedelta
 from pathlib import Path
 from app.database import SessionLocal, engine, Base
-from app.models import Saison, Schwimmbad, Wettkampf, Kind, Figur, Anmeldung, User, Verein
+from app.models import Saison, Schwimmbad, Wettkampf, Kind, Figur, Anmeldung, User, Verein, Verband
 from app.auth import get_password_hash
 from app.seed_constants import ensure_verbaende
 
 # Pfad zum Figurenkatalog
 FIGUREN_KATALOG = "data/figuren/figuren-v1.0-saison-2024.json"
+
+# Diverse Vornamen (Deutsch, Schweiz, Migration Background)
+VORNAMEN_M = [
+    # Deutsch/Schweiz
+    "Max", "Felix", "Leon", "Tim", "Lukas", "Jonas", "Noah", "Finn", "Elias", "Ben",
+    "Paul", "Luca", "Moritz", "Jan", "Simon", "David", "Niklas", "Alexander", "Jakob",
+    # Türkisch
+    "Mehmet", "Ali", "Emre", "Ahmet", "Murat", "Cem",
+    # Arabisch
+    "Mohammed", "Omar", "Yusuf", "Hassan", "Amin",
+    # Griechisch
+    "Alexandros", "Dimitrios", "Georgios", "Nikos",
+    # Italienisch
+    "Marco", "Luca", "Giovanni", "Andrea", "Matteo",
+    # Spanisch
+    "Carlos", "Miguel", "Diego", "Pablo",
+]
+
+VORNAMEN_W = [
+    # Deutsch/Schweiz
+    "Anna", "Sophie", "Emma", "Lena", "Mia", "Laura", "Lea", "Marie", "Sarah", "Lisa",
+    "Hannah", "Lara", "Julia", "Nina", "Clara", "Paula", "Emilia", "Amelie",
+    # Türkisch
+    "Aylin", "Elif", "Zeynep", "Ayse", "Fatma", "Selin",
+    # Arabisch
+    "Amira", "Layla", "Fatima", "Yasmin", "Nour",
+    # Griechisch
+    "Elena", "Maria", "Katerina", "Sofia",
+    # Italienisch
+    "Giulia", "Francesca", "Alessia", "Chiara",
+    # Spanisch
+    "Carmen", "Elena", "Isabella", "Lucia",
+]
+
+NACHNAMEN = [
+    # Deutsch/Schweiz
+    "Müller", "Schmidt", "Schneider", "Fischer", "Weber", "Meyer", "Wagner", "Becker",
+    "Schulz", "Hoffmann", "Schäfer", "Koch", "Bauer", "Richter", "Klein", "Wolf",
+    "Schröder", "Neumann", "Schwarz", "Zimmermann", "Braun", "Hofmann", "Hartmann",
+    "Lange", "Schmitt", "Werner", "Krause", "Meier", "Lehmann", "Huber", "Mayer",
+    # Türkisch
+    "Yilmaz", "Kaya", "Demir", "Celik", "Sahin", "Özdemir", "Arslan", "Dogan",
+    # Arabisch
+    "Al-Ahmad", "Hassan", "Ibrahim", "Khalil", "Mansour", "Nasser",
+    # Griechisch
+    "Papadopoulos", "Georgiou", "Dimitriou", "Nikolaou",
+    # Italienisch
+    "Rossi", "Russo", "Ferrari", "Esposito", "Bianchi", "Romano", "Colombo",
+    # Spanisch
+    "García", "Martínez", "López", "González", "Rodríguez", "Sánchez",
+]
 
 def reset_database():
     """Drop all tables and recreate them."""
@@ -52,20 +104,32 @@ def seed_data():
 
         # Create Saisons
         print("\n📅 Creating saisons...")
-        saison_2024 = Saison(
-            name="Saison 2024/2025",
-            from_date=date(2024, 9, 1),
-            to_date=date(2025, 6, 30)
-        )
-        saison_2023 = Saison(
-            name="Saison 2023/2024",
-            from_date=date(2023, 9, 1),
-            to_date=date(2024, 6, 30)
-        )
-        db.add_all([saison_2024, saison_2023])
+        saisons = [
+            Saison(
+                name="Winter 25/26",
+                from_date=date(2025, 11, 1),
+                to_date=date(2026, 2, 28)
+            ),
+            Saison(
+                name="Frühjahrsmeeting 26",
+                from_date=date(2026, 3, 1),
+                to_date=date(2026, 5, 31)
+            ),
+            Saison(
+                name="Sommerfest 26",
+                from_date=date(2026, 6, 1),
+                to_date=date(2026, 8, 31)
+            ),
+            Saison(
+                name="Herbstpokal 26",
+                from_date=date(2026, 9, 1),
+                to_date=date(2026, 10, 31)
+            ),
+        ]
+        db.add_all(saisons)
         db.commit()
-        print(f"   ✓ Created: {saison_2024.name}")
-        print(f"   ✓ Created: {saison_2023.name}")
+        for saison in saisons:
+            print(f"   ✓ Created: {saison.name}")
 
         # Create Schwimmbäder
         print("\n🏊 Creating schwimmbäder...")
@@ -123,30 +187,30 @@ def seed_data():
         # Create Wettkämpfe
         print("\n🏆 Creating wettkämpfe...")
         wettkampf1 = Wettkampf(
-            name="Herbstcup 2024",
-            datum=date(2024, 10, 15),
+            name="Wintercup 2025",
+            datum=date(2025, 12, 8),
             max_teilnehmer=120,
-            saison_id=saison_2024.id,
+            saison_id=saisons[0].id,
             schwimmbad_id=schwimmbad1.id
         )
         wettkampf2 = Wettkampf(
-            name="Winterpokal 2024",
-            datum=date(2024, 12, 8),
+            name="Frühjahrsmeeting 2026",
+            datum=date(2026, 4, 15),
             max_teilnehmer=150,
-            saison_id=saison_2024.id,
+            saison_id=saisons[1].id,
             schwimmbad_id=schwimmbad2.id
         )
         wettkampf3 = Wettkampf(
-            name="Frühjahrsmeeting 2025",
-            datum=date(2025, 3, 22),
+            name="Sommerfest 2026",
+            datum=date(2026, 7, 10),
             max_teilnehmer=100,
-            saison_id=saison_2024.id,
+            saison_id=saisons[2].id,
             schwimmbad_id=schwimmbad3.id
         )
         wettkampf4 = Wettkampf(
-            name="Sommerfest 2025",
-            datum=date(2025, 6, 15),
-            saison_id=saison_2024.id,
+            name="Herbstpokal 2026",
+            datum=date(2026, 10, 5),
+            saison_id=saisons[3].id,
             schwimmbad_id=schwimmbad1.id
         )
         db.add_all([wettkampf1, wettkampf2, wettkampf3, wettkampf4])
@@ -156,57 +220,69 @@ def seed_data():
         print(f"   ✓ Created: {wettkampf3.name}")
         print(f"   ✓ Created: {wettkampf4.name}")
 
-        # Create Kinder
-        print("\n👶 Creating kinder...")
-        kind1 = Kind(
-            vorname="Anna",
-            nachname="Schmidt",
-            geburtsdatum=date(2012, 5, 15),
-            geschlecht="W",
-            verein=verein1
-        )
-        kind2 = Kind(
-            vorname="Max",
-            nachname="Müller",
-            geburtsdatum=date(2013, 8, 22),
-            geschlecht="M",
-            verein=verein2
-        )
-        kind3 = Kind(
-            vorname="Sophie",
-            nachname="Weber",
-            geburtsdatum=date(2011, 3, 10),
-            geschlecht="W",
-            verein=verein1
-        )
-        kind4 = Kind(
-            vorname="Leon",
-            nachname="Fischer",
-            geburtsdatum=date(2014, 11, 5),
-            geschlecht="M"
-        )
-        kind5 = Kind(
-            vorname="Emma",
-            nachname="Wagner",
-            geburtsdatum=date(2012, 7, 18),
-            geschlecht="W",
-            verein=verein3
-        )
-        kind6 = Kind(
-            vorname="Tim",
-            nachname="Hoffmann",
-            geburtsdatum=date(2013, 2, 28),
-            geschlecht="M",
-            verein=verein2
-        )
-        db.add_all([kind1, kind2, kind3, kind4, kind5, kind6])
+        # Create Kinder (50 with diverse names)
+        print("\n👶 Creating 50 kinder with diverse backgrounds...")
+
+        # Get all Vereine and Verbände for random assignment
+        all_vereine = db.query(Verein).all()
+        all_verbaende = db.query(Verband).all()
+
+        kinder = []
+        for i in range(50):
+            # Random gender
+            geschlecht = random.choice(["M", "W"])
+            vorname = random.choice(VORNAMEN_M if geschlecht == "M" else VORNAMEN_W)
+            nachname = random.choice(NACHNAMEN)
+
+            # Random birth date between 2010 and 2016
+            year = random.randint(2010, 2016)
+            month = random.randint(1, 12)
+            day = random.randint(1, 28)  # Safe for all months
+            geburtsdatum = date(year, month, day)
+
+            # Randomly assign to Verein (70%), Verband (25%), or neither (5%)
+            rand = random.random()
+            if rand < 0.70 and all_vereine:
+                # Assign to Verein
+                kind = Kind(
+                    vorname=vorname,
+                    nachname=nachname,
+                    geburtsdatum=geburtsdatum,
+                    geschlecht=geschlecht,
+                    verein_id=random.choice(all_vereine).id
+                )
+            elif rand < 0.95 and all_verbaende:
+                # Assign to Verband
+                kind = Kind(
+                    vorname=vorname,
+                    nachname=nachname,
+                    geburtsdatum=geburtsdatum,
+                    geschlecht=geschlecht,
+                    verband_id=random.choice(all_verbaende).id
+                )
+            else:
+                # No affiliation
+                kind = Kind(
+                    vorname=vorname,
+                    nachname=nachname,
+                    geburtsdatum=geburtsdatum,
+                    geschlecht=geschlecht
+                )
+
+            kinder.append(kind)
+            db.add(kind)
+
         db.commit()
-        print(f"   ✓ Created: {kind1.vorname} {kind1.nachname}")
-        print(f"   ✓ Created: {kind2.vorname} {kind2.nachname}")
-        print(f"   ✓ Created: {kind3.vorname} {kind3.nachname}")
-        print(f"   ✓ Created: {kind4.vorname} {kind4.nachname}")
-        print(f"   ✓ Created: {kind5.vorname} {kind5.nachname}")
-        print(f"   ✓ Created: {kind6.vorname} {kind6.nachname}")
+
+        # Count assignments
+        verein_count = sum(1 for k in kinder if k.verein_id is not None)
+        verband_count = sum(1 for k in kinder if k.verband_id is not None)
+        no_affiliation = len(kinder) - verein_count - verband_count
+
+        print(f"   ✓ Created 50 Kinder:")
+        print(f"      • {verein_count} assigned to Vereine")
+        print(f"      • {verband_count} assigned to Verbände")
+        print(f"      • {no_affiliation} without affiliation")
 
         # Create Figuren (Kunstschwimm-Figuren) from JSON catalog
         print("\n🎯 Creating figuren from JSON catalog...")
@@ -285,52 +361,40 @@ def seed_data():
         # Create some sample registrations
         print("\n📝 Creating anmeldungen...")
 
-        # Only create sample registrations if we have enough figures
-        if len(figuren) >= 23:
-            # Anna meldet sich für Herbstcup an
-            anmeldung1 = Anmeldung(
-                kind_id=kind1.id,
-                wettkampf_id=wettkampf1.id,
-                startnummer=1,
-                anmeldedatum=date(2024, 9, 15),
-                vorlaeufig=0,
-                status="aktiv"
-            )
-            # Wähle 3 Figuren für Anna
-            anmeldung1.figuren.extend([figuren[0], figuren[8], figuren[17]])  # Ballettbein, Flamingo, Hocke
-            db.add(anmeldung1)
+        # Only create sample registrations if we have enough figures and kinder
+        if len(figuren) >= 23 and len(kinder) >= 10:
+            # Create 5-10 random registrations
+            num_anmeldungen = random.randint(5, 10)
+            for i in range(num_anmeldungen):
+                kind = random.choice(kinder[:20])  # Use first 20 kinder
+                wettkampf = random.choice([wettkampf1, wettkampf2, wettkampf3, wettkampf4])
 
-            # Max für Winterpokal
-            anmeldung2 = Anmeldung(
-                kind_id=kind2.id,
-                wettkampf_id=wettkampf2.id,
-                startnummer=1,
-                anmeldedatum=date(2024, 10, 1),
-                vorlaeufig=0,
-                status="aktiv"
-            )
-            anmeldung2.figuren.extend([figuren[4], figuren[11], figuren[18]])  # Vertikale, Ritter, Pike
-            db.add(anmeldung2)
+                anmeldung = Anmeldung(
+                    kind_id=kind.id,
+                    wettkampf_id=wettkampf.id,
+                    startnummer=i + 1,
+                    anmeldedatum=wettkampf.datum - timedelta(days=random.randint(30, 90)),
+                    vorlaeufig=0,
+                    status="aktiv"
+                )
 
-            # Sophie für Frühjahrsmeeting
-            anmeldung3 = Anmeldung(
-                kind_id=kind3.id,
-                wettkampf_id=wettkampf3.id,
-                startnummer=1,
-                anmeldedatum=date(2025, 2, 10),
-                vorlaeufig=0,
-                status="aktiv"
-            )
-            anmeldung3.figuren.extend([figuren[6], figuren[16], figuren[22]])  # Vertikale im Spagat, Spagat zur Vertikalen, Spagat zur Vertikalen
-            db.add(anmeldung3)
+                # Select 3 random figures from the competition's allowed figures
+                if len(wettkampf.figuren) >= 3:
+                    selected_figuren = random.sample(wettkampf.figuren, 3)
+                    anmeldung.figuren.extend(selected_figuren)
+
+                db.add(anmeldung)
 
             db.commit()
-            print(f"   ✓ Created 3 Anmeldungen")
+            print(f"   ✓ Created {num_anmeldungen} Anmeldungen")
         else:
-            print(f"   ⚠️  Skipping sample registrations (need at least 23 figures, have {len(figuren)})")
+            print(f"   ⚠️  Skipping sample registrations (need at least 23 figures and 10 kinder)")
 
         print("\n✨ Database seeding complete!")
         print(f"\n📊 Summary:")
+        print(f"   • {db.query(User).count()} Users")
+        print(f"   • {db.query(Verband).count()} Verbände")
+        print(f"   • {db.query(Verein).count()} Vereine")
         print(f"   • {db.query(Saison).count()} Saisons")
         print(f"   • {db.query(Schwimmbad).count()} Schwimmbäder")
         print(f"   • {db.query(Wettkampf).count()} Wettkämpfe")

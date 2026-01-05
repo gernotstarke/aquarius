@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import apiClient from '../api/client';
-import { Verband } from '../types';
 
 interface NavItem {
   to: string;
@@ -18,15 +15,12 @@ interface NavSection {
 
 const navSections: NavSection[] = [
   {
-    title: 'Grunddaten',
-    icon: '📅',
-    defaultOpen: true,
+    title: 'Anmeldung',
+    icon: '📝',
+    defaultOpen: false,
     items: [
-      { to: '/grunddaten/saisons', label: 'Saisons' },
-      { to: '/grunddaten/schwimmbaeder', label: 'Schwimmbäder' },
-      { to: '/grunddaten/figuren', label: 'Figuren' },
-      { to: '/grunddaten/vereine', label: 'Vereine' },
-      { to: '/grunddaten/verbaende', label: 'Verbände' },
+      { to: '/anmeldung', label: 'Neue Anmeldung' },
+      { to: '/anmeldung/liste', label: 'Alle Anmeldungen' },
     ],
   },
   {
@@ -47,25 +41,30 @@ const navSections: NavSection[] = [
     ],
   },
   {
-    title: 'Anmeldung',
-    icon: '📝',
+    title: 'Grunddaten',
+    icon: '📅',
+    defaultOpen: true,
+    items: [
+      { to: '/kinder', label: 'Kinder' },
+      { to: '/grunddaten/saisons', label: 'Saisons' },
+      { to: '/grunddaten/schwimmbaeder', label: 'Schwimmbäder' },
+      { to: '/grunddaten/figuren', label: 'Figuren' },
+      { to: '/grunddaten/vereine', label: 'Vereine' },
+      { to: '/grunddaten/verbaende', label: 'Verbände' },
+    ],
+  },
+  {
+    title: 'Auswertungen',
+    icon: '📊',
     defaultOpen: false,
     items: [
-      { to: '/anmeldung', label: 'Neue Anmeldung' },
-      { to: '/anmeldung/liste', label: 'Alle Anmeldungen' },
+      { to: '/auswertungen', label: 'Übersicht' },
     ],
   },
 ];
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
-  const { data: verbaende } = useQuery<Verband[]>({
-    queryKey: ['verbaende'],
-    queryFn: async () => {
-      const response = await apiClient.get('/verband');
-      return response.data;
-    },
-  });
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(
     navSections.reduce((acc, section) => ({
       ...acc,
@@ -96,6 +95,9 @@ const Sidebar: React.FC = () => {
       <nav className="px-3 pb-6">
         {navSections.map((section) => (
           <div key={section.title} className="mb-2">
+            {section.title === 'Auswertungen' && (
+              <div className="my-4 border-t border-neutral-200" />
+            )}
             <button
               onClick={() => toggleSection(section.title)}
               className={`
@@ -131,24 +133,6 @@ const Sidebar: React.FC = () => {
                     {item.label}
                   </Link>
                 ))}
-                {section.title === 'Grunddaten' && verbaende && verbaende.length > 0 && (
-                  <div className="pt-3">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-                      Verbände
-                    </p>
-                    <div className="mt-2 space-y-1 text-xs text-neutral-500">
-                      {verbaende.map((verband) => (
-                        <div
-                          key={verband.id}
-                          className="truncate"
-                          title={`${verband.name} (${verband.ort})`}
-                        >
-                          {verband.name}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>

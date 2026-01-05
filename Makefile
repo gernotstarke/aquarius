@@ -46,18 +46,6 @@ web-dev-turso: ## Start web app development servers with Turso cloud database
 web-test: ## Run web app tests
 	@cd web && make test
 
-web-db-reset: ## Reset web app database
-	@cd web && make db-reset
-
-web-db-seed: ## Seed web app database with test data
-	@cd web && make db-seed
-
-web-db-export-local: ## Export local SQLite database to web/backend/exports/
-	@cd web && make db-export-local
-
-web-db-export-turso: ## Export Turso production database to web/backend/exports/
-	@cd web && make db-export-turso
-
 web-deploy: ## Deploy web app to fly.io
 	@cd web && make deploy
 

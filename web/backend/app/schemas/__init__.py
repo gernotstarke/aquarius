@@ -57,6 +57,7 @@ class Verein(VereinBase):
 # Verband Schemas
 class VerbandBase(BaseModel):
     name: str
+    abkuerzung: str
     land: str
     ort: str
 
@@ -69,6 +70,9 @@ class VerbandUpdate(VerbandBase):
 class Verband(VerbandBase):
     model_config = ConfigDict(from_attributes=True)
     id: int
+
+class VerbandWithCount(Verband):
+    nomination_count: int
 
 # Figur Schemas
 class FigurBase(BaseModel):

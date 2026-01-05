@@ -6,6 +6,13 @@ import Button from '../components/Button';
 const Grunddaten: React.FC = () => {
   const tiles = [
     {
+      name: 'Kinder',
+      description: 'Teilnehmende Kinder verwalten',
+      path: '/kinder',
+      icon: '🧒',
+      color: 'bg-orange-100 hover:bg-orange-200',
+    },
+    {
       name: 'Saisons',
       description: 'Saisons verwalten',
       path: '/grunddaten/saisons',

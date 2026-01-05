@@ -6,6 +6,7 @@ from app import models
 def test_kind_crud(client, db):
     verband = models.Verband(
         name="Bezirk Nord",
+        abkuerzung="BEN",
         land="Deutschland",
         ort="Kassel",
     )

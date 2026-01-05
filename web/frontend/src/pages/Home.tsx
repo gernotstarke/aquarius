@@ -48,6 +48,13 @@ const Home: React.FC = () => {
       icon: '📅',
       color: 'bg-blue-50 hover:bg-blue-100',
     },
+    {
+      name: 'Auswertungen',
+      description: 'Reports und Urkundendruck',
+      path: '/auswertungen',
+      icon: '📊',
+      color: 'bg-orange-50 hover:bg-orange-100',
+    },
   ];
 
   return (

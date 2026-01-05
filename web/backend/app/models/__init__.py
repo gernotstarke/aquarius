@@ -70,6 +70,7 @@ class Verband(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False, unique=True, index=True)
+    abkuerzung = Column(String(5), nullable=False, unique=True, index=True)
     land = Column(String, nullable=False)
     ort = Column(String, nullable=False)
 

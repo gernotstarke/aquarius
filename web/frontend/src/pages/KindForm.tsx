@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/client';
-import { Kind, KindCreate, Verein } from '../types';
+import { Kind, KindCreate, Verein, Verband } from '../types';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
@@ -19,12 +19,21 @@ const KindForm: React.FC = () => {
     geburtsdatum: '',
     geschlecht: '',
     verein_id: undefined,
+    verband_id: undefined,
   });
 
   const { data: vereine } = useQuery<Verein[]>({
     queryKey: ['vereine'],
     queryFn: async () => {
       const response = await apiClient.get('/verein');
+      return response.data;
+    },
+  });
+
+  const { data: verbaende } = useQuery<Verband[]>({
+    queryKey: ['verbaende'],
+    queryFn: async () => {
+      const response = await apiClient.get('/verband');
       return response.data;
     },
   });
@@ -46,6 +55,7 @@ const KindForm: React.FC = () => {
         geburtsdatum: kind.geburtsdatum,
         geschlecht: kind.geschlecht || '',
         verein_id: kind.verein_id,
+        verband_id: kind.verband_id,
       });
     }
   }, [kind]);
@@ -139,6 +149,24 @@ const KindForm: React.FC = () => {
               {vereine?.map((verein) => (
                 <option key={verein.id} value={verein.id}>
                   {verein.name} ({verein.ort})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-body font-medium text-neutral-700">
+              Verband (optional)
+            </label>
+            <select
+              className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
+              value={formData.verband_id || ''}
+              onChange={(e) => setFormData({ ...formData, verband_id: e.target.value ? Number(e.target.value) : undefined })}
+            >
+              <option value="">Kein Verband</option>
+              {verbaende?.map((verband) => (
+                <option key={verband.id} value={verband.id}>
+                  {verband.abkuerzung}
                 </option>
               ))}
             </select>

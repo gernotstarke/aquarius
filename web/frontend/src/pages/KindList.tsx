@@ -113,11 +113,11 @@ const KindList: React.FC = () => {
                   <p className="text-body text-neutral-600">
                     Geboren: {kind.geburtsdatum}
                   </p>
-                  {kind.geschlecht && (
-                    <p className="text-body text-neutral-500">Geschlecht: {kind.geschlecht}</p>
-                  )}
                   {kind.verein && (
                     <p className="text-body text-neutral-500">Verein: {kind.verein.name} ({kind.verein.ort})</p>
+                  )}
+                  {kind.verband && (
+                    <p className="text-body text-neutral-500">Verband: {kind.verband.abkuerzung}</p>
                   )}
                 </div>
               </Link>

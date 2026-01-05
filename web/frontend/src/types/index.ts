@@ -44,8 +44,10 @@ export interface VereinCreate {
 export interface Verband {
   id: number;
   name: string;
+  abkuerzung: string;
   land: string;
   ort: string;
+  nomination_count?: number;
 }
 
 export interface Wettkampf {
