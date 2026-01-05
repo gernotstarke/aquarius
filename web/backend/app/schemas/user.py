@@ -25,6 +25,8 @@ class User(UserBase):
 class Token(BaseModel):
     access_token: str
     token_type: str
+    requires_2fa_setup: Optional[bool] = None
+    warning: Optional[str] = None
 
 class TokenData(BaseModel):
     username: Optional[str] = None

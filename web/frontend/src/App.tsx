@@ -26,6 +26,7 @@ import AnmeldungForm from './pages/AnmeldungForm';
 // Admin imports
 import AdminLayout from './components/AdminLayout';
 import AdminLogin from './pages/admin/Login';
+import TOTPSetup from './pages/admin/TOTPSetup';
 import AdminDashboard from './pages/admin/Dashboard';
 import UserList from './pages/admin/UserList';
 import SystemHealth from './pages/admin/SystemHealth';
@@ -129,7 +130,8 @@ const App: React.FC = () => {
 
           {/* Admin App */}
           <Route path="/admin/login" element={<AdminLogin />} />
-          
+          <Route path="/admin/totp-setup" element={<TOTPSetup />} />
+
           <Route path="/admin" element={<RequireAuth />}>
             <Route element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
