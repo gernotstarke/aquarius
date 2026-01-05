@@ -59,6 +59,25 @@ db-import-figures: ## Import figures from JSON catalog (usage: make db-import-fi
 	fi
 	@docker compose exec backend python import_figures.py "$(FILE)"
 
+db-export-local: ## Export local SQLite database from Docker to ./backend/exports/
+	@echo "📥 Exporting local SQLite database..."
+	@mkdir -p backend/exports
+	@docker compose cp backend:/app/database/aquarius.db backend/exports/aquarius-local-$$(date +%Y%m%d-%H%M%S).db
+	@echo "✅ Database exported to backend/exports/"
+	@ls -lh backend/exports/*.db | tail -1
+
+db-export-turso: ## Export Turso production database to ./backend/exports/
+	@echo "📥 Exporting Turso production database..."
+	@mkdir -p backend/exports
+	@if ! command -v turso &> /dev/null; then \
+		echo "❌ Error: turso CLI not installed"; \
+		echo "Install with: brew install tursodatabase/tap/turso"; \
+		exit 1; \
+	fi
+	@turso db shell aquarius ".dump" > backend/exports/aquarius-turso-$$(date +%Y%m%d-%H%M%S).sql
+	@echo "✅ Database exported to backend/exports/"
+	@ls -lh backend/exports/*.sql | tail -1
+
 ##@ Cloud Deployment (fly.io)
 
 deploy: ## Deploy to fly.io production
