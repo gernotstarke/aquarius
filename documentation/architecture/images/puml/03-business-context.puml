@@ -2,12 +2,16 @@
 !include <C4/C4_Context>
 
 
-Person(praesident, "Präsident", "Plant Saison und Wettkämpfe")
-Person(verein, "Verein", "Meldet Kinder an")
-Person(punktrichter, "Punktrichter", "Verwaltet Wettkampf vor Ort")
+
+Person(praesident, "Präsident", "Plant Saison und Wettkämpfe", $tags="lead")
+AddElementTag("lead", $bgColor="#FDE68A", $fontColor="#92400E")
+
+Person(verein, "Verein", "organisiert und \nversichert Kinder")
+Person(punktrichter, "Punktrichter", "Verwaltet Wettkampf \nvor Ort")
 Person(kampfrichter, "Kampfrichter", "Bewertet Starts")
 Person(kind, "Kind", "Nimmt am Wettkampf teil")
-Person(kind, "Kind", "meldet sich an")
+
+Person(eltern, "Eltern", "melden und \nversichern Kinder")
 
 System(aquarius, "Aquarius", "Bewertungssystem für Kunds- und Figurenschwimmen")
 
@@ -15,10 +19,11 @@ System_Ext(schwimmverband, "Schwimmverband", "Figuren und Regeln")
 
 Rel(praesident, aquarius, "Plant Saison, verwaltet Stammdaten")
 Rel_U(verein, aquarius, "organisiert Teams" )
-Rel_U(Eltern, aquarius, "Melden Kinder an")
+Rel_U(eltern, aquarius, "Melden Kinder an")
 Rel(punktrichter, aquarius, "Führt Wettkampf durch", "offline")
 Rel(kampfrichter, aquarius, "Erfasst Punkte", "offline")
 Rel_R(kind, aquarius, "Sieht Ergebnisse")
+Rel_R(kind, aquarius, "meldet sich an")
 
 Rel_L(schwimmverband, aquarius, "Figurenkatalog, Regeln", "Manuell")
 
