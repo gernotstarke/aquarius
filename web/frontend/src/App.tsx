@@ -19,6 +19,7 @@ import FigurenForm from './pages/FigurenForm';
 import FigurDetail from './pages/FigurDetail';
 import AnmeldungList from './pages/AnmeldungList';
 import AnmeldungForm from './pages/AnmeldungForm';
+import Grunddaten from './pages/Grunddaten';
 
 // Admin imports
 import AdminLayout from './components/AdminLayout';
@@ -56,6 +57,7 @@ const App: React.FC = () => {
             <Route index element={<Home />} />
 
             {/* Grunddaten */}
+            <Route path="/grunddaten" element={<Grunddaten />} />
             <Route path="/grunddaten/saisons" element={<SaisonList />} />
             <Route path="/grunddaten/saisons/new" element={<SaisonForm />} />
             <Route path="/grunddaten/saisons/:id" element={<SaisonForm />} />

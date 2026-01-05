@@ -36,8 +36,8 @@ const Home: React.FC = () => {
     },
     {
       name: 'Grunddaten',
-      description: 'Schwimmbäder, Figuren und Kinder verwalten',
-      path: '/schwimmbad',
+      description: 'Saisons, Schwimmbäder, Figuren und Vereine verwalten',
+      path: '/grunddaten',
       icon: '🏊',
       color: 'bg-green-50 hover:bg-green-100',
     },
