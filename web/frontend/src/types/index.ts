@@ -41,6 +41,13 @@ export interface VereinCreate {
   contact: string;
 }
 
+export interface Verband {
+  id: number;
+  name: string;
+  land: string;
+  ort: string;
+}
+
 export interface Wettkampf {
   id: number;
   name: string;
@@ -66,6 +73,10 @@ export interface Kind {
   geschlecht?: string;
   verein_id?: number;
   verein?: Verein;
+  verband_id?: number;
+  verband?: Verband;
+  versicherung?: string;
+  vertrag?: string;
 }
 
 export interface KindCreate {
@@ -74,6 +85,9 @@ export interface KindCreate {
   geburtsdatum: string;
   geschlecht?: string;
   verein_id?: number;
+  verband_id?: number;
+  versicherung?: string;
+  vertrag?: string;
 }
 
 export interface Figur {

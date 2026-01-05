@@ -469,6 +469,22 @@ def delete_kind(kind_id: int, db: Session = Depends(get_db)):
 
 
 # ============================================================================
+# VERBAND READ-ONLY ENDPOINTS
+# ============================================================================
+
+@app.get("/api/verband", response_model=List[schemas.Verband])
+def list_verbaende(skip: int = 0, limit: int = 200, db: Session = Depends(get_db)):
+    """Get list of all associations (read-only)."""
+    return (
+        db.query(models.Verband)
+        .order_by(models.Verband.land, models.Verband.name)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+
+# ============================================================================
 # FIGUR CRUD ENDPOINTS
 # ============================================================================
 

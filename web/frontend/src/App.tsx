@@ -3,12 +3,14 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import NewLayout from './components/NewLayout';
 import Home from './pages/Home';
+import Grunddaten from './pages/Grunddaten';
 import SaisonList from './pages/SaisonList';
 import SaisonForm from './pages/SaisonForm';
 import SchwimmbadList from './pages/SchwimmbadList';
 import SchwimmbadForm from './pages/SchwimmbadForm';
 import VereinList from './pages/VereinList';
 import VereinForm from './pages/VereinForm';
+import VerbandList from './pages/VerbandList';
 import WettkampfList from './pages/WettkampfList';
 import WettkampfForm from './pages/WettkampfForm';
 import WettkampfDetail from './pages/WettkampfDetail';
@@ -56,6 +58,7 @@ const App: React.FC = () => {
             <Route index element={<Home />} />
 
             {/* Grunddaten */}
+            <Route path="/grunddaten" element={<Grunddaten />} />
             <Route path="/grunddaten/saisons" element={<SaisonList />} />
             <Route path="/grunddaten/saisons/new" element={<SaisonForm />} />
             <Route path="/grunddaten/saisons/:id" element={<SaisonForm />} />
@@ -72,6 +75,7 @@ const App: React.FC = () => {
             <Route path="/grunddaten/vereine" element={<VereinList />} />
             <Route path="/grunddaten/vereine/new" element={<VereinForm />} />
             <Route path="/grunddaten/vereine/:id" element={<VereinForm />} />
+            <Route path="/grunddaten/verbaende" element={<VerbandList />} />
 
             {/* Legacy stammdaten routes for backwards compatibility */}
             <Route path="/stammdaten/saisons" element={<SaisonList />} />

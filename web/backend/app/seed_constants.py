@@ -73,8 +73,12 @@ VERBAND_DATA = [
 def ensure_verbaende(db):
     """Insert constant Verbände if they are missing."""
     existing = {name for (name,) in db.query(models.Verband.name).all()}
+    created = 0
     for payload in VERBAND_DATA:
         if payload["name"] in existing:
             continue
         db.add(models.Verband(**payload))
+        created += 1
     db.commit()
+    total = db.query(models.Verband).count()
+    return created, total

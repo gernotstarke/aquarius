@@ -47,8 +47,8 @@ def seed_data():
 
         # Create Verbände (constant data)
         print("\n🏢 Creating verbände...")
-        ensure_verbaende(db)
-        print("   ✓ Verbände loaded")
+        verbaende_created, verbaende_total = ensure_verbaende(db)
+        print(f"   ✓ Verbände loaded: {verbaende_created} new, {verbaende_total} total")
 
         # Create Saisons
         print("\n📅 Creating saisons...")
@@ -118,6 +118,7 @@ def seed_data():
         print(f"   ✓ Created: {verein1.name}")
         print(f"   ✓ Created: {verein2.name}")
         print(f"   ✓ Created: {verein3.name}")
+        print(f"   ✓ Vereine total: {db.query(Verein).count()}")
 
         # Create Wettkämpfe
         print("\n🏆 Creating wettkämpfe...")
