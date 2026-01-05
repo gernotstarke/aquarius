@@ -2,13 +2,13 @@
 FastAPI main application for Aquarius CRUD prototype.
 Simple CRUD operations for Kind, Wettkampf, Schwimmbad, and Saison.
 """
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
-from sqlalchemy import text
-from typing import List
+from sqlalchemy import text, or_, asc, desc
+from typing import List, Optional
 import os
 import logging
 
@@ -47,6 +47,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Total-Count"], # Expose pagination header
 )
 
 # Mount static files for backend use
@@ -368,9 +369,57 @@ def delete_wettkampf(wettkampf_id: int, db: Session = Depends(get_db)):
 # ============================================================================
 
 @app.get("/api/kind", response_model=List[schemas.Kind])
-def list_kind(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    """Get list of all children."""
-    return db.query(models.Kind).offset(skip).limit(limit).all()
+def list_kind(
+    response: Response,
+    skip: int = 0,
+    limit: int = 20,
+    search: Optional[str] = None,
+    sort_by: Optional[str] = "nachname",
+    sort_order: Optional[str] = "asc",
+    db: Session = Depends(get_db)
+):
+    """Get list of all children with search, sort, and pagination."""
+    query = db.query(models.Kind)
+
+    # Search (Filter)
+    if search:
+        search_term = f"%{search}%"
+        query = query.join(models.Verein, isouter=True).filter(
+            or_(
+                models.Kind.vorname.ilike(search_term),
+                models.Kind.nachname.ilike(search_term),
+                models.Verein.name.ilike(search_term)
+            )
+        )
+    
+    # Total count for pagination headers
+    total_count = query.count()
+    response.headers["X-Total-Count"] = str(total_count)
+
+    # Sorting
+    if sort_by:
+        sort_column = None
+        if sort_by == "vorname":
+            sort_column = models.Kind.vorname
+        elif sort_by == "nachname":
+            sort_column = models.Kind.nachname
+        elif sort_by == "verein":
+            # Ensure join if not already joined
+            if not search:
+                query = query.join(models.Verein, isouter=True)
+            sort_column = models.Verein.name
+        
+        if sort_column is not None:
+            if sort_order == "desc":
+                query = query.order_by(desc(sort_column))
+            else:
+                query = query.order_by(asc(sort_column))
+    
+    # Default sorting if none provided (fallback)
+    else:
+        query = query.order_by(models.Kind.nachname)
+
+    return query.offset(skip).limit(limit).all()
 
 
 @app.get("/api/kind/{kind_id}", response_model=schemas.Kind)

@@ -1,20 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/client';
 import { Kind } from '../types';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import Input from '../components/Input';
 
 const KindList: React.FC = () => {
   const queryClient = useQueryClient();
 
-  const { data: kinder, isLoading } = useQuery<Kind[]>({
-    queryKey: ['kinder'],
+  // State for List controls
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(20);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('nachname');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['kinder', page, pageSize, searchTerm, sortBy, sortOrder],
     queryFn: async () => {
-      const response = await apiClient.get('/kind');
-      return response.data;
+      const response = await apiClient.get<Kind[]>('/kind', {
+        params: {
+          skip: (page - 1) * pageSize,
+          limit: pageSize,
+          search: searchTerm || undefined,
+          sort_by: sortBy,
+          sort_order: sortOrder
+        }
+      });
+      return {
+        items: response.data,
+        total: parseInt(response.headers['x-total-count'] || '0', 10)
+      };
     },
+    placeholderData: (previousData) => previousData,
   });
 
   const deleteMutation = useMutation({
@@ -24,21 +44,65 @@ const KindList: React.FC = () => {
     },
   });
 
-  if (isLoading) {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setPage(1); // Reset to page 1 on search
+  };
+
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortBy(e.target.value);
+    setPage(1);
+  };
+
+  const toggleSortOrder = () => {
+    setSortOrder(current => current === 'asc' ? 'desc' : 'asc');
+  };
+
+  const totalItems = data?.total || 0;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const kinder = data?.items || [];
+
+  if (isLoading && !data) {
     return <div className="text-center py-12 text-body-lg">Lädt...</div>;
   }
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h2 className="text-h1 font-bold text-neutral-900">Kinder</h2>
         <Link to="/kind/new">
           <Button size="lg">Neues Kind</Button>
         </Link>
       </div>
 
+      {/* Controls: Search and Sort */}
+      <div className="flex flex-col md:flex-row gap-4 bg-neutral-50 p-4 rounded-lg border border-neutral-200">
+        <div className="flex-1">
+          <Input
+            placeholder="Suche nach Name oder Verein..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="bg-white"
+          />
+        </div>
+        <div className="flex gap-2 shrink-0">
+          <select
+            value={sortBy}
+            onChange={handleSortChange}
+            className="px-4 py-3 bg-white border border-neutral-300 rounded-lg text-body focus-ring min-h-touch cursor-pointer"
+          >
+            <option value="nachname">Nachname</option>
+            <option value="vorname">Vorname</option>
+            <option value="verein">Verein</option>
+          </select>
+          <Button variant="secondary" onClick={toggleSortOrder}>
+            {sortOrder === 'asc' ? 'Aufsteigend' : 'Absteigend'}
+          </Button>
+        </div>
+      </div>
+
       <div className="grid gap-6">
-        {kinder?.map((kind) => (
+        {kinder.map((kind) => (
           <Card key={kind.id}>
             <div className="flex items-center justify-between">
               <Link to={`/kind/${kind.id}`} className="block flex-1 group">
@@ -76,14 +140,37 @@ const KindList: React.FC = () => {
           </Card>
         ))}
 
-        {(!kinder || kinder.length === 0) && (
+        {kinder.length === 0 && (
           <Card>
             <p className="text-center text-body-lg text-neutral-500 py-8">
-              Keine Kinder vorhanden
+              {searchTerm ? 'Keine Kinder gefunden, die der Suche entsprechen.' : 'Keine Kinder vorhanden.'}
             </p>
           </Card>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-8 pb-8">
+          <Button
+            variant="secondary"
+            disabled={page === 1}
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+          >
+            Zurück
+          </Button>
+          <span className="text-body text-neutral-600">
+            Seite {page} von {totalPages}
+          </span>
+          <Button
+            variant="secondary"
+            disabled={page >= totalPages}
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+          >
+            Weiter
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

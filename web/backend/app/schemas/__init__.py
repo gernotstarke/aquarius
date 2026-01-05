@@ -54,6 +54,22 @@ class Verein(VereinBase):
     model_config = ConfigDict(from_attributes=True)
     id: int
 
+# Verband Schemas
+class VerbandBase(BaseModel):
+    name: str
+    land: str
+    ort: str
+
+class VerbandCreate(VerbandBase):
+    pass
+
+class VerbandUpdate(VerbandBase):
+    pass
+
+class Verband(VerbandBase):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+
 # Figur Schemas
 class FigurBase(BaseModel):
     name: str
@@ -127,6 +143,9 @@ class KindBase(BaseModel):
     geburtsdatum: date
     geschlecht: str | None = None
     verein_id: int | None = None
+    verband_id: int | None = None
+    versicherung: str | None = None
+    vertrag: str | None = None
 
 class KindCreate(KindBase):
     pass
@@ -138,4 +157,4 @@ class Kind(KindBase):
     model_config = ConfigDict(from_attributes=True)
     id: int
     verein: Optional[Verein] = None
-
+    verband: Optional[Verband] = None

@@ -78,7 +78,10 @@ class KindBase(BaseModel):
     nachname: str
     geburtsdatum: date
     geschlecht: str | None = None
-    verein: str | None = None
+    verein_id: int | None = None
+    verband_id: int | None = None
+    versicherung: str | None = None
+    vertrag: str | None = None
 
 
 class KindCreate(KindBase):
