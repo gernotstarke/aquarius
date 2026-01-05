@@ -27,6 +27,8 @@ PROFILES=(
   "Catppuccin Macchiato"
   "Atom One Dark"
   "Belafonte Day"
+  "Everforest Light"
+  "Grass"
 )
 
 # Check if iTerm2 is installed
@@ -36,10 +38,10 @@ if ! [ -d "/Applications/iTerm.app" ]; then
 fi
 
 # Rectangle Pro positions for each window
-POSITIONS=("top-left" "top-right" "bottom-left" "bottom-right")
+POSITIONS=("top-left-sixth" "top-right-sixth" "bottom-left-sixth" "bottom-right-sixth" "bottom-center-sixth" "top-center-sixth")
 
 # Create each window, then position it with Rectangle Pro
-for i in 0 1 2 3; do
+for i in 0 1 2 3 4 5; do
   profile="${PROFILES[$i]}"
   position="${POSITIONS[$i]}"
 
