@@ -50,6 +50,14 @@ export interface Verband {
   nomination_count?: number;
 }
 
+export interface Versicherung {
+  id: number;
+  name: string;
+  kurz: string;
+  land: string;
+  hauptsitz: string;
+}
+
 export interface Wettkampf {
   id: number;
   name: string;
@@ -77,7 +85,8 @@ export interface Kind {
   verein?: Verein;
   verband_id?: number;
   verband?: Verband;
-  versicherung?: string;
+  versicherung_id?: number;
+  versicherung?: Versicherung;
   vertrag?: string;
 }
 
@@ -88,7 +97,7 @@ export interface KindCreate {
   geschlecht?: string;
   verein_id?: number;
   verband_id?: number;
-  versicherung?: string;
+  versicherung_id?: number;
   vertrag?: string;
 }
 

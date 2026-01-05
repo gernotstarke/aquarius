@@ -119,6 +119,12 @@ const KindList: React.FC = () => {
                   {kind.verband && (
                     <p className="text-body text-neutral-500">Verband: {kind.verband.abkuerzung}</p>
                   )}
+                  {kind.versicherung && (
+                    <p className="text-body text-neutral-500">
+                      Versicherung: {kind.versicherung.kurz}
+                      {kind.vertrag ? ` (Vertrag: ${kind.vertrag})` : ''}
+                    </p>
+                  )}
                 </div>
               </Link>
               <div className="flex gap-4 ml-4">

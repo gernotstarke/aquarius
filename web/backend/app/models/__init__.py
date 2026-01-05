@@ -78,6 +78,20 @@ class Verband(Base):
     kinder = relationship("Kind", back_populates="verband")
 
 
+class Versicherung(Base):
+    """Insurance company model."""
+    __tablename__ = "versicherung"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False, unique=True, index=True)
+    kurz = Column(String(5), nullable=False, unique=True, index=True)
+    land = Column(String, nullable=False)
+    hauptsitz = Column(String, nullable=False)
+
+    # Relationships
+    kinder = relationship("Kind", back_populates="versicherung")
+
+
 class Wettkampf(Base):
     """Competition model."""
     __tablename__ = "wettkampf"
@@ -107,12 +121,13 @@ class Kind(Base):
     geschlecht = Column(String(1))  # M, W, D
     verein_id = Column(Integer, ForeignKey("verein.id"), nullable=True)
     verband_id = Column(Integer, ForeignKey("verband.id"), nullable=True)
-    versicherung = Column(String, nullable=True)
+    versicherung_id = Column(Integer, ForeignKey("versicherung.id"), nullable=True)
     vertrag = Column(String, nullable=True)
 
     # Relationships
     verein = relationship("Verein", back_populates="kinder")
     verband = relationship("Verband", back_populates="kinder")
+    versicherung = relationship("Versicherung", back_populates="kinder")
     anmeldungen = relationship("Anmeldung", back_populates="kind")
 
 

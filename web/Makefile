@@ -50,6 +50,68 @@ db-seed: ## Seed database with sample data
 	@echo "📊 Seeding database..."
 	@docker compose exec backend python seed_db.py
 
+db-init-admin: ## Create or update admin user (interactive, production-safe)
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "🔐 Admin User Setup (Production-Safe)"
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo ""
+	@docker compose exec backend python -c '\
+import getpass; \
+import sys; \
+from app.database import SessionLocal; \
+from app.models import User; \
+from app.auth import get_password_hash; \
+\
+print("This will create or update a ROOT admin user."); \
+print(""); \
+username = input("Admin username [admin]: ").strip() or "admin"; \
+\
+while True: \
+    password = getpass.getpass("Admin password (min 12 chars): "); \
+    if len(password) < 12: \
+        print("❌ Password must be at least 12 characters"); \
+        continue; \
+    password2 = getpass.getpass("Confirm password: "); \
+    if password != password2: \
+        print("❌ Passwords do not match"); \
+        continue; \
+    break; \
+\
+db = SessionLocal(); \
+try: \
+    user = db.query(User).filter(User.username == username).first(); \
+    \
+    if user: \
+        user.hashed_password = get_password_hash(password); \
+        user.role = "ROOT"; \
+        user.is_active = True; \
+        db.commit(); \
+        print(""); \
+        print(f"✅ Updated password for user: {username}"); \
+    else: \
+        user = User( \
+            username=username, \
+            full_name="System Administrator", \
+            hashed_password=get_password_hash(password), \
+            role="ROOT", \
+            is_active=True \
+        ); \
+        db.add(user); \
+        db.commit(); \
+        print(""); \
+        print(f"✅ Created admin user: {username}"); \
+    \
+    print(""); \
+    print("Next steps:"); \
+    print("  1. Log in at /admin/login"); \
+    print("  2. Setup 2FA (when implemented)"); \
+    print("  3. Save backup codes securely"); \
+finally: \
+    db.close(); \
+'
+	@echo ""
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
 db-import-figures: ## Import figures from JSON catalog (usage: make db-import-figures FILE=path/to/catalog.json)
 	@if [ -z "$(FILE)" ]; then \
 		echo "❌ Error: FILE parameter is required"; \

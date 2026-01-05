@@ -80,7 +80,7 @@ class KindBase(BaseModel):
     geschlecht: str | None = None
     verein_id: int | None = None
     verband_id: int | None = None
-    versicherung: str | None = None
+    versicherung_id: int | None = None
     vertrag: str | None = None
 
 

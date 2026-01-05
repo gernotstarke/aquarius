@@ -9,9 +9,9 @@ import shutil
 from datetime import date, timedelta
 from pathlib import Path
 from app.database import SessionLocal, engine, Base
-from app.models import Saison, Schwimmbad, Wettkampf, Kind, Figur, Anmeldung, User, Verein, Verband
+from app.models import Saison, Schwimmbad, Wettkampf, Kind, Figur, Anmeldung, User, Verein, Verband, Versicherung
 from app.auth import get_password_hash
-from app.seed_constants import ensure_verbaende
+from app.seed_constants import ensure_verbaende, ensure_versicherungen
 
 # Pfad zum Figurenkatalog
 FIGUREN_KATALOG = "data/figuren/figuren-v1.0-saison-2024.json"
@@ -101,6 +101,11 @@ def seed_data():
         print("\n🏢 Creating verbände...")
         verbaende_created, verbaende_total = ensure_verbaende(db)
         print(f"   ✓ Verbände loaded: {verbaende_created} new, {verbaende_total} total")
+
+        # Create Versicherungen (constant data)
+        print("\n🛡️  Creating versicherungen...")
+        versicherungen_created, versicherungen_total = ensure_versicherungen(db)
+        print(f"   ✓ Versicherungen loaded: {versicherungen_created} new, {versicherungen_total} total")
 
         # Create Saisons
         print("\n📅 Creating saisons...")
@@ -397,6 +402,9 @@ def seed_data():
         print(f"   • {db.query(Verein).count()} Vereine")
         print(f"   • {db.query(Saison).count()} Saisons")
         print(f"   • {db.query(Schwimmbad).count()} Schwimmbäder")
+        print(f"   • {db.query(Verein).count()} Vereine")
+        print(f"   • {db.query(Verband).count()} Verbände")
+        print(f"   • {db.query(Versicherung).count()} Versicherungen")
         print(f"   • {db.query(Wettkampf).count()} Wettkämpfe")
         print(f"   • {db.query(Kind).count()} Kinder")
         print(f"   • {db.query(Figur).count()} Figuren")

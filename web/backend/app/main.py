@@ -516,6 +516,22 @@ def list_verbaende(
 
 
 # ============================================================================
+# VERSICHERUNG READ-ONLY ENDPOINTS
+# ============================================================================
+
+@app.get("/api/versicherung", response_model=List[schemas.Versicherung])
+def list_versicherungen(skip: int = 0, limit: int = 200, db: Session = Depends(get_db)):
+    """Get list of all insurance companies (read-only)."""
+    return (
+        db.query(models.Versicherung)
+        .order_by(models.Versicherung.name)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+
+# ============================================================================
 # FIGUR CRUD ENDPOINTS
 # ============================================================================
 

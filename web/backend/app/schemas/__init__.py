@@ -74,6 +74,22 @@ class Verband(VerbandBase):
 class VerbandWithCount(Verband):
     nomination_count: int
 
+class VersicherungBase(BaseModel):
+    name: str
+    kurz: str
+    land: str
+    hauptsitz: str
+
+class VersicherungCreate(VersicherungBase):
+    pass
+
+class VersicherungUpdate(VersicherungBase):
+    pass
+
+class Versicherung(VersicherungBase):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+
 # Figur Schemas
 class FigurBase(BaseModel):
     name: str
@@ -148,7 +164,7 @@ class KindBase(BaseModel):
     geschlecht: str | None = None
     verein_id: int | None = None
     verband_id: int | None = None
-    versicherung: str | None = None
+    versicherung_id: int | None = None
     vertrag: str | None = None
 
 class KindCreate(KindBase):
@@ -162,3 +178,4 @@ class Kind(KindBase):
     id: int
     verein: Optional[Verein] = None
     verband: Optional[Verband] = None
+    versicherung: Optional[Versicherung] = None

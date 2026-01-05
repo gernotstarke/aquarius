@@ -47,6 +47,13 @@ const Grunddaten: React.FC = () => {
       icon: '🏛️',
       color: 'bg-orange-50 hover:bg-orange-100',
     },
+    {
+      name: 'Versicherungen',
+      description: 'Versicherungsgesellschaften anzeigen',
+      path: '/grunddaten/versicherungen',
+      icon: '🛡️',
+      color: 'bg-amber-50 hover:bg-amber-100',
+    },
   ];
 
   return (

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/client';
-import { Kind, KindCreate, Verein, Verband } from '../types';
+import { Kind, KindCreate, Verein, Verband, Versicherung } from '../types';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
@@ -20,6 +20,8 @@ const KindForm: React.FC = () => {
     geschlecht: '',
     verein_id: undefined,
     verband_id: undefined,
+    versicherung_id: undefined,
+    vertrag: '',
   });
 
   const { data: vereine } = useQuery<Verein[]>({
@@ -34,6 +36,14 @@ const KindForm: React.FC = () => {
     queryKey: ['verbaende'],
     queryFn: async () => {
       const response = await apiClient.get('/verband');
+      return response.data;
+    },
+  });
+
+  const { data: versicherungen } = useQuery<Versicherung[]>({
+    queryKey: ['versicherungen'],
+    queryFn: async () => {
+      const response = await apiClient.get('/versicherung');
       return response.data;
     },
   });
@@ -56,6 +66,8 @@ const KindForm: React.FC = () => {
         geschlecht: kind.geschlecht || '',
         verein_id: kind.verein_id,
         verband_id: kind.verband_id,
+        versicherung_id: kind.versicherung_id,
+        vertrag: kind.vertrag || '',
       });
     }
   }, [kind]);
@@ -166,11 +178,37 @@ const KindForm: React.FC = () => {
               <option value="">Kein Verband</option>
               {verbaende?.map((verband) => (
                 <option key={verband.id} value={verband.id}>
-                  {verband.abkuerzung}
+                  {verband.abkuerzung} — {verband.name}
                 </option>
               ))}
             </select>
           </div>
+
+          <div className="space-y-2">
+            <label className="block text-body font-medium text-neutral-700">
+              Versicherung (optional)
+            </label>
+            <select
+              className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
+              value={formData.versicherung_id || ''}
+              onChange={(e) => setFormData({ ...formData, versicherung_id: e.target.value ? Number(e.target.value) : undefined })}
+            >
+              <option value="">Keine Versicherung</option>
+              {versicherungen?.map((versicherung) => (
+                <option key={versicherung.id} value={versicherung.id}>
+                  {versicherung.kurz} — {versicherung.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <Input
+            label="Vertragsnummer (optional)"
+            type="text"
+            value={formData.vertrag || ''}
+            onChange={(e) => setFormData({ ...formData, vertrag: e.target.value })}
+            placeholder="z.B. VK-2024-1234"
+          />
 
           <div className="flex gap-4 pt-4">
             <Button type="submit" size="lg">

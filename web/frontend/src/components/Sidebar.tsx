@@ -50,6 +50,7 @@ const navSections: NavSection[] = [
       { to: '/grunddaten/schwimmbaeder', label: 'Schwimmbäder' },
       { to: '/grunddaten/figuren', label: 'Figuren' },
       { to: '/grunddaten/vereine', label: 'Vereine' },
+      { to: '/grunddaten/versicherungen', label: 'Versicherungen' },
       { to: '/grunddaten/verbaende', label: 'Verbände' },
     ],
   },

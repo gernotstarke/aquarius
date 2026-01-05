@@ -11,6 +11,7 @@ import SchwimmbadForm from './pages/SchwimmbadForm';
 import VereinList from './pages/VereinList';
 import VereinForm from './pages/VereinForm';
 import VerbandList from './pages/VerbandList';
+import VersicherungList from './pages/VersicherungList';
 import WettkampfList from './pages/WettkampfList';
 import WettkampfForm from './pages/WettkampfForm';
 import WettkampfDetail from './pages/WettkampfDetail';
@@ -77,6 +78,7 @@ const App: React.FC = () => {
             <Route path="/grunddaten/vereine/new" element={<VereinForm />} />
             <Route path="/grunddaten/vereine/:id" element={<VereinForm />} />
             <Route path="/grunddaten/verbaende" element={<VerbandList />} />
+            <Route path="/grunddaten/versicherungen" element={<VersicherungList />} />
 
             {/* Legacy stammdaten routes for backwards compatibility */}
             <Route path="/stammdaten/saisons" element={<SaisonList />} />

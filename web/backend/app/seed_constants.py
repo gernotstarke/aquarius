@@ -82,6 +82,117 @@ VERBAND_DATA = [
     },
 ]
 
+VERSICHERUNG_DATA = [
+    {
+        "land": "Deutschland",
+        "name": "HUK-Cowburg",
+        "kurz": "HUKC",
+        "hauptsitz": "Coburg",
+    },
+    {
+        "land": "Deutschland",
+        "name": "Ali-Kanns Versicherungs-AG",
+        "kurz": "AKV",
+        "hauptsitz": "München",
+    },
+    {
+        "land": "Deutschland",
+        "name": "R+W Versicherung AG",
+        "kurz": "RWV",
+        "hauptsitz": "Wiesbaden",
+    },
+    {
+        "land": "Deutschland",
+        "name": "OsmoseDirekt (Geniali Deutschland)",
+        "kurz": "OSD",
+        "hauptsitz": "Saarbrücken",
+    },
+    {
+        "land": "Deutschland",
+        "name": "ERGOO Versicherung AG",
+        "kurz": "ERGO",
+        "hauptsitz": "Düsseldorf",
+    },
+    {
+        "land": "Deutschland",
+        "name": "SIGNAL IDUNAh Gruppe",
+        "kurz": "SIGI",
+        "hauptsitz": "Dortmund / Hamburg",
+    },
+    {
+        "land": "Deutschland",
+        "name": "DEVKus Versicherungen",
+        "kurz": "DVK",
+        "hauptsitz": "Köln",
+    },
+    {
+        "land": "Deutschland",
+        "name": "Barmenja Versicherungen",
+        "kurz": "BARM",
+        "hauptsitz": "Wuppertal",
+    },
+    {
+        "land": "Deutschland",
+        "name": "NUERNBERGER Versicherei",
+        "kurz": "NUEV",
+        "hauptsitz": "Nürnberg",
+    },
+    {
+        "land": "Deutschland",
+        "name": "ADAK Versicherung AG",
+        "kurz": "ADAK",
+        "hauptsitz": "München",
+    },
+    {
+        "land": "Österreich",
+        "name": "Ali-Kanns Elementar Versicherungs-AG",
+        "kurz": "AKE",
+        "hauptsitz": "Wien",
+    },
+    {
+        "land": "Österreich",
+        "name": "UNIQO Österreich Versicherungen AG",
+        "kurz": "UNQO",
+        "hauptsitz": "Wien",
+    },
+    {
+        "land": "Österreich",
+        "name": "ReifEisen Versicherung AG",
+        "kurz": "REI",
+        "hauptsitz": "Wien",
+    },
+    {
+        "land": "Österreich",
+        "name": "Grazer Wechselwitzige Versicherung AG (GRAWE)",
+        "kurz": "GRAW",
+        "hauptsitz": "Graz",
+    },
+    {
+        "land": "Schweiz",
+        "name": "Zuerich Versicherungs-Gesellschaft AG",
+        "kurz": "ZURI",
+        "hauptsitz": "Zürich",
+    },
+    {
+        "land": "Schweiz",
+        "name": "Die Schweizerische Mobilär Versicherungsgesellschaft AG",
+        "kurz": "MOBI",
+        "hauptsitz": "Bern",
+    },
+    {
+        "land": "Schweiz",
+        "name": "Groupo Mutuel",
+        "kurz": "GMUT",
+        "hauptsitz": "Martigny",
+    },
+    {
+        "land": "Schweiz",
+        "name": "Ali-Kanns Suisse Versicherungs-Gesellschaft AG",
+        "kurz": "AKS",
+        "hauptsitz": "Wallisellen",
+    },
+]
+
 
 def ensure_verbaende(db):
     """Insert constant Verbände if they are missing."""
@@ -94,4 +205,18 @@ def ensure_verbaende(db):
         created += 1
     db.commit()
     total = db.query(models.Verband).count()
+    return created, total
+
+
+def ensure_versicherungen(db):
+    """Insert constant Versicherungen if they are missing."""
+    existing = {name for (name,) in db.query(models.Versicherung.name).all()}
+    created = 0
+    for payload in VERSICHERUNG_DATA:
+        if payload["name"] in existing:
+            continue
+        db.add(models.Versicherung(**payload))
+        created += 1
+    db.commit()
+    total = db.query(models.Versicherung).count()
     return created, total
