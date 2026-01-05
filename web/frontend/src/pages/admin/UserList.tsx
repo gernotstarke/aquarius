@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../../api/client';
-import { UserPlus, Trash2, User as UserIcon } from 'lucide-react';
+import { UserPlus, Trash2, User as UserIcon, Edit2 } from 'lucide-react';
 
 interface User {
   id: number;
@@ -12,16 +12,25 @@ interface User {
   created_at: string;
 }
 
+const ROLE_LABELS: Record<string, string> = {
+  'ROOT': 'Admin',
+  'PLANER': 'Datenpflege',
+  'OFFIZIELLER': 'Bewertung'
+};
+
 const UserList: React.FC = () => {
   const queryClient = useQueryClient();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+
   // Form State
   const [formData, setFormData] = useState({
     username: '',
     password: '',
     full_name: '',
-    role: 'OFFIZIELLER'
+    role: 'OFFIZIELLER',
+    is_active: true
   });
 
   const { data: users, isLoading, error } = useQuery<User[]>({
@@ -39,7 +48,19 @@ const UserList: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       setIsCreateModalOpen(false);
-      setFormData({ username: '', password: '', full_name: '', role: 'OFFIZIELLER' });
+      setFormData({ username: '', password: '', full_name: '', role: 'OFFIZIELLER', is_active: true });
+    }
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: any }) => {
+      await apiClient.put(`/users/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      setIsEditModalOpen(false);
+      setEditingUser(null);
+      setFormData({ username: '', password: '', full_name: '', role: 'OFFIZIELLER', is_active: true });
     }
   });
 
@@ -52,9 +73,39 @@ const UserList: React.FC = () => {
     }
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     createMutation.mutate(formData);
+  };
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+
+    const updateData: any = {
+      full_name: formData.full_name,
+      role: formData.role,
+      is_active: formData.is_active
+    };
+
+    // Only include password if it's been changed
+    if (formData.password) {
+      updateData.password = formData.password;
+    }
+
+    updateMutation.mutate({ id: editingUser.id, data: updateData });
+  };
+
+  const handleEdit = (user: User) => {
+    setEditingUser(user);
+    setFormData({
+      username: user.username,
+      password: '',
+      full_name: user.full_name || '',
+      role: user.role,
+      is_active: user.is_active
+    });
+    setIsEditModalOpen(true);
   };
 
   if (isLoading) return <div className="text-center py-10">Loading users...</div>;
@@ -103,11 +154,11 @@ const UserList: React.FC = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                    ${user.role === 'ROOT' ? 'bg-red-100 text-red-800' : 
-                      user.role === 'PLANER' ? 'bg-blue-100 text-blue-800' : 
-                      'bg-gray-100 text-gray-800'}`}>
-                    {user.role}
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                    ${user.role === 'ROOT' ? 'bg-red-100 text-red-800' :
+                      user.role === 'PLANER' ? 'bg-blue-100 text-blue-800' :
+                      'bg-green-100 text-green-800'}`}>
+                    {ROLE_LABELS[user.role]}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -119,18 +170,28 @@ const UserList: React.FC = () => {
                   {new Date(user.created_at).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  {user.role !== 'ROOT' && (
-                    <button 
-                      onClick={() => {
-                        if (confirm(`Are you sure you want to delete user ${user.username}?`)) {
-                          deleteMutation.mutate(user.id);
-                        }
-                      }}
-                      className="text-red-600 hover:text-red-900"
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      onClick={() => handleEdit(user)}
+                      className="text-blue-600 hover:text-blue-900"
+                      title="Edit user"
                     >
-                      <Trash2 size={18} />
+                      <Edit2 size={18} />
                     </button>
-                  )}
+                    {user.role !== 'ROOT' && (
+                      <button
+                        onClick={() => {
+                          if (confirm(`Are you sure you want to delete user ${user.username}?`)) {
+                            deleteMutation.mutate(user.id);
+                          }
+                        }}
+                        className="text-red-600 hover:text-red-900"
+                        title="Delete user"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
@@ -140,10 +201,10 @@ const UserList: React.FC = () => {
 
       {/* Create User Modal */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md border-t-4 border-red-600">
             <h2 className="text-xl font-bold mb-6">Create New User</h2>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleCreateSubmit}>
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2">Username</label>
                 <input
@@ -173,17 +234,28 @@ const UserList: React.FC = () => {
                   onChange={e => setFormData({...formData, full_name: e.target.value})}
                 />
               </div>
-              <div className="mb-6">
+              <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2">Role</label>
                 <select
                   className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-red-500 bg-white"
                   value={formData.role}
                   onChange={e => setFormData({...formData, role: e.target.value})}
                 >
-                  <option value="OFFIZIELLER">Offizieller (Judge)</option>
-                  <option value="PLANER">Planer (Manager)</option>
-                  <option value="ROOT">ROOT (Admin)</option>
+                  <option value="OFFIZIELLER">Bewertung (Offizielle)</option>
+                  <option value="PLANER">Datenpflege (Backoffice)</option>
+                  <option value="ROOT">Admin (ROOT)</option>
                 </select>
+              </div>
+              <div className="mb-6">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_active}
+                    onChange={e => setFormData({...formData, is_active: e.target.checked})}
+                    className="mr-2"
+                  />
+                  <span className="text-sm text-gray-700">Active</span>
+                </label>
               </div>
               <div className="flex justify-end space-x-4">
                 <button
@@ -198,6 +270,90 @@ const UserList: React.FC = () => {
                   className="bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-4 rounded transition-colors"
                 >
                   Create User
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
+      {isEditModalOpen && editingUser && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md border-t-4 border-blue-600">
+            <h2 className="text-xl font-bold mb-6">Edit User: {editingUser.username}</h2>
+            <form onSubmit={handleEditSubmit}>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">Username</label>
+                <input
+                  type="text"
+                  disabled
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-500 bg-gray-100 leading-tight"
+                  value={formData.username}
+                />
+                <p className="text-xs text-gray-500 mt-1">Username cannot be changed</p>
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                  Password
+                  <span className="font-normal text-gray-500 ml-2">(leave empty to keep current)</span>
+                </label>
+                <input
+                  type="password"
+                  placeholder="Enter new password to change"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
+                  value={formData.password}
+                  onChange={e => setFormData({...formData, password: e.target.value})}
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
+                <input
+                  type="text"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
+                  value={formData.full_name}
+                  onChange={e => setFormData({...formData, full_name: e.target.value})}
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">Role</label>
+                <select
+                  className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 bg-white"
+                  value={formData.role}
+                  onChange={e => setFormData({...formData, role: e.target.value})}
+                >
+                  <option value="OFFIZIELLER">Bewertung (Offizielle)</option>
+                  <option value="PLANER">Datenpflege (Backoffice)</option>
+                  <option value="ROOT">Admin (ROOT)</option>
+                </select>
+              </div>
+              <div className="mb-6">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_active}
+                    onChange={e => setFormData({...formData, is_active: e.target.checked})}
+                    className="mr-2"
+                  />
+                  <span className="text-sm text-gray-700">Active</span>
+                </label>
+              </div>
+              <div className="flex justify-end space-x-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditModalOpen(false);
+                    setEditingUser(null);
+                  }}
+                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded transition-colors"
+                >
+                  Update User
                 </button>
               </div>
             </form>
