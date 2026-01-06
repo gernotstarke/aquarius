@@ -6,7 +6,7 @@ from fastapi import FastAPI, Depends, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import text, or_, asc, desc, func, case
 from typing import List, Optional
 import os
@@ -389,6 +389,7 @@ def anmeldung_with_insurance_ok(db_anmeldung: models.Anmeldung) -> schemas.Anmel
         status=db_anmeldung.status,
         figuren=db_anmeldung.figuren,
         insurance_ok=kind_has_insurance(db_anmeldung.kind),
+        kind=db_anmeldung.kind,
     )
 
 @app.get("/api/kind", response_model=List[schemas.Kind])
@@ -447,9 +448,9 @@ def list_kind(
         
         if sort_column is not None:
             if sort_order == "desc":
-                query = query.order_by(desc(sort_column))
+                query = query.order_by(desc(sort_column), models.Kind.nachname)
             else:
-                query = query.order_by(asc(sort_column))
+                query = query.order_by(asc(sort_column), models.Kind.nachname)
     
     # Default sorting if none provided (fallback)
     else:
@@ -634,14 +635,18 @@ def delete_figur(figur_id: int, db: Session = Depends(get_db)):
 @app.get("/api/anmeldung", response_model=List[schemas.Anmeldung])
 def list_anmeldung(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """Get list of all registrations."""
-    anmeldungen = db.query(models.Anmeldung).offset(skip).limit(limit).all()
+    anmeldungen = db.query(models.Anmeldung).options(
+        joinedload(models.Anmeldung.kind)
+    ).offset(skip).limit(limit).all()
     return [anmeldung_with_insurance_ok(a) for a in anmeldungen]
 
 
 @app.get("/api/anmeldung/{anmeldung_id}", response_model=schemas.Anmeldung)
 def get_anmeldung(anmeldung_id: int, db: Session = Depends(get_db)):
     """Get a specific registration by ID."""
-    anmeldung = db.query(models.Anmeldung).filter(models.Anmeldung.id == anmeldung_id).first()
+    anmeldung = db.query(models.Anmeldung).options(
+        joinedload(models.Anmeldung.kind)
+    ).filter(models.Anmeldung.id == anmeldung_id).first()
     if not anmeldung:
         raise HTTPException(status_code=404, detail="Anmeldung not found")
     return anmeldung_with_insurance_ok(anmeldung)
@@ -817,7 +822,9 @@ def delete_anmeldung(anmeldung_id: int, db: Session = Depends(get_db)):
 @app.get("/api/wettkampf/{wettkampf_id}/details", response_model=schemas.WettkampfWithDetails)
 def get_wettkampf_with_details(wettkampf_id: int, db: Session = Depends(get_db)):
     """Get competition with all figures and registrations."""
-    wettkampf = db.query(models.Wettkampf).filter(models.Wettkampf.id == wettkampf_id).first()
+    wettkampf = db.query(models.Wettkampf).options(
+        joinedload(models.Wettkampf.anmeldungen).joinedload(models.Anmeldung.kind)
+    ).filter(models.Wettkampf.id == wettkampf_id).first()
     if not wettkampf:
         raise HTTPException(status_code=404, detail="Wettkampf not found")
     return schemas.WettkampfWithDetails(

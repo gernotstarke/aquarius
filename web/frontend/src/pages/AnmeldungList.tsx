@@ -2,25 +2,18 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/client';
-import { Anmeldung, Kind, Wettkampf } from '../types';
+import { Anmeldung, Wettkampf } from '../types';
 import Card from '../components/Card';
 import Button from '../components/Button';
 
 const AnmeldungList: React.FC = () => {
   const queryClient = useQueryClient();
+  const [selectedWettkampfId, setSelectedWettkampfId] = React.useState<number>(0);
 
   const { data: anmeldungen, isLoading } = useQuery<Anmeldung[]>({
     queryKey: ['anmeldungen'],
     queryFn: async () => {
       const response = await apiClient.get('/anmeldung');
-      return response.data;
-    },
-  });
-
-  const { data: kinder } = useQuery<Kind[]>({
-    queryKey: ['kinder'],
-    queryFn: async () => {
-      const response = await apiClient.get('/kind');
       return response.data;
     },
   });
@@ -44,15 +37,22 @@ const AnmeldungList: React.FC = () => {
     return <div className="text-center py-12 text-body-lg">Lädt...</div>;
   }
 
-  const getKindName = (kindId: number) => {
-    const kind = kinder?.find(k => k.id === kindId);
-    return kind ? `${kind.vorname} ${kind.nachname}` : `Kind #${kindId}`;
+  const getKindName = (anmeldung: Anmeldung) => {
+    if (anmeldung.kind) {
+      return `${anmeldung.kind.vorname} ${anmeldung.kind.nachname}`;
+    }
+    return `Kind #${anmeldung.kind_id}`;
   };
 
   const getWettkampfName = (wettkampfId: number) => {
     const wettkampf = wettkaempfe?.find(w => w.id === wettkampfId);
     return wettkampf ? wettkampf.name : `Wettkampf #${wettkampfId}`;
   };
+
+  // Filter anmeldungen by selected wettkampf
+  const filteredAnmeldungen = selectedWettkampfId === 0
+    ? anmeldungen
+    : anmeldungen?.filter(a => a.wettkampf_id === selectedWettkampfId);
 
   return (
     <div className="space-y-8">
@@ -63,8 +63,27 @@ const AnmeldungList: React.FC = () => {
         </Link>
       </div>
 
+      {/* Wettkampf Filter */}
+      <div className="bg-neutral-50 p-4 rounded-lg border border-neutral-200">
+        <label className="block text-sm font-medium text-neutral-700 mb-2">
+          Wettkampf filtern
+        </label>
+        <select
+          value={selectedWettkampfId}
+          onChange={(e) => setSelectedWettkampfId(Number(e.target.value))}
+          className="w-full md:w-auto px-4 py-3 bg-white border border-neutral-300 rounded-lg text-body focus-ring min-h-touch cursor-pointer"
+        >
+          <option value={0}>Alle Wettkämpfe</option>
+          {wettkaempfe?.map((wettkampf) => (
+            <option key={wettkampf.id} value={wettkampf.id}>
+              {wettkampf.name} - {wettkampf.datum}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div className="grid gap-6">
-        {anmeldungen?.map((anmeldung) => (
+        {filteredAnmeldungen?.map((anmeldung) => (
           <Card key={anmeldung.id} className="transition-shadow hover:shadow-md">
             <div className="flex items-start justify-between">
               <Link to={`/anmeldung/${anmeldung.id}`} className="space-y-3 flex-1 group block">
@@ -73,11 +92,16 @@ const AnmeldungList: React.FC = () => {
                     #{anmeldung.startnummer}
                   </span>
                   <h3 className="text-h3 font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">
-                    {getKindName(anmeldung.kind_id)}
+                    {getKindName(anmeldung)}
                   </h3>
                   {anmeldung.vorlaeufig === 1 && (
                     <span className="px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-700">
                       vorläufig
+                    </span>
+                  )}
+                  {anmeldung.insurance_ok === false && (
+                    <span className="px-3 py-1 rounded-full text-sm bg-orange-100 text-orange-700">
+                      unversichert
                     </span>
                   )}
                   {anmeldung.vorlaeufig === 0 && anmeldung.status === 'aktiv' && (
@@ -134,10 +158,12 @@ const AnmeldungList: React.FC = () => {
           </Card>
         ))}
 
-        {(!anmeldungen || anmeldungen.length === 0) && (
+        {(!filteredAnmeldungen || filteredAnmeldungen.length === 0) && (
           <Card>
             <p className="text-center text-body-lg text-neutral-500 py-8">
-              Keine Anmeldungen vorhanden
+              {selectedWettkampfId === 0
+                ? 'Keine Anmeldungen vorhanden'
+                : 'Keine Anmeldungen für den ausgewählten Wettkampf vorhanden'}
             </p>
           </Card>
         )}

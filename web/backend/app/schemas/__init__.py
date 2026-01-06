@@ -127,35 +127,6 @@ class Wettkampf(WettkampfBase):
     model_config = ConfigDict(from_attributes=True)
     id: int
 
-# Anmeldung Schemas
-class AnmeldungCreate(BaseModel):
-    kind_id: int
-    wettkampf_id: int
-    figur_ids: List[int] = []
-
-class AnmeldungUpdate(BaseModel):
-    status: str | None = None
-    vorlaeufig: int | None = None
-    figur_ids: List[int] | None = None
-
-class Anmeldung(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    id: int
-    kind_id: int
-    wettkampf_id: int
-    startnummer: int | None = None
-    anmeldedatum: date
-    vorlaeufig: int
-    status: str
-    figuren: List[Figur] = []
-
-# Wettkampf With Details (Depends on Figur and Anmeldung)
-class WettkampfWithDetails(Wettkampf):
-    figuren: List[Figur] = []
-    anmeldungen: List[Anmeldung] = []
-    saison: Optional[Saison] = None
-    schwimmbad: Optional[Schwimmbad] = None
-
 # Kind Schemas
 class KindBase(BaseModel):
     vorname: str
@@ -179,3 +150,34 @@ class Kind(KindBase):
     verein: Optional[Verein] = None
     verband: Optional[Verband] = None
     versicherung: Optional[Versicherung] = None
+
+# Anmeldung Schemas
+class AnmeldungCreate(BaseModel):
+    kind_id: int
+    wettkampf_id: int
+    figur_ids: List[int] = []
+
+class AnmeldungUpdate(BaseModel):
+    status: str | None = None
+    vorlaeufig: int | None = None
+    figur_ids: List[int] | None = None
+
+class Anmeldung(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    kind_id: int
+    wettkampf_id: int
+    startnummer: int | None = None
+    anmeldedatum: date
+    vorlaeufig: int
+    status: str
+    figuren: List[Figur] = []
+    insurance_ok: bool
+    kind: Optional[Kind] = None
+
+# Wettkampf With Details (Depends on Figur and Anmeldung)
+class WettkampfWithDetails(Wettkampf):
+    figuren: List[Figur] = []
+    anmeldungen: List[Anmeldung] = []
+    saison: Optional[Saison] = None
+    schwimmbad: Optional[Schwimmbad] = None

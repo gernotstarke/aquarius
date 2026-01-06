@@ -62,6 +62,11 @@ const KindList: React.FC = () => {
   const totalPages = Math.ceil(totalItems / pageSize);
   const kinder = data?.items || [];
 
+  const isKindInsured = (kind: Kind) => {
+    const hasContractInsurance = Boolean(kind.versicherung_id && kind.vertrag);
+    return Boolean(kind.verein_id || kind.verband_id || hasContractInsurance);
+  };
+
   if (isLoading && !data) {
     return <div className="text-center py-12 text-body-lg">Lädt...</div>;
   }
@@ -94,6 +99,7 @@ const KindList: React.FC = () => {
             <option value="nachname">Nachname</option>
             <option value="vorname">Vorname</option>
             <option value="verein">Verein</option>
+            <option value="unversichert">Unversichert</option>
           </select>
           <Button variant="secondary" onClick={toggleSortOrder}>
             {sortOrder === 'asc' ? 'Aufsteigend' : 'Absteigend'}
@@ -104,7 +110,13 @@ const KindList: React.FC = () => {
       <div className="grid gap-6">
         {kinder.map((kind) => (
           <Card key={kind.id}>
-            <div className="flex items-center justify-between">
+            <div className="relative flex items-center justify-between">
+              <span
+                className={`absolute top-4 right-4 h-3 w-3 rounded-full ${
+                  isKindInsured(kind) ? 'bg-green-200' : 'bg-red-500'
+                }`}
+                title={isKindInsured(kind) ? 'Versichert' : 'Unversichert'}
+              />
               <Link to={`/kind/${kind.id}`} className="block flex-1 group">
                 <div className="space-y-2">
                   <h3 className="text-h3 font-semibold text-neutral-900 group-hover:text-primary-600 transition-colors">

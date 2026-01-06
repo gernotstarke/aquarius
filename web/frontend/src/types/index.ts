@@ -131,6 +131,8 @@ export interface Anmeldung {
   status: string;
   vorlaeufig: number;
   figuren: Figur[];
+  insurance_ok?: boolean;
+  kind?: Kind;
 }
 
 export interface AnmeldungCreate {
