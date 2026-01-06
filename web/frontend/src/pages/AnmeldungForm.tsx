@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/client';
 import { AnmeldungCreate, Kind, Wettkampf, WettkampfWithDetails, Anmeldung } from '../types';
@@ -8,12 +8,17 @@ import Button from '../components/Button';
 
 const AnmeldungForm: React.FC = () => {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isEdit = Boolean(id);
 
+  const preselectedWettkampfId = searchParams.get('wettkampf');
+
   const [selectedKindId, setSelectedKindId] = useState<number>(0);
-  const [selectedWettkampfId, setSelectedWettkampfId] = useState<number>(0);
+  const [selectedWettkampfId, setSelectedWettkampfId] = useState<number>(
+    preselectedWettkampfId ? Number(preselectedWettkampfId) : 0
+  );
   const [selectedFigurIds, setSelectedFigurIds] = useState<number[]>([]);
 
   const { data: anmeldung } = useQuery<Anmeldung>({
@@ -122,7 +127,7 @@ const AnmeldungForm: React.FC = () => {
               <option value={0}>Bitte wählen...</option>
               {kinder?.map((kind) => (
                 <option key={kind.id} value={kind.id}>
-                  {kind.vorname} {kind.nachname} ({kind.verein || 'Kein Verein'})
+                  {kind.vorname} {kind.nachname} ({kind.verein?.name || 'Kein Verein'})
                 </option>
               ))}
             </select>

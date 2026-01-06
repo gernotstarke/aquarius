@@ -202,9 +202,14 @@ const WettkampfDetail: React.FC = () => {
       label: `Anmeldungen (${wettkampf.anmeldungen.length})`,
       content: (
         <Card>
-          <h3 className="text-h3 font-bold mb-6">
-            Anmeldungen ({wettkampf.anmeldungen.length})
-          </h3>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-h3 font-bold">
+              Anmeldungen ({wettkampf.anmeldungen.length})
+            </h3>
+            <Button onClick={() => navigate(`/anmeldung/new?wettkampf=${id}`)}>
+              Neue Anmeldung
+            </Button>
+          </div>
           {wettkampf.anmeldungen.length === 0 ? (
             <p className="text-neutral-500 text-center py-8">
               Noch keine Anmeldungen vorhanden
@@ -223,7 +228,7 @@ const WettkampfDetail: React.FC = () => {
                       </span>
                       <div>
                         <p className="font-medium text-body-lg">
-                          Kind-ID: {anmeldung.kind_id}
+                          {anmeldung.kind ? `${anmeldung.kind.vorname} ${anmeldung.kind.nachname}` : `Kind-ID: ${anmeldung.kind_id}`}
                         </p>
                         <p className="text-sm text-neutral-600">
                           {anmeldung.anmeldedatum}
@@ -234,6 +239,11 @@ const WettkampfDetail: React.FC = () => {
                       {anmeldung.vorlaeufig === 1 && (
                         <span className="px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-700">
                           vorläufig
+                        </span>
+                      )}
+                      {anmeldung.insurance_ok === false && (
+                        <span className="px-3 py-1 rounded-full text-sm bg-orange-100 text-orange-700">
+                          unversichert
                         </span>
                       )}
                       {anmeldung.vorlaeufig === 0 && anmeldung.status === 'aktiv' && (
