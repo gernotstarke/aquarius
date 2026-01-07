@@ -1,13 +1,13 @@
 """Anmeldung (Registration) API Router."""
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import func
+from sqlalchemy.orm import Session
 from typing import List
 from datetime import date
 
 from app.database import get_db
 from app import models
 from app.anmeldung import schemas as anmeldung_schemas
+from app.anmeldung.repository import AnmeldungRepository
 from app.shared.utils import kind_has_insurance, anmeldung_with_insurance_ok
 
 router = APIRouter(prefix="/api", tags=["anmeldung"])
@@ -16,18 +16,16 @@ router = APIRouter(prefix="/api", tags=["anmeldung"])
 @router.get("/anmeldung", response_model=List[anmeldung_schemas.Anmeldung])
 def list_anmeldung(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """Get list of all registrations."""
-    anmeldungen = db.query(models.Anmeldung).options(
-        joinedload(models.Anmeldung.kind)
-    ).offset(skip).limit(limit).all()
+    repo = AnmeldungRepository(db)
+    anmeldungen = repo.list(skip=skip, limit=limit)
     return [anmeldung_with_insurance_ok(a) for a in anmeldungen]
 
 
 @router.get("/anmeldung/{anmeldung_id}", response_model=anmeldung_schemas.Anmeldung)
 def get_anmeldung(anmeldung_id: int, db: Session = Depends(get_db)):
     """Get a specific registration by ID."""
-    anmeldung = db.query(models.Anmeldung).options(
-        joinedload(models.Anmeldung.kind)
-    ).filter(models.Anmeldung.id == anmeldung_id).first()
+    repo = AnmeldungRepository(db)
+    anmeldung = repo.get_with_details(anmeldung_id)
     if not anmeldung:
         raise HTTPException(status_code=404, detail="Anmeldung not found")
     return anmeldung_with_insurance_ok(anmeldung)
@@ -42,7 +40,10 @@ def create_anmeldung(anmeldung: anmeldung_schemas.AnmeldungCreate, db: Session =
     - Registration is marked as 'vorläufig' (preliminary) if:
       1. No figures are selected yet, OR
       2. Maximum participants for the competition is reached
+      3. Kind has no insurance
     """
+    repo = AnmeldungRepository(db)
+
     # Get wettkampf to check max_teilnehmer
     wettkampf = db.query(models.Wettkampf).filter(
         models.Wettkampf.id == anmeldung.wettkampf_id
@@ -51,11 +52,7 @@ def create_anmeldung(anmeldung: anmeldung_schemas.AnmeldungCreate, db: Session =
         raise HTTPException(status_code=404, detail="Wettkampf not found")
 
     # Count current final (non-vorläufig) registrations
-    final_count = db.query(models.Anmeldung).filter(
-        models.Anmeldung.wettkampf_id == anmeldung.wettkampf_id,
-        models.Anmeldung.vorlaeufig == 0,
-        models.Anmeldung.status == "aktiv"
-    ).count()
+    final_count = repo.count_final_registrations(anmeldung.wettkampf_id)
 
     kind = db.query(models.Kind).filter(models.Kind.id == anmeldung.kind_id).first()
     if not kind:
@@ -78,12 +75,7 @@ def create_anmeldung(anmeldung: anmeldung_schemas.AnmeldungCreate, db: Session =
         reasons.append("maximale Teilnehmerzahl erreicht")
 
     # Atomically get next startnummer for this competition
-    # Using database-level MAX to avoid race conditions
-    max_startnummer = db.query(func.max(models.Anmeldung.startnummer)).filter(
-        models.Anmeldung.wettkampf_id == anmeldung.wettkampf_id
-    ).scalar()
-
-    next_startnummer = (max_startnummer or 0) + 1
+    next_startnummer = repo.get_next_startnummer(anmeldung.wettkampf_id)
 
     # Create anmeldung with startnummer
     db_anmeldung = models.Anmeldung(
@@ -127,7 +119,9 @@ def update_anmeldung(anmeldung_id: int, anmeldung: anmeldung_schemas.AnmeldungUp
     - Automatically updates 'vorläufig' status based on figure selection
     - If figures are added to a preliminary registration, it may become final
     """
-    db_anmeldung = db.query(models.Anmeldung).filter(models.Anmeldung.id == anmeldung_id).first()
+    repo = AnmeldungRepository(db)
+
+    db_anmeldung = repo.get(anmeldung_id)
     if not db_anmeldung:
         raise HTTPException(status_code=404, detail="Anmeldung not found")
 
@@ -138,13 +132,9 @@ def update_anmeldung(anmeldung_id: int, anmeldung: anmeldung_schemas.AnmeldungUp
         db_anmeldung.vorlaeufig = anmeldung.vorlaeufig
 
     if anmeldung.figur_ids is not None:
-        # Clear existing figures
-        db_anmeldung.figuren.clear()
-        # Add new figures
-        for figur_id in anmeldung.figur_ids:
-            figur = db.query(models.Figur).filter(models.Figur.id == figur_id).first()
-            if figur:
-                db_anmeldung.figuren.append(figur)
+        # Use repository to set figuren
+        repo.set_figuren(anmeldung_id, anmeldung.figur_ids)
+        db.refresh(db_anmeldung)
 
         # Auto-update vorläufig status based on figures
         if len(anmeldung.figur_ids) > 0 and db_anmeldung.vorlaeufig == 1:
@@ -184,10 +174,8 @@ def update_anmeldung(anmeldung_id: int, anmeldung: anmeldung_schemas.AnmeldungUp
 @router.delete("/anmeldung/{anmeldung_id}", status_code=204)
 def delete_anmeldung(anmeldung_id: int, db: Session = Depends(get_db)):
     """Delete a registration."""
-    db_anmeldung = db.query(models.Anmeldung).filter(models.Anmeldung.id == anmeldung_id).first()
-    if not db_anmeldung:
+    repo = AnmeldungRepository(db)
+    deleted = repo.delete(anmeldung_id)
+    if not deleted:
         raise HTTPException(status_code=404, detail="Anmeldung not found")
-
-    db.delete(db_anmeldung)
-    db.commit()
     return None
