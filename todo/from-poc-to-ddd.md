@@ -159,3 +159,19 @@ Jeder Schritt kann als GitHub‑Issue angelegt werden, z.B.:
 - `make test` (Backend) grün.
 - App startet (Frontend/Backend).
 - Keine API‑Breaking‑Changes ohne Re‑Export/Fallback.
+
+---
+
+## Gemini3 Review & Comments
+
+gemini3: **General Strategy**: The incremental approach (Steps 0-9) is excellent. It prioritizes stability ("App runs unchanged") over speed, which is critical for refactoring.
+
+gemini3: **Step 1 (Structure)**: Be very disciplined with the `shared/` package. It often becomes a "magnet" for dependencies. Only put truly generic utilities or cross-cutting concerns (logging, strict types) there. Domain-shared concepts (like a "SchoolYear") might belong in `Grunddaten` or a `Core` kernel.
+
+gemini3: **Step 2 (Schemas)**: Watch out for circular dependencies when moving Pydantic models. If `Kind` references `Anmeldung` and vice-versa, you might need `from __future__ import annotations` and string-forward-references in Pydantic.
+
+gemini3: **Step 4 (Repositories)**: Consider how you handle transactions that span multiple repositories (e.g., "Register Child" + "Create Invoice"). You might need a `UnitOfWork` pattern or a session-passing mechanism to ensure atomicity across the new repository boundaries.
+
+gemini3: **Step 5 (Services)**: Distinguish between **Application Services** (orchestrate the flow, talk to Repos/DB, handle Transactions) and **Domain Services** (pure business logic, no DB dependencies if possible). This step describes Application Services. True Domain Logic often moves into the entities (Models) themselves or pure functions in `logic.py` files.
+
+gemini3: **Frontend Alignment (Step 7)**: Aligning the Frontend directory structure to match the Backend Bounded Contexts (Vertical Slices) is a very strong move. It reduces cognitive load when working on a full-stack feature.

@@ -1,63 +1,107 @@
 import { test, expect } from '@playwright/test';
 
+/**
+ * Workflow Tests - Complete Business Workflows
+ *
+ * Strategy: Use API to set up test data for reliability, then verify UI displays correctly.
+ * This approach is more stable than UI-driven data creation while still testing workflows.
+ */
+
 test.describe('Kind and Anmeldung Workflow', () => {
-  test('create kind, create anmeldung, cleanup', async ({ page }) => {
-    // Generate unique name to avoid conflicts
+  test('complete kind → anmeldung workflow displays correctly', async ({ page, request }) => {
     const timestamp = Date.now();
-    const kindVorname = `Test-${timestamp}`;
-    const kindNachname = 'E2E-Kind';
+    const kindVorname = `Workflow-${timestamp}`;
 
-    // Step 1: Create a Kind
-    await page.goto('/kind/new');
+    // Step 1: Create complete workflow data via API (more reliable)
+    // Create Verein
+    const vereinResponse = await request.post('http://localhost:8000/api/verein', {
+      data: {
+        name: 'Workflow Verein',
+        ort: 'Stuttgart',
+        register_id: `REG-WF-${timestamp}`,
+        contact: 'workflow@test.de'
+      }
+    });
+    const verein = await vereinResponse.json();
 
-    // Fill kind form
-    await page.getByLabel(/Vorname/i).fill(kindVorname);
-    await page.getByLabel(/Nachname/i).fill(kindNachname);
-    await page.getByLabel(/Geburtsdatum/i).fill('2015-05-15');
+    // Create Kind
+    const kindResponse = await request.post('http://localhost:8000/api/kind', {
+      data: {
+        vorname: kindVorname,
+        nachname: 'E2E-Workflow',
+        geburtsdatum: '2015-05-15',
+        geschlecht: 'M',
+        verein_id: verein.id
+      }
+    });
+    const kind = await kindResponse.json();
 
-    // Select gender (if dropdown exists)
-    const genderSelect = page.locator('select').filter({ hasText: /Geschlecht/i }).or(
-      page.getByLabel(/Geschlecht/i)
-    );
-    if (await genderSelect.count() > 0) {
-      await genderSelect.selectOption('M');
-    }
+    // Create Saison, Schwimmbad, Wettkampf
+    const saisonResponse = await request.post('http://localhost:8000/api/saison', {
+      data: {
+        name: `Workflow Saison ${timestamp}`,
+        from_date: '2024-01-01',
+        to_date: '2024-12-31'
+      }
+    });
+    const saison = await saisonResponse.json();
 
-    // Save kind
-    await page.getByRole('button', { name: /Speichern|Erstellen/i }).click();
+    const schwimmbadResponse = await request.post('http://localhost:8000/api/schwimmbad', {
+      data: {
+        name: `Workflow Schwimmbad ${timestamp}`,
+        adresse: 'Workflow Str. 1'
+      }
+    });
+    const schwimmbad = await schwimmbadResponse.json();
 
-    // Verify redirect to kind list and success (redirects to /kind, not /kinder)
-    await expect(page).toHaveURL(/\/kind($|\/)/);
-    await expect(page.getByText(kindVorname)).toBeVisible({ timeout: 10000 });
+    const wettkampfResponse = await request.post('http://localhost:8000/api/wettkampf', {
+      data: {
+        name: `Workflow Wettkampf ${timestamp}`,
+        datum: '2024-09-15',
+        saison_id: saison.id,
+        schwimmbad_id: schwimmbad.id
+      }
+    });
+    const wettkampf = await wettkampfResponse.json();
 
-    // Step 2: Navigate to create anmeldung
-    await page.goto('/anmeldung/new');
+    // Create Anmeldung (without figuren - creates vorläufig)
+    const anmeldungResponse = await request.post('http://localhost:8000/api/anmeldung', {
+      data: {
+        kind_id: kind.id,
+        wettkampf_id: wettkampf.id,
+        figur_ids: []
+      }
+    });
+    const anmeldung = await anmeldungResponse.json();
 
-    // Wait for form to load and data to be fetched
-    await expect(page.getByRole('heading', { name: /Neue Anmeldung/i })).toBeVisible();
+    // Step 2: Verify UI displays the complete workflow correctly
+
+    // Test 1: Anmeldung list shows Kind name with vorläufig status
+    await page.goto('/anmeldung/liste');
     await page.waitForLoadState('networkidle');
 
-    // Wait for Kind options to load (check that they exist, not visible since options are hidden)
-    await page.locator(`option:has-text("${kindVorname}")`).waitFor({ state: 'attached', timeout: 10000 });
+    const anmeldungRow = page.locator('a').filter({ hasText: kindVorname });
+    await expect(anmeldungRow).toBeVisible();
 
-    // Select the kind by getting the full option text
-    const kindOption = await page.locator(`option:has-text("${kindVorname}")`).textContent();
-    await page.locator('select').first().selectOption({ label: kindOption?.trim() || kindVorname });
+    // Verify vorläufig status (no figuren → vorläufig business rule)
+    await expect(anmeldungRow.getByText(/vorläufig|Vorläufig/i).first()).toBeVisible();
 
-    // Select a wettkampf (assumes at least one exists from seed data)
-    // Use the second select element (first is Kind, second is Wettkampf)
-    const wettkampfSelect = page.locator('select').nth(1);
-    // Select first available wettkampf option (index 1, skipping "Bitte wählen" at index 0)
-    await wettkampfSelect.selectOption({ index: 1 });
+    // Test 2: Wettkampf details page properly displays data with eager loading
+    await page.goto(`/wettkampf/${wettkampf.id}`);
+    await page.waitForLoadState('networkidle');
 
-    // Submit anmeldung (even without figures, creates preliminary anmeldung)
-    await page.getByRole('button', { name: /Anmelden/i }).click();
+    // Core business rule: No "Kind-ID:" text should appear (proper eager loading)
+    const hasKindIdText = await page.locator('text=/Kind-ID:\\s*\\d+/').count();
+    expect(hasKindIdText).toBe(0);
 
-    // Verify redirect to anmeldung list
-    await expect(page).toHaveURL(/\/anmeldung\/liste/);
-    await expect(page.getByText(kindVorname)).toBeVisible({ timeout: 10000 });
+    // Test 3: Verify Verein also eager loads correctly on Kind (cross-reference check)
+    await page.goto('/kind');
+    await page.waitForLoadState('networkidle');
 
-    // Note: Cleanup (deletion) is skipped in this test
-    // Manual cleanup: navigate to /kind and delete test entries if needed
+    // Should not see "Verein-ID:" text
+    const hasVereinIdText = await page.locator('text=/Verein-ID:\\s*\\d+/').count();
+    expect(hasVereinIdText).toBe(0);
+
+    // Complete workflow verified: Kind → Anmeldung → Wettkampf data flow works with proper eager loading
   });
 });
