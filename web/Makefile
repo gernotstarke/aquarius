@@ -1,4 +1,4 @@
-.PHONY: help dev dev-with-turso dev-down test db-reset db-seed db-import-figures deploy deploy-status deploy-logs deploy-ssh deploy-rollback deploy-setup clean
+.PHONY: help dev dev-with-turso dev-down test test-ui db-reset db-seed db-import-figures deploy deploy-status deploy-logs deploy-ssh deploy-rollback deploy-setup clean
 
 ##@ Web App Development
 
@@ -26,6 +26,24 @@ dev-down: ## Stop development servers
 test: ## Run tests (auto-discovers all tests in tests/ directory)
 	@echo "🧪 Running tests..."
 	@docker compose run --rm backend pytest
+
+test-ui: ## Run frontend UI smoke tests (Playwright, runs locally due to ARM Docker issues)
+	@echo "🧪 Running UI tests..."
+	@echo "📝 Note: Tests run locally (not in Docker) due to ARM architecture limitations"
+	@if ! command -v npx &> /dev/null || ! [ -d "frontend/node_modules/@playwright/test" ]; then \
+		echo "❌ Error: Playwright not installed"; \
+		echo ""; \
+		echo "First-time setup:"; \
+		echo "  cd frontend"; \
+		echo "  npm install"; \
+		echo "  npx playwright install chromium"; \
+		echo ""; \
+		exit 1; \
+	fi
+	@docker compose up -d backend frontend
+	@echo "⏳ Waiting for services to be ready..."
+	@sleep 8
+	@cd frontend && PLAYWRIGHT_BASE_URL=http://localhost:5173 npm run test:e2e
 
 clean: ## Clean build artifacts and caches
 	@echo "🧹 Cleaning web app..."
