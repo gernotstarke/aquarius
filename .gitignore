@@ -54,3 +54,5 @@ web/backend/exports/
 # Logs
 logs/
 *.log
+web/frontend/test-results
+web/frontend/test-results*
