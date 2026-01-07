@@ -8,9 +8,10 @@ header:
   overlay_filter: "0.3"
 ---
 
-# Architecture Decision Records (ADRs)
 
-ADRs dokumentieren wichtige Architekturentscheidungen mit ihrem Kontext, den betrachteten Alternativen und den Begründungen.
+Hier dokumentieren wir mit [ADRs](https://adr.github.io/) wichtige Architekturentscheidungen mit ihrem Kontext, den betrachteten Alternativen und den Begründungen.
+Gepflegt (_maintained_) werden diese Entscheidungen im Aquarius GitHub Repository unter /documentation/adrs, in Markdown Format.
+
 
 <div class="arch-search-container" data-scope="adr">
   <div class="arch-search-box">
