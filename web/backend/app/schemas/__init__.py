@@ -1,189 +1,129 @@
-"""Pydantic schemas for request/response validation."""
-from datetime import date
-from typing import List, Optional
-from pydantic import BaseModel, ConfigDict
+"""
+Pydantic schemas for request/response validation.
+
+This module now re-exports schemas from domain-specific modules for backward compatibility.
+All schemas have been moved to their respective domain directories (Step 2 of DDD migration).
+"""
+
+# User schemas (not yet migrated to domain structure)
 from .user import User, UserCreate, UserUpdate, Token, TokenData
 
-# Saison Schemas
-class SaisonBase(BaseModel):
-    name: str
-    from_date: date
-    to_date: date
+# Re-export Grunddaten (Master Data) schemas
+from app.grunddaten.schemas import (
+    # Saison
+    Saison,
+    SaisonBase,
+    SaisonCreate,
+    SaisonUpdate,
+    # Schwimmbad
+    Schwimmbad,
+    SchwimmbadBase,
+    SchwimmbadCreate,
+    SchwimmbadUpdate,
+    # Verein
+    Verein,
+    VereinBase,
+    VereinCreate,
+    VereinUpdate,
+    # Verband
+    Verband,
+    VerbandBase,
+    VerbandCreate,
+    VerbandUpdate,
+    VerbandWithCount,
+    # Versicherung
+    Versicherung,
+    VersicherungBase,
+    VersicherungCreate,
+    VersicherungUpdate,
+    # Figur
+    Figur,
+    FigurBase,
+    FigurCreate,
+    FigurUpdate,
+)
 
-class SaisonCreate(SaisonBase):
-    pass
+# Re-export Kind schemas
+from app.kind.schemas import (
+    Kind,
+    KindBase,
+    KindCreate,
+    KindUpdate,
+)
 
-class SaisonUpdate(SaisonBase):
-    pass
+# Re-export Wettkampf schemas
+from app.wettkampf.schemas import (
+    Wettkampf,
+    WettkampfBase,
+    WettkampfCreate,
+    WettkampfUpdate,
+    WettkampfWithDetails,
+)
 
-class Saison(SaisonBase):
-    model_config = ConfigDict(from_attributes=True)
-    id: int
+# Re-export Anmeldung schemas
+from app.anmeldung.schemas import (
+    Anmeldung,
+    AnmeldungCreate,
+    AnmeldungUpdate,
+)
 
-# Schwimmbad Schemas
-class SchwimmbadBase(BaseModel):
-    name: str
-    adresse: str
-    phone_no: str | None = None
-    manager: str | None = None
+__all__ = [
+    # User
+    "User",
+    "UserCreate",
+    "UserUpdate",
+    "Token",
+    "TokenData",
+    # Grunddaten - Saison
+    "Saison",
+    "SaisonBase",
+    "SaisonCreate",
+    "SaisonUpdate",
+    # Grunddaten - Schwimmbad
+    "Schwimmbad",
+    "SchwimmbadBase",
+    "SchwimmbadCreate",
+    "SchwimmbadUpdate",
+    # Grunddaten - Verein
+    "Verein",
+    "VereinBase",
+    "VereinCreate",
+    "VereinUpdate",
+    # Grunddaten - Verband
+    "Verband",
+    "VerbandBase",
+    "VerbandCreate",
+    "VerbandUpdate",
+    "VerbandWithCount",
+    # Grunddaten - Versicherung
+    "Versicherung",
+    "VersicherungBase",
+    "VersicherungCreate",
+    "VersicherungUpdate",
+    # Grunddaten - Figur
+    "Figur",
+    "FigurBase",
+    "FigurCreate",
+    "FigurUpdate",
+    # Kind
+    "Kind",
+    "KindBase",
+    "KindCreate",
+    "KindUpdate",
+    # Wettkampf
+    "Wettkampf",
+    "WettkampfBase",
+    "WettkampfCreate",
+    "WettkampfUpdate",
+    "WettkampfWithDetails",
+    # Anmeldung
+    "Anmeldung",
+    "AnmeldungCreate",
+    "AnmeldungUpdate",
+]
 
-class SchwimmbadCreate(SchwimmbadBase):
-    pass
-
-class SchwimmbadUpdate(SchwimmbadBase):
-    pass
-
-class Schwimmbad(SchwimmbadBase):
-    model_config = ConfigDict(from_attributes=True)
-    id: int
-
-# Verein Schemas
-class VereinBase(BaseModel):
-    name: str
-    ort: str
-    register_id: str
-    contact: str
-
-class VereinCreate(VereinBase):
-    pass
-
-class VereinUpdate(VereinBase):
-    pass
-
-class Verein(VereinBase):
-    model_config = ConfigDict(from_attributes=True)
-    id: int
-
-# Verband Schemas
-class VerbandBase(BaseModel):
-    name: str
-    abkuerzung: str
-    land: str
-    ort: str
-
-class VerbandCreate(VerbandBase):
-    pass
-
-class VerbandUpdate(VerbandBase):
-    pass
-
-class Verband(VerbandBase):
-    model_config = ConfigDict(from_attributes=True)
-    id: int
-
-class VerbandWithCount(Verband):
-    nomination_count: int
-
-class VersicherungBase(BaseModel):
-    name: str
-    kurz: str
-    land: str
-    hauptsitz: str
-
-class VersicherungCreate(VersicherungBase):
-    pass
-
-class VersicherungUpdate(VersicherungBase):
-    pass
-
-class Versicherung(VersicherungBase):
-    model_config = ConfigDict(from_attributes=True)
-    id: int
-
-# Figur Schemas
-class FigurBase(BaseModel):
-    name: str
-    kategorie: str | None = None
-    beschreibung: str | None = None
-    schwierigkeitsgrad: float | None = None
-    altersklasse: str | None = None
-    bild: str | None = None
-
-class FigurCreate(FigurBase):
-    pass
-
-class FigurUpdate(FigurBase):
-    pass
-
-class Figur(FigurBase):
-    model_config = ConfigDict(from_attributes=True)
-    id: int
-
-# Wettkampf Schemas
-class WettkampfBase(BaseModel):
-    name: str
-    datum: date
-    max_teilnehmer: int | None = None
-    saison_id: int
-    schwimmbad_id: int
-
-class WettkampfCreate(WettkampfBase):
-    pass
-
-class WettkampfUpdate(WettkampfBase):
-    pass
-
-class Wettkampf(WettkampfBase):
-    model_config = ConfigDict(from_attributes=True)
-    id: int
-
-# Kind Schemas
-class KindBase(BaseModel):
-    vorname: str
-    nachname: str
-    geburtsdatum: date
-    geschlecht: str | None = None
-    verein_id: int | None = None
-    verband_id: int | None = None
-    versicherung_id: int | None = None
-    vertrag: str | None = None
-
-class KindCreate(KindBase):
-    pass
-
-class KindUpdate(KindBase):
-    pass
-
-class Kind(KindBase):
-    model_config = ConfigDict(from_attributes=True)
-    id: int
-    verein: Optional[Verein] = None
-    verband: Optional[Verband] = None
-    versicherung: Optional[Versicherung] = None
-
-# Anmeldung Schemas
-class AnmeldungCreate(BaseModel):
-    kind_id: int
-    wettkampf_id: int
-    figur_ids: List[int] = []
-
-class AnmeldungUpdate(BaseModel):
-    status: str | None = None
-    vorlaeufig: int | None = None
-    figur_ids: List[int] | None = None
-
-class Anmeldung(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    id: int
-    kind_id: int
-    wettkampf_id: int
-    startnummer: int | None = None
-    anmeldedatum: date
-    vorlaeufig: int
-    status: str
-    figuren: List[Figur] = []
-    insurance_ok: bool
-    kind: Optional[Kind] = None
-
-# Wettkampf With Details (Depends on Figur and Anmeldung)
-class WettkampfWithDetails(Wettkampf):
-    figuren: List[Figur] = []
-    anmeldungen: List[Anmeldung] = []
-    saison: Optional[Saison] = None
-    schwimmbad: Optional[Schwimmbad] = None
-
-# Placeholder for future Domain-Driven Schemas (Step 2+)
-# from app.kind import schemas as kind_schemas
-# from app.anmeldung import schemas as anmeldung_schemas
-# from app.wettkampf import schemas as wettkampf_schemas
-# from app.grunddaten import schemas as grunddaten_schemas
+# Resolve forward references now that all schemas are imported
+# This is necessary for schemas that use TYPE_CHECKING imports
+Kind.model_rebuild()
+Anmeldung.model_rebuild()
+WettkampfWithDetails.model_rebuild()
