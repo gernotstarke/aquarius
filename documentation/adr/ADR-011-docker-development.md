@@ -694,6 +694,7 @@ docker-compose build --build-arg UID=$(id -u)
 
 - **IDE-Integration**: Dev Containers empfohlen für beste Erfahrung
 - **Debugging**: Unterschiedlich zu lokaler Entwicklung (aber machbar)
+- **E2E-Tests**: Playwright läuft lokal auf dem Host (nicht im Docker-Setup), siehe ADR-029
 
 ---
 
