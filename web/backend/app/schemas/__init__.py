@@ -181,3 +181,9 @@ class WettkampfWithDetails(Wettkampf):
     anmeldungen: List[Anmeldung] = []
     saison: Optional[Saison] = None
     schwimmbad: Optional[Schwimmbad] = None
+
+# Placeholder for future Domain-Driven Schemas (Step 2+)
+# from app.kind import schemas as kind_schemas
+# from app.anmeldung import schemas as anmeldung_schemas
+# from app.wettkampf import schemas as wettkampf_schemas
+# from app.grunddaten import schemas as grunddaten_schemas

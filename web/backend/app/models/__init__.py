@@ -160,3 +160,9 @@ class Anmeldung(Base):
     kind = relationship("Kind", back_populates="anmeldungen")
     wettkampf = relationship("Wettkampf", back_populates="anmeldungen")
     figuren = relationship("Figur", secondary=anmeldung_figur_association)
+
+# Placeholder for future Domain-Driven Models
+# from app.kind import models as kind_models
+# from app.anmeldung import models as anmeldung_models
+# from app.wettkampf import models as wettkampf_models
+# from app.grunddaten import models as grunddaten_models
