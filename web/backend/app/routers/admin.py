@@ -14,7 +14,7 @@ router = APIRouter(
 @router.get("/database/stats")
 async def get_database_stats(
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(auth.get_current_active_user)
+    current_user: models.User = Depends(auth.get_current_admin_user)
 ):
     """Get statistics about all database tables."""
     # Get all table names from the models
@@ -34,6 +34,7 @@ async def get_database_stats(
         "kind": models.Kind,
         "figur": models.Figur,
         "anmeldung": models.Anmeldung,
+        "versicherung": models.Versicherung,
     }
 
     for table_name in sorted(table_names):
@@ -43,10 +44,14 @@ async def get_database_stats(
 
         model = table_model_map.get(table_name)
         if model:
-            count = db.query(model).count()
-            stats.append({
-                "table_name": table_name,
-                "count": count
-            })
+            try:
+                count = db.query(model).count()
+                stats.append({
+                    "table_name": table_name,
+                    "count": count
+                })
+            except Exception:
+                # Skip tables that cause errors
+                continue
 
     return {"tables": stats}
