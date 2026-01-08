@@ -40,10 +40,15 @@ test-ui: ## Run frontend UI smoke tests (Playwright, runs locally due to ARM Doc
 		echo ""; \
 		exit 1; \
 	fi
-	@docker compose up -d backend frontend
-	@echo "⏳ Waiting for services to be ready..."
-	@sleep 8
-	@cd frontend && PLAYWRIGHT_BASE_URL=http://localhost:5173 npm run test:e2e
+	@echo "🔄 building and starting services..."
+	@docker compose up -d --build backend frontend
+	@echo "⏳ Waiting for backend to be healthy..."
+	@until docker compose ps backend | grep "healthy" > /dev/null; do \
+		echo "   ...waiting for backend..."; \
+		sleep 2; \
+	done
+	@echo "✅ Backend is healthy!"
+	@cd frontend && PLAYWRIGHT_BASE_URL=http://localhost:5173 npm run test:e2e -- --workers=1
 
 clean: ## Clean build artifacts and caches
 	@echo "🧹 Cleaning web app..."
