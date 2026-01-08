@@ -8,6 +8,8 @@ from app import models
 from app.kind import schemas as kind_schemas
 from app.kind.repository import KindRepository
 from app.kind.services import KindService
+from app.kind.dtos import KindDTO
+from app.kind.mappers import map_kind_to_dto, map_kinder_to_dtos
 
 router = APIRouter(prefix="/api", tags=["kind"])
 
@@ -18,7 +20,7 @@ def get_kind_service(db: Session = Depends(get_db)) -> KindService:
     return KindService(repo)
 
 
-@router.get("/kind", response_model=List[kind_schemas.Kind])
+@router.get("/kind", response_model=List[KindDTO])
 def list_kind(
     response: Response,
     skip: int = 0,
@@ -40,31 +42,36 @@ def list_kind(
     # Set pagination header
     response.headers["X-Total-Count"] = str(total_count)
 
-    return results
+    # Map ORM models to DTOs
+    return map_kinder_to_dtos(results)
 
 
-@router.get("/kind/{kind_id}", response_model=kind_schemas.Kind)
+@router.get("/kind/{kind_id}", response_model=KindDTO)
 def get_kind(kind_id: int, service: KindService = Depends(get_kind_service)):
     """Get a specific child by ID."""
     kind = service.get_kind(kind_id)
     if not kind:
         raise HTTPException(status_code=404, detail="Kind not found")
-    return kind
+    # Map ORM model to DTO
+    return map_kind_to_dto(kind)
 
 
-@router.post("/kind", response_model=kind_schemas.Kind, status_code=201)
+@router.post("/kind", response_model=KindDTO, status_code=201)
 def create_kind(kind: kind_schemas.KindCreate, service: KindService = Depends(get_kind_service)):
     """Create a new child."""
-    return service.create_kind(kind)
+    created_kind = service.create_kind(kind)
+    # Map ORM model to DTO
+    return map_kind_to_dto(created_kind)
 
 
-@router.put("/kind/{kind_id}", response_model=kind_schemas.Kind)
+@router.put("/kind/{kind_id}", response_model=KindDTO)
 def update_kind(kind_id: int, kind: kind_schemas.KindUpdate, service: KindService = Depends(get_kind_service)):
     """Update a child."""
     db_kind = service.update_kind(kind_id, kind)
     if not db_kind:
         raise HTTPException(status_code=404, detail="Kind not found")
-    return db_kind
+    # Map ORM model to DTO
+    return map_kind_to_dto(db_kind)
 
 
 @router.delete("/kind/{kind_id}", status_code=204)

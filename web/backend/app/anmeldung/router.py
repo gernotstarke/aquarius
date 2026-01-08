@@ -9,10 +9,11 @@ from app import models
 from app.anmeldung import schemas as anmeldung_schemas
 from app.anmeldung.repository import AnmeldungRepository
 from app.anmeldung.services import AnmeldungService
+from app.anmeldung.dtos import AnmeldungDTO
+from app.anmeldung.mappers import map_anmeldung_to_dto, map_anmeldungen_to_dtos
 from app.kind.repository import KindRepository
 from app.wettkampf.repository import WettkampfRepository
 from app.grunddaten.repository import FigurRepository
-from app.shared.utils import kind_has_insurance, anmeldung_with_insurance_ok
 
 router = APIRouter(prefix="/api", tags=["anmeldung"])
 
@@ -26,23 +27,25 @@ def get_anmeldung_service(db: Session = Depends(get_db)) -> AnmeldungService:
     return AnmeldungService(anmeldung_repo, kind_repo, wettkampf_repo, figur_repo)
 
 
-@router.get("/anmeldung", response_model=List[anmeldung_schemas.Anmeldung])
+@router.get("/anmeldung", response_model=List[AnmeldungDTO])
 def list_anmeldung(skip: int = 0, limit: int = 100, service: AnmeldungService = Depends(get_anmeldung_service)):
     """Get list of all registrations."""
     anmeldungen = service.list_anmeldungen(skip=skip, limit=limit)
-    return [anmeldung_with_insurance_ok(a) for a in anmeldungen]
+    # Map ORM models to DTOs
+    return map_anmeldungen_to_dtos(anmeldungen)
 
 
-@router.get("/anmeldung/{anmeldung_id}", response_model=anmeldung_schemas.Anmeldung)
+@router.get("/anmeldung/{anmeldung_id}", response_model=AnmeldungDTO)
 def get_anmeldung(anmeldung_id: int, service: AnmeldungService = Depends(get_anmeldung_service)):
     """Get a specific registration by ID."""
     anmeldung = service.get_anmeldung(anmeldung_id)
     if not anmeldung:
         raise HTTPException(status_code=404, detail="Anmeldung not found")
-    return anmeldung_with_insurance_ok(anmeldung)
+    # Map ORM model to DTO
+    return map_anmeldung_to_dto(anmeldung)
 
 
-@router.post("/anmeldung", response_model=anmeldung_schemas.Anmeldung, status_code=201)
+@router.post("/anmeldung", response_model=AnmeldungDTO, status_code=201)
 def create_anmeldung(anmeldung: anmeldung_schemas.AnmeldungCreate, service: AnmeldungService = Depends(get_anmeldung_service)):
     """
     Create a new registration with automatic startnummer assignment.
@@ -55,24 +58,28 @@ def create_anmeldung(anmeldung: anmeldung_schemas.AnmeldungCreate, service: Anme
     """
     try:
         db_anmeldung = service.create_anmeldung(anmeldung)
-        return anmeldung_with_insurance_ok(db_anmeldung)
+        # Map ORM model to DTO
+        return map_anmeldung_to_dto(db_anmeldung)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=409, detail=f"Registration conflict: {str(e)}")
 
 
-@router.put("/anmeldung/{anmeldung_id}", response_model=anmeldung_schemas.Anmeldung)
+@router.put("/anmeldung/{anmeldung_id}", response_model=AnmeldungDTO)
 def update_anmeldung(anmeldung_id: int, anmeldung: anmeldung_schemas.AnmeldungUpdate, db: Session = Depends(get_db)):
     """
     Update a registration.
 
     - Automatically updates 'vorläufig' status based on figure selection
     - If figures are added to a preliminary registration, it may become final
+
+    TODO: This endpoint should be refactored to use the service layer instead of
+    direct repository and database access.
     """
     repo = AnmeldungRepository(db)
 
-    db_anmeldung = repo.get(anmeldung_id)
+    db_anmeldung = repo.get_with_details(anmeldung_id)
     if not db_anmeldung:
         raise HTTPException(status_code=404, detail="Anmeldung not found")
 
@@ -113,13 +120,11 @@ def update_anmeldung(anmeldung_id: int, anmeldung: anmeldung_schemas.AnmeldungUp
             db_anmeldung.status = "vorläufig"
 
     db.commit()
-    db.refresh(db_anmeldung)
-    if not kind_has_insurance(db_anmeldung.kind):
-        db_anmeldung.vorlaeufig = 1
-        db_anmeldung.status = "vorläufig"
-        db.commit()
-        db.refresh(db_anmeldung)
-    return anmeldung_with_insurance_ok(db_anmeldung)
+    # Need to reload with details for mapping
+    db_anmeldung = repo.get_with_details(anmeldung_id)
+
+    # Map ORM model to DTO
+    return map_anmeldung_to_dto(db_anmeldung)
 
 
 @router.delete("/anmeldung/{anmeldung_id}", status_code=204)

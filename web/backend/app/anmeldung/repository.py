@@ -52,10 +52,12 @@ class AnmeldungRepository:
             limit: Maximum number of records to return
 
         Returns:
-            List of Anmeldung instances with eager-loaded Kind
+            List of Anmeldung instances with eager-loaded Kind and nested entities
         """
         return self.db.query(models.Anmeldung).options(
-            joinedload(models.Anmeldung.kind)
+            joinedload(models.Anmeldung.kind).joinedload(models.Kind.verein),
+            joinedload(models.Anmeldung.kind).joinedload(models.Kind.verband),
+            joinedload(models.Anmeldung.kind).joinedload(models.Kind.versicherung)
         ).offset(skip).limit(limit).all()
 
     def get_next_startnummer(self, wettkampf_id: int) -> int:
