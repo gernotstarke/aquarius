@@ -1,5 +1,5 @@
 """Kind (Child) Repository - Data access layer for Kind domain."""
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import or_, asc, desc, case
 from typing import List, Optional
 
@@ -21,12 +21,18 @@ class KindRepository:
             kind_data: Kind creation data
 
         Returns:
-            Created Kind model instance
+            Created Kind model instance with eagerly loaded relationships
         """
         db_kind = models.Kind(**kind_data.model_dump())
         self.db.add(db_kind)
         self.db.commit()
         self.db.refresh(db_kind)
+        # Eagerly load relationships for response
+        db_kind = self.db.query(models.Kind).options(
+            joinedload(models.Kind.verein),
+            joinedload(models.Kind.verband),
+            joinedload(models.Kind.versicherung)
+        ).filter(models.Kind.id == db_kind.id).first()
         return db_kind
 
     def get(self, kind_id: int) -> Optional[models.Kind]:
@@ -36,9 +42,13 @@ class KindRepository:
             kind_id: ID of the Kind to retrieve
 
         Returns:
-            Kind model instance if found, None otherwise
+            Kind model instance with eagerly loaded relationships if found, None otherwise
         """
-        return self.db.query(models.Kind).filter(models.Kind.id == kind_id).first()
+        return self.db.query(models.Kind).options(
+            joinedload(models.Kind.verein),
+            joinedload(models.Kind.verband),
+            joinedload(models.Kind.versicherung)
+        ).filter(models.Kind.id == kind_id).first()
 
     def search(
         self,
@@ -61,9 +71,13 @@ class KindRepository:
             sort_order: Sort order (asc or desc)
 
         Returns:
-            Tuple of (list of Kind instances, total count)
+            Tuple of (list of Kind instances with eager loaded relationships, total count)
         """
-        db_query = self.db.query(models.Kind)
+        db_query = self.db.query(models.Kind).options(
+            joinedload(models.Kind.verein),
+            joinedload(models.Kind.verband),
+            joinedload(models.Kind.versicherung)
+        )
 
         # Search (Filter)
         if query:
@@ -124,21 +138,23 @@ class KindRepository:
 
         Args:
             kind_id: ID of the Kind to update
-            kind_data: Updated Kind data
+            kind_data: Updated Kind data (partial updates supported)
 
         Returns:
-            Updated Kind model instance if found, None otherwise
+            Updated Kind model instance with eagerly loaded relationships if found, None otherwise
         """
         db_kind = self.get(kind_id)
         if not db_kind:
             return None
 
-        for key, value in kind_data.model_dump().items():
+        # Only update fields that were explicitly set (partial updates)
+        for key, value in kind_data.model_dump(exclude_unset=True).items():
             setattr(db_kind, key, value)
 
         self.db.commit()
         self.db.refresh(db_kind)
-        return db_kind
+        # Reload with eager loading to ensure relationships are loaded
+        return self.get(kind_id)
 
     def delete(self, kind_id: int) -> bool:
         """Delete a Kind by ID.

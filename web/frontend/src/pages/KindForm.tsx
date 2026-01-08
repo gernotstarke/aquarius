@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import apiClient from '../api/client';
-import { Kind, KindCreate, Verein, Verband, Versicherung } from '../types';
+import { getKind, createKind, updateKind } from '../api/kind';
+import { listVereine, listVerbaende, listVersicherungen } from '../api/grunddaten';
+import { Kind, KindCreate } from '../types/kind';
+import { Verein, Verband, Versicherung } from '../types/grunddaten';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
@@ -24,36 +26,24 @@ const KindForm: React.FC = () => {
     vertrag: '',
   });
 
-  const { data: vereine } = useQuery<Verein[]>({
+  const { data: vereine } = useQuery<Verein[], Error, Verein[]>({
     queryKey: ['vereine'],
-    queryFn: async () => {
-      const response = await apiClient.get('/verein');
-      return response.data;
-    },
+    queryFn: () => listVereine(),
   });
 
-  const { data: verbaende } = useQuery<Verband[]>({
+  const { data: verbaende } = useQuery<Verband[], Error, Verband[]>({
     queryKey: ['verbaende'],
-    queryFn: async () => {
-      const response = await apiClient.get('/verband');
-      return response.data;
-    },
+    queryFn: () => listVerbaende(),
   });
 
-  const { data: versicherungen } = useQuery<Versicherung[]>({
+  const { data: versicherungen } = useQuery<Versicherung[], Error, Versicherung[]>({
     queryKey: ['versicherungen'],
-    queryFn: async () => {
-      const response = await apiClient.get('/versicherung');
-      return response.data;
-    },
+    queryFn: () => listVersicherungen(),
   });
 
   const { data: kind } = useQuery<Kind>({
     queryKey: ['kind', id],
-    queryFn: async () => {
-      const response = await apiClient.get(`/kind/${id}`);
-      return response.data;
-    },
+    queryFn: () => getKind(Number(id)),
     enabled: isEdit,
   });
 
@@ -73,7 +63,7 @@ const KindForm: React.FC = () => {
   }, [kind]);
 
   const createMutation = useMutation({
-    mutationFn: (data: KindCreate) => apiClient.post('/kind', data),
+    mutationFn: createKind,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['kinder'] });
       navigate('/kind');
@@ -81,7 +71,7 @@ const KindForm: React.FC = () => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: (data: KindCreate) => apiClient.put(`/kind/${id}`, data),
+    mutationFn: (data: KindCreate) => updateKind(Number(id), data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['kinder'] });
       queryClient.invalidateQueries({ queryKey: ['kind', id] });
@@ -108,6 +98,7 @@ const KindForm: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <Input
             label="Vorname"
+            name="vorname"
             type="text"
             value={formData.vorname}
             onChange={(e) => setFormData({ ...formData, vorname: e.target.value })}
@@ -117,6 +108,7 @@ const KindForm: React.FC = () => {
 
           <Input
             label="Nachname"
+            name="nachname"
             type="text"
             value={formData.nachname}
             onChange={(e) => setFormData({ ...formData, nachname: e.target.value })}
@@ -126,6 +118,7 @@ const KindForm: React.FC = () => {
 
           <Input
             label="Geburtsdatum"
+            name="geburtsdatum"
             type="date"
             value={formData.geburtsdatum}
             onChange={(e) => setFormData({ ...formData, geburtsdatum: e.target.value })}
@@ -137,6 +130,7 @@ const KindForm: React.FC = () => {
               Geschlecht (optional)
             </label>
             <select
+              name="geschlecht"
               className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
               value={formData.geschlecht}
               onChange={(e) => setFormData({ ...formData, geschlecht: e.target.value })}
@@ -153,6 +147,7 @@ const KindForm: React.FC = () => {
               Verein (optional)
             </label>
             <select
+              name="verein_id"
               className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
               value={formData.verein_id || ''}
               onChange={(e) => setFormData({ ...formData, verein_id: e.target.value ? Number(e.target.value) : undefined })}
@@ -171,6 +166,7 @@ const KindForm: React.FC = () => {
               Verband (optional)
             </label>
             <select
+              name="verband_id"
               className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
               value={formData.verband_id || ''}
               onChange={(e) => setFormData({ ...formData, verband_id: e.target.value ? Number(e.target.value) : undefined })}
@@ -189,6 +185,7 @@ const KindForm: React.FC = () => {
               Versicherung (optional)
             </label>
             <select
+              name="versicherung_id"
               className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
               value={formData.versicherung_id || ''}
               onChange={(e) => setFormData({ ...formData, versicherung_id: e.target.value ? Number(e.target.value) : undefined })}
@@ -204,6 +201,7 @@ const KindForm: React.FC = () => {
 
           <Input
             label="Vertragsnummer (optional)"
+            name="vertrag"
             type="text"
             value={formData.vertrag || ''}
             onChange={(e) => setFormData({ ...formData, vertrag: e.target.value })}

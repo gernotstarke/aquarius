@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import apiClient from '../api/client';
-import { Kind } from '../types';
+import { listKinder, deleteKind, isKindInsured } from '../api/kind';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import Input from '../components/Input';
@@ -19,26 +18,18 @@ const KindList: React.FC = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['kinder', page, pageSize, searchTerm, sortBy, sortOrder],
-    queryFn: async () => {
-      const response = await apiClient.get<Kind[]>('/kind', {
-        params: {
-          skip: (page - 1) * pageSize,
-          limit: pageSize,
-          search: searchTerm || undefined,
-          sort_by: sortBy,
-          sort_order: sortOrder
-        }
-      });
-      return {
-        items: response.data,
-        total: parseInt(response.headers['x-total-count'] || '0', 10)
-      };
-    },
+    queryFn: () => listKinder({
+      skip: (page - 1) * pageSize,
+      limit: pageSize,
+      search: searchTerm || undefined,
+      sort_by: sortBy,
+      sort_order: sortOrder
+    }),
     placeholderData: (previousData) => previousData,
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => apiClient.delete(`/kind/${id}`),
+    mutationFn: deleteKind,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['kinder'] });
     },
@@ -61,11 +52,6 @@ const KindList: React.FC = () => {
   const totalItems = data?.total || 0;
   const totalPages = Math.ceil(totalItems / pageSize);
   const kinder = data?.items || [];
-
-  const isKindInsured = (kind: Kind) => {
-    const hasContractInsurance = Boolean(kind.versicherung_id && kind.vertrag);
-    return Boolean(kind.verein_id || kind.verband_id || hasContractInsurance);
-  };
 
   if (isLoading && !data) {
     return <div className="text-center py-12 text-body-lg">Lädt...</div>;
@@ -92,6 +78,7 @@ const KindList: React.FC = () => {
         </div>
         <div className="flex gap-2 shrink-0">
           <select
+            name="sort_by"
             value={sortBy}
             onChange={handleSortChange}
             className="px-4 py-3 bg-white border border-neutral-300 rounded-lg text-body focus-ring min-h-touch cursor-pointer"
