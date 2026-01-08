@@ -8,31 +8,42 @@ from app.database import get_db
 from app import models
 from app.anmeldung import schemas as anmeldung_schemas
 from app.anmeldung.repository import AnmeldungRepository
+from app.anmeldung.services import AnmeldungService
+from app.kind.repository import KindRepository
+from app.wettkampf.repository import WettkampfRepository
+from app.grunddaten.repository import FigurRepository
 from app.shared.utils import kind_has_insurance, anmeldung_with_insurance_ok
 
 router = APIRouter(prefix="/api", tags=["anmeldung"])
 
 
+def get_anmeldung_service(db: Session = Depends(get_db)) -> AnmeldungService:
+    """Dependency to get AnmeldungService instance."""
+    anmeldung_repo = AnmeldungRepository(db)
+    kind_repo = KindRepository(db)
+    wettkampf_repo = WettkampfRepository(db)
+    figur_repo = FigurRepository(db)
+    return AnmeldungService(anmeldung_repo, kind_repo, wettkampf_repo, figur_repo)
+
+
 @router.get("/anmeldung", response_model=List[anmeldung_schemas.Anmeldung])
-def list_anmeldung(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def list_anmeldung(skip: int = 0, limit: int = 100, service: AnmeldungService = Depends(get_anmeldung_service)):
     """Get list of all registrations."""
-    repo = AnmeldungRepository(db)
-    anmeldungen = repo.list(skip=skip, limit=limit)
+    anmeldungen = service.list_anmeldungen(skip=skip, limit=limit)
     return [anmeldung_with_insurance_ok(a) for a in anmeldungen]
 
 
 @router.get("/anmeldung/{anmeldung_id}", response_model=anmeldung_schemas.Anmeldung)
-def get_anmeldung(anmeldung_id: int, db: Session = Depends(get_db)):
+def get_anmeldung(anmeldung_id: int, service: AnmeldungService = Depends(get_anmeldung_service)):
     """Get a specific registration by ID."""
-    repo = AnmeldungRepository(db)
-    anmeldung = repo.get_with_details(anmeldung_id)
+    anmeldung = service.get_anmeldung(anmeldung_id)
     if not anmeldung:
         raise HTTPException(status_code=404, detail="Anmeldung not found")
     return anmeldung_with_insurance_ok(anmeldung)
 
 
 @router.post("/anmeldung", response_model=anmeldung_schemas.Anmeldung, status_code=201)
-def create_anmeldung(anmeldung: anmeldung_schemas.AnmeldungCreate, db: Session = Depends(get_db)):
+def create_anmeldung(anmeldung: anmeldung_schemas.AnmeldungCreate, service: AnmeldungService = Depends(get_anmeldung_service)):
     """
     Create a new registration with automatic startnummer assignment.
 
@@ -42,73 +53,13 @@ def create_anmeldung(anmeldung: anmeldung_schemas.AnmeldungCreate, db: Session =
       2. Maximum participants for the competition is reached
       3. Kind has no insurance
     """
-    repo = AnmeldungRepository(db)
-
-    # Get wettkampf to check max_teilnehmer
-    wettkampf = db.query(models.Wettkampf).filter(
-        models.Wettkampf.id == anmeldung.wettkampf_id
-    ).first()
-    if not wettkampf:
-        raise HTTPException(status_code=404, detail="Wettkampf not found")
-
-    # Count current final (non-vorläufig) registrations
-    final_count = repo.count_final_registrations(anmeldung.wettkampf_id)
-
-    kind = db.query(models.Kind).filter(models.Kind.id == anmeldung.kind_id).first()
-    if not kind:
-        raise HTTPException(status_code=404, detail="Kind not found")
-
-    # Determine if registration should be preliminary
-    is_vorlaeufig = 0
-    reasons = []
-
-    if len(anmeldung.figur_ids) == 0:
-        is_vorlaeufig = 1
-        reasons.append("keine Figuren ausgewählt")
-
-    if not kind_has_insurance(kind):
-        is_vorlaeufig = 1
-        reasons.append("keine Versicherung")
-
-    if wettkampf.max_teilnehmer and final_count >= wettkampf.max_teilnehmer:
-        is_vorlaeufig = 1
-        reasons.append("maximale Teilnehmerzahl erreicht")
-
-    # Atomically get next startnummer for this competition
-    next_startnummer = repo.get_next_startnummer(anmeldung.wettkampf_id)
-
-    # Create anmeldung with startnummer
-    db_anmeldung = models.Anmeldung(
-        kind_id=anmeldung.kind_id,
-        wettkampf_id=anmeldung.wettkampf_id,
-        startnummer=next_startnummer,
-        anmeldedatum=date.today(),
-        vorlaeufig=is_vorlaeufig,
-        status="vorläufig" if is_vorlaeufig else "aktiv"
-    )
-    db.add(db_anmeldung)
-    db.flush()  # Get the ID without committing
-
-    # Add selected figures (if any)
-    for figur_id in anmeldung.figur_ids:
-        figur = db.query(models.Figur).filter(models.Figur.id == figur_id).first()
-        if figur:
-            db_anmeldung.figuren.append(figur)
-
     try:
-        db.commit()
-        db.refresh(db_anmeldung)
-
-        # Log preliminary registration reasons
-        if is_vorlaeufig:
-            print(f"ℹ️  Vorläufige Anmeldung #{next_startnummer}: {', '.join(reasons)}")
-
+        db_anmeldung = service.create_anmeldung(anmeldung)
         return anmeldung_with_insurance_ok(db_anmeldung)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
-        db.rollback()
-        # If unique constraint fails (race condition), retry would happen here
-        # For now, just raise the error
-        raise HTTPException(status_code=409, detail=f"Startnummer conflict: {str(e)}")
+        raise HTTPException(status_code=409, detail=f"Registration conflict: {str(e)}")
 
 
 @router.put("/anmeldung/{anmeldung_id}", response_model=anmeldung_schemas.Anmeldung)
@@ -172,10 +123,9 @@ def update_anmeldung(anmeldung_id: int, anmeldung: anmeldung_schemas.AnmeldungUp
 
 
 @router.delete("/anmeldung/{anmeldung_id}", status_code=204)
-def delete_anmeldung(anmeldung_id: int, db: Session = Depends(get_db)):
+def delete_anmeldung(anmeldung_id: int, service: AnmeldungService = Depends(get_anmeldung_service)):
     """Delete a registration."""
-    repo = AnmeldungRepository(db)
-    deleted = repo.delete(anmeldung_id)
+    deleted = service.delete_anmeldung(anmeldung_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Anmeldung not found")
     return None

@@ -7,9 +7,15 @@ from app.database import get_db
 from app import models
 from app.kind import schemas as kind_schemas
 from app.kind.repository import KindRepository
-from app.shared.utils import kind_has_insurance
+from app.kind.services import KindService
 
 router = APIRouter(prefix="/api", tags=["kind"])
+
+
+def get_kind_service(db: Session = Depends(get_db)) -> KindService:
+    """Dependency to get KindService instance."""
+    repo = KindRepository(db)
+    return KindService(repo)
 
 
 @router.get("/kind", response_model=List[kind_schemas.Kind])
@@ -20,11 +26,10 @@ def list_kind(
     search: Optional[str] = None,
     sort_by: Optional[str] = "nachname",
     sort_order: Optional[str] = "asc",
-    db: Session = Depends(get_db)
+    service: KindService = Depends(get_kind_service)
 ):
     """Get list of all children with search, sort, and pagination."""
-    repo = KindRepository(db)
-    results, total_count = repo.search(
+    results, total_count = service.search_kinder(
         skip=skip,
         limit=limit,
         query=search,
@@ -39,44 +44,33 @@ def list_kind(
 
 
 @router.get("/kind/{kind_id}", response_model=kind_schemas.Kind)
-def get_kind(kind_id: int, db: Session = Depends(get_db)):
+def get_kind(kind_id: int, service: KindService = Depends(get_kind_service)):
     """Get a specific child by ID."""
-    repo = KindRepository(db)
-    kind = repo.get(kind_id)
+    kind = service.get_kind(kind_id)
     if not kind:
         raise HTTPException(status_code=404, detail="Kind not found")
     return kind
 
 
 @router.post("/kind", response_model=kind_schemas.Kind, status_code=201)
-def create_kind(kind: kind_schemas.KindCreate, db: Session = Depends(get_db)):
+def create_kind(kind: kind_schemas.KindCreate, service: KindService = Depends(get_kind_service)):
     """Create a new child."""
-    repo = KindRepository(db)
-    return repo.create(kind)
+    return service.create_kind(kind)
 
 
 @router.put("/kind/{kind_id}", response_model=kind_schemas.Kind)
-def update_kind(kind_id: int, kind: kind_schemas.KindUpdate, db: Session = Depends(get_db)):
+def update_kind(kind_id: int, kind: kind_schemas.KindUpdate, service: KindService = Depends(get_kind_service)):
     """Update a child."""
-    repo = KindRepository(db)
-    db_kind = repo.update(kind_id, kind)
+    db_kind = service.update_kind(kind_id, kind)
     if not db_kind:
         raise HTTPException(status_code=404, detail="Kind not found")
-
-    # Check insurance and update related anmeldungen if needed
-    if not kind_has_insurance(db_kind):
-        db.query(models.Anmeldung).filter(
-            models.Anmeldung.kind_id == db_kind.id
-        ).update({"vorlaeufig": 1, "status": "vorläufig"})
-        db.commit()
     return db_kind
 
 
 @router.delete("/kind/{kind_id}", status_code=204)
-def delete_kind(kind_id: int, db: Session = Depends(get_db)):
+def delete_kind(kind_id: int, service: KindService = Depends(get_kind_service)):
     """Delete a child."""
-    repo = KindRepository(db)
-    deleted = repo.delete(kind_id)
+    deleted = service.delete_kind(kind_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Kind not found")
     return None

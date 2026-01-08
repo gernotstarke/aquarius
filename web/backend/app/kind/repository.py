@@ -156,3 +156,24 @@ class KindRepository:
         self.db.delete(db_kind)
         self.db.commit()
         return True
+
+    def mark_anmeldungen_vorlaeufig(self, kind_id: int) -> int:
+        """Mark all Anmeldungen for a Kind as vorläufig (preliminary).
+
+        This is typically called when a Kind loses insurance coverage,
+        as all their registrations must then be marked as preliminary.
+
+        Args:
+            kind_id: ID of the Kind whose Anmeldungen should be marked
+
+        Returns:
+            Number of Anmeldungen updated
+        """
+        updated_count = self.db.query(models.Anmeldung).filter(
+            models.Anmeldung.kind_id == kind_id
+        ).update({
+            "vorlaeufig": 1,
+            "status": "vorläufig"
+        })
+        self.db.commit()
+        return updated_count
