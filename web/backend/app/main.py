@@ -403,7 +403,11 @@ def list_kind(
     db: Session = Depends(get_db)
 ):
     """Get list of all children with search, sort, and pagination."""
-    query = db.query(models.Kind)
+    query = db.query(models.Kind).options(
+        joinedload(models.Kind.verein),
+        joinedload(models.Kind.verband),
+        joinedload(models.Kind.versicherung)
+    )
 
     # Search (Filter)
     if search:
@@ -462,7 +466,11 @@ def list_kind(
 @app.get("/api/kind/{kind_id}", response_model=schemas.Kind)
 def get_kind(kind_id: int, db: Session = Depends(get_db)):
     """Get a specific child by ID."""
-    kind = db.query(models.Kind).filter(models.Kind.id == kind_id).first()
+    kind = db.query(models.Kind).options(
+        joinedload(models.Kind.verein),
+        joinedload(models.Kind.verband),
+        joinedload(models.Kind.versicherung)
+    ).filter(models.Kind.id == kind_id).first()
     if not kind:
         raise HTTPException(status_code=404, detail="Kind not found")
     return kind
@@ -475,6 +483,12 @@ def create_kind(kind: schemas.KindCreate, db: Session = Depends(get_db)):
     db.add(db_kind)
     db.commit()
     db.refresh(db_kind)
+    # Eagerly load relationships for response
+    db_kind = db.query(models.Kind).options(
+        joinedload(models.Kind.verein),
+        joinedload(models.Kind.verband),
+        joinedload(models.Kind.versicherung)
+    ).filter(models.Kind.id == db_kind.id).first()
     return db_kind
 
 
@@ -485,7 +499,7 @@ def update_kind(kind_id: int, kind: schemas.KindUpdate, db: Session = Depends(ge
     if not db_kind:
         raise HTTPException(status_code=404, detail="Kind not found")
 
-    for key, value in kind.model_dump().items():
+    for key, value in kind.model_dump(exclude_unset=True).items():
         setattr(db_kind, key, value)
 
     db.commit()
@@ -495,6 +509,12 @@ def update_kind(kind_id: int, kind: schemas.KindUpdate, db: Session = Depends(ge
             models.Anmeldung.kind_id == db_kind.id
         ).update({"vorlaeufig": 1, "status": "vorläufig"})
         db.commit()
+    # Eagerly load relationships for response
+    db_kind = db.query(models.Kind).options(
+        joinedload(models.Kind.verein),
+        joinedload(models.Kind.verband),
+        joinedload(models.Kind.versicherung)
+    ).filter(models.Kind.id == kind_id).first()
     return db_kind
 
 

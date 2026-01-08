@@ -141,8 +141,15 @@ class KindBase(BaseModel):
 class KindCreate(KindBase):
     pass
 
-class KindUpdate(KindBase):
-    pass
+class KindUpdate(BaseModel):
+    vorname: str | None = None
+    nachname: str | None = None
+    geburtsdatum: date | None = None
+    geschlecht: str | None = None
+    verein_id: int | None = None
+    verband_id: int | None = None
+    versicherung_id: int | None = None
+    vertrag: str | None = None
 
 class Kind(KindBase):
     model_config = ConfigDict(from_attributes=True)

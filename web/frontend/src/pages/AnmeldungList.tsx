@@ -1,8 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import apiClient from '../api/client';
-import { Anmeldung, Wettkampf } from '../types';
+import { listAnmeldungen, deleteAnmeldung } from '../api/anmeldung';
+import { listWettkaempfe } from '../api/wettkampf';
+import { Anmeldung } from '../types/anmeldung';
+import { Wettkampf } from '../types/wettkampf';
 import Card from '../components/Card';
 import Button from '../components/Button';
 
@@ -10,24 +12,18 @@ const AnmeldungList: React.FC = () => {
   const queryClient = useQueryClient();
   const [selectedWettkampfId, setSelectedWettkampfId] = React.useState<number>(0);
 
-  const { data: anmeldungen, isLoading } = useQuery<Anmeldung[]>({
+  const { data: anmeldungen, isLoading } = useQuery<Anmeldung[], Error, Anmeldung[]>({
     queryKey: ['anmeldungen'],
-    queryFn: async () => {
-      const response = await apiClient.get('/anmeldung');
-      return response.data;
-    },
+    queryFn: () => listAnmeldungen(),
   });
 
-  const { data: wettkaempfe } = useQuery<Wettkampf[]>({
+  const { data: wettkaempfe } = useQuery<Wettkampf[], Error, Wettkampf[]>({
     queryKey: ['wettkaempfe'],
-    queryFn: async () => {
-      const response = await apiClient.get('/wettkampf');
-      return response.data;
-    },
+    queryFn: () => listWettkaempfe(),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => apiClient.delete(`/anmeldung/${id}`),
+    mutationFn: deleteAnmeldung,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['anmeldungen'] });
     },
@@ -51,8 +47,8 @@ const AnmeldungList: React.FC = () => {
 
   // Filter anmeldungen by selected wettkampf
   const filteredAnmeldungen = selectedWettkampfId === 0
-    ? anmeldungen
-    : anmeldungen?.filter(a => a.wettkampf_id === selectedWettkampfId);
+    ? (anmeldungen || [])
+    : (anmeldungen || []).filter(a => a.wettkampf_id === selectedWettkampfId);
 
   return (
     <div className="space-y-8">

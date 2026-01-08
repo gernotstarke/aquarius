@@ -107,6 +107,7 @@ const WettkampfForm: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <Input
             label="Name"
+            name="name"
             type="text"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -116,6 +117,7 @@ const WettkampfForm: React.FC = () => {
 
           <Input
             label="Datum"
+            name="datum"
             type="date"
             value={formData.datum}
             onChange={(e) => setFormData({ ...formData, datum: e.target.value })}
@@ -127,6 +129,7 @@ const WettkampfForm: React.FC = () => {
               Saison
             </label>
             <select
+              name="saison_id"
               className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
               value={formData.saison_id}
               onChange={(e) => setFormData({ ...formData, saison_id: Number(e.target.value) })}
@@ -146,6 +149,7 @@ const WettkampfForm: React.FC = () => {
               Schwimmbad
             </label>
             <select
+              name="schwimmbad_id"
               className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
               value={formData.schwimmbad_id}
               onChange={(e) => setFormData({ ...formData, schwimmbad_id: Number(e.target.value) })}
@@ -163,6 +167,7 @@ const WettkampfForm: React.FC = () => {
           <div className={isWobbling ? 'animate-wobble' : ''}>
             <Input
                 id="max_teilnehmer"
+                name="max_teilnehmer"
                 label="Max. Teilnehmer (optional)"
                 type="number"
                 value={formData.max_teilnehmer || ''}

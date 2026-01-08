@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import apiClient from '../api/client';
-import { AnmeldungCreate, Kind, Wettkampf, WettkampfWithDetails, Anmeldung } from '../types';
+import { getAnmeldung, createAnmeldung, updateAnmeldung } from '../api/anmeldung';
+import { listKinder } from '../api/kind';
+import { listWettkaempfe, getWettkampfWithDetails } from '../api/wettkampf';
+import { AnmeldungCreate, Anmeldung } from '../types/anmeldung';
+import { Wettkampf, WettkampfWithDetails } from '../types/wettkampf';
 import Card from '../components/Card';
 import Button from '../components/Button';
 
@@ -23,35 +26,25 @@ const AnmeldungForm: React.FC = () => {
 
   const { data: anmeldung } = useQuery<Anmeldung>({
     queryKey: ['anmeldung', id],
-    queryFn: async () => {
-      const response = await apiClient.get(`/anmeldung/${id}`);
-      return response.data;
-    },
+    queryFn: () => getAnmeldung(Number(id)),
     enabled: isEdit,
   });
 
-  const { data: kinder } = useQuery<Kind[]>({
+  const { data: kinderData } = useQuery({
     queryKey: ['kinder'],
-    queryFn: async () => {
-      const response = await apiClient.get('/kind');
-      return response.data;
-    },
+    queryFn: () => listKinder({ limit: 1000 }),
   });
 
-  const { data: wettkaempfe } = useQuery<Wettkampf[]>({
+  const kinder = kinderData?.items;
+
+  const { data: wettkaempfe } = useQuery<Wettkampf[], Error, Wettkampf[]>({
     queryKey: ['wettkaempfe'],
-    queryFn: async () => {
-      const response = await apiClient.get('/wettkampf');
-      return response.data;
-    },
+    queryFn: () => listWettkaempfe(),
   });
 
   const { data: wettkampfDetails } = useQuery<WettkampfWithDetails>({
     queryKey: ['wettkampf-details', selectedWettkampfId],
-    queryFn: async () => {
-      const response = await apiClient.get(`/wettkampf/${selectedWettkampfId}/details`);
-      return response.data;
-    },
+    queryFn: () => getWettkampfWithDetails(selectedWettkampfId),
     enabled: selectedWettkampfId > 0,
   });
 
@@ -64,7 +57,7 @@ const AnmeldungForm: React.FC = () => {
   }, [anmeldung]);
 
   const createMutation = useMutation({
-    mutationFn: (data: AnmeldungCreate) => apiClient.post('/anmeldung', data),
+    mutationFn: createAnmeldung,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['anmeldungen'] });
       navigate('/anmeldung/liste');
@@ -73,7 +66,7 @@ const AnmeldungForm: React.FC = () => {
 
   const updateMutation = useMutation({
     mutationFn: (data: { figur_ids: number[] }) =>
-      apiClient.put(`/anmeldung/${id}`, data),
+      updateAnmeldung(Number(id), data as Partial<AnmeldungCreate>),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['anmeldungen'] });
       queryClient.invalidateQueries({ queryKey: ['anmeldung', id] });
@@ -118,6 +111,7 @@ const AnmeldungForm: React.FC = () => {
               Kind
             </label>
             <select
+              name="kind_id"
               className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
               value={selectedKindId}
               onChange={(e) => setSelectedKindId(Number(e.target.value))}
@@ -139,6 +133,7 @@ const AnmeldungForm: React.FC = () => {
               Wettkampf
             </label>
             <select
+              name="wettkampf_id"
               className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
               value={selectedWettkampfId}
               onChange={(e) => {

@@ -1,149 +1,30 @@
-export interface Saison {
-  id: number;
-  name: string;
-  from_date: string;
-  to_date: string;
-}
+/**
+ * Central type exports - Re-exports all domain types
+ *
+ * This file maintains backward compatibility while allowing
+ * components to import from domain-specific files.
+ *
+ * Prefer importing from domain-specific files (e.g., import { Kind } from '../types/kind')
+ * over importing from this index file.
+ */
 
-export interface SaisonCreate {
-  name: string;
-  from_date: string;
-  to_date: string;
-}
+// Grunddaten domain
+export type { Verein, VereinCreate, Verband, Versicherung } from './grunddaten';
 
-export interface Schwimmbad {
-  id: number;
-  name: string;
-  adresse: string;
-  phone_no?: string;
-  manager?: string;
-}
+// Saison domain
+export type { Saison, SaisonCreate } from './saison';
 
-export interface SchwimmbadCreate {
-  name: string;
-  adresse: string;
-  phone_no?: string;
-  manager?: string;
-}
+// Schwimmbad domain
+export type { Schwimmbad, SchwimmbadCreate } from './schwimmbad';
 
-export interface Verein {
-  id: number;
-  name: string;
-  ort: string;
-  register_id: string;
-  contact: string;
-}
+// Figur domain
+export type { Figur, FigurCreate } from './figur';
 
-export interface VereinCreate {
-  name: string;
-  ort: string;
-  register_id: string;
-  contact: string;
-}
+// Kind domain
+export type { Kind, KindCreate } from './kind';
 
-export interface Verband {
-  id: number;
-  name: string;
-  abkuerzung: string;
-  land: string;
-  ort: string;
-  nomination_count?: number;
-}
+// Wettkampf domain
+export type { Wettkampf, WettkampfCreate, WettkampfWithDetails } from './wettkampf';
 
-export interface Versicherung {
-  id: number;
-  name: string;
-  kurz: string;
-  land: string;
-  hauptsitz: string;
-}
-
-export interface Wettkampf {
-  id: number;
-  name: string;
-  datum: string;
-  max_teilnehmer?: number;
-  saison_id: number;
-  schwimmbad_id: number;
-}
-
-export interface WettkampfCreate {
-  name: string;
-  datum: string;
-  max_teilnehmer?: number;
-  saison_id: number;
-  schwimmbad_id: number;
-}
-
-export interface Kind {
-  id: number;
-  vorname: string;
-  nachname: string;
-  geburtsdatum: string;
-  geschlecht?: string;
-  verein_id?: number;
-  verein?: Verein;
-  verband_id?: number;
-  verband?: Verband;
-  versicherung_id?: number;
-  versicherung?: Versicherung;
-  vertrag?: string;
-}
-
-export interface KindCreate {
-  vorname: string;
-  nachname: string;
-  geburtsdatum: string;
-  geschlecht?: string;
-  verein_id?: number;
-  verband_id?: number;
-  versicherung_id?: number;
-  vertrag?: string;
-}
-
-export interface Figur {
-  id: number;
-  name: string;
-  beschreibung?: string;
-  schwierigkeitsgrad?: number;
-  kategorie?: string;
-  altersklasse?: string;
-  min_alter?: number;
-  bild?: string;
-}
-
-export interface FigurCreate {
-  name: string;
-  beschreibung?: string;
-  schwierigkeitsgrad?: number;
-  kategorie?: string;
-  altersklasse?: string;
-  min_alter?: number;
-  bild?: string;
-}
-
-export interface Anmeldung {
-  id: number;
-  kind_id: number;
-  wettkampf_id: number;
-  startnummer: number;
-  anmeldedatum: string;
-  status: string;
-  vorlaeufig: number;
-  figuren: Figur[];
-  insurance_ok?: boolean;
-  kind?: Kind;
-}
-
-export interface AnmeldungCreate {
-  kind_id: number;
-  wettkampf_id: number;
-  figur_ids: number[];
-}
-
-export interface WettkampfWithDetails extends Wettkampf {
-  figuren: Figur[];
-  anmeldungen: Anmeldung[];
-  saison?: Saison;
-  schwimmbad?: Schwimmbad;
-}
+// Anmeldung domain
+export type { Anmeldung, AnmeldungCreate } from './anmeldung';
