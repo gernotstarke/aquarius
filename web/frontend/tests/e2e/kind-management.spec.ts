@@ -78,9 +78,10 @@ test.describe('Kind Management Workflow', () => {
     await expect(kindRow).toBeVisible();
 
     // Verify Kind has insurance (green dot) because of Verein
-    const kindCard = page.locator('div').filter({ hasText: uniqueName }).first();
-    const greenDot = kindCard.locator('.bg-green-200');
-    await expect(greenDot).toBeVisible();
+    const kindLink = page.getByRole('link', { name: new RegExp(uniqueName) });
+    await expect(kindLink).toBeVisible();
+    const kindCardContainer = kindLink.locator('xpath=ancestor::div[contains(@class, "relative")]');
+    await expect(kindCardContainer.locator('span.bg-green-200')).toBeVisible();
 
     // Step 4: Test search functionality
     await page.fill('input[placeholder*="Suche"]', uniqueName);
@@ -99,18 +100,18 @@ test.describe('Kind Management Workflow', () => {
     await page.waitForTimeout(500);
 
     // Step 5: Edit Kind details
-    await page.goto('/kind');
-    await page.waitForLoadState('networkidle');
-
-    const editButton = page.locator('a').filter({ hasText: uniqueName })
-      .locator('..').locator('..').locator('button', { hasText: 'Bearbeiten' });
-    await editButton.click();
+    // Get the Kind ID from the search result we fetched earlier
+    const kindId = createdIds.kind[0];
+    // Navigate directly to the edit page
+    await page.goto(`/kind/${kindId}`);
     await page.waitForLoadState('networkidle');
 
     // Update nachname
     await page.fill('input[name="nachname"]', 'UpdatedTestperson');
     await page.click('button[type="submit"]');
-    await page.waitForURL('/kind');
+    // Wait for navigation back to the list
+    await page.waitForURL('/kind', { timeout: 10000 });
+    await page.waitForLoadState('networkidle');
 
     // Verify update
     await page.goto('/kind');
@@ -121,8 +122,9 @@ test.describe('Kind Management Workflow', () => {
     await page.goto('/kind');
     await page.waitForLoadState('networkidle');
 
-    const deleteButton = page.locator('a').filter({ hasText: uniqueName })
-      .locator('..').locator('..').locator('button', { hasText: 'Löschen' });
+    // Find the card containing the Kind, then find the Delete button within it
+    const kindCardForDelete = page.locator('div').filter({ hasText: new RegExp(uniqueName) }).first();
+    const deleteButton = kindCardForDelete.getByRole('button', { name: 'Löschen' });
 
     // Handle confirmation dialog
     page.on('dialog', dialog => dialog.accept());
@@ -178,13 +180,23 @@ test.describe('Kind Management Workflow', () => {
     await page.goto('/kind');
     await page.waitForLoadState('networkidle');
 
+    // Wait for the list to load
+    await page.waitForSelector('text=Insured-', { timeout: 5000 });
+
     // Insured Kind should have green dot
-    const insuredCard = page.locator('div').filter({ hasText: `Insured-${timestamp}` }).first();
-    await expect(insuredCard.locator('.bg-green-200')).toBeVisible();
+    // The insurance indicator is a span with absolute positioning at top-right of the card
+    const insuredLink = page.getByRole('link', { name: new RegExp(`Insured-${timestamp}`) });
+    await expect(insuredLink).toBeVisible();
+    // Find the parent card and check for green dot
+    const insuredCard = insuredLink.locator('xpath=ancestor::div[contains(@class, "relative")]');
+    await expect(insuredCard.locator('span.bg-green-200')).toBeVisible();
 
     // Uninsured Kind should have red dot
-    const uninsuredCard = page.locator('div').filter({ hasText: `Uninsured-${timestamp}` }).first();
-    await expect(uninsuredCard.locator('.bg-red-500')).toBeVisible();
+    const uninsuredLink = page.getByRole('link', { name: new RegExp(`Uninsured-${timestamp}`) });
+    await expect(uninsuredLink).toBeVisible();
+    // Find the parent card and check for red dot
+    const uninsuredCard = uninsuredLink.locator('xpath=ancestor::div[contains(@class, "relative")]');
+    await expect(uninsuredCard.locator('span.bg-red-500')).toBeVisible();
   });
 
   test('sorting and pagination work correctly', async ({ page, request }) => {

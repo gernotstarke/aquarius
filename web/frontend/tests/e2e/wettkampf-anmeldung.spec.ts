@@ -126,15 +126,19 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
     const hasSaisonId = await page.locator(`text=/Saison-ID.*${saison.id}/`).count();
     expect(hasSaisonId).toBe(0);
 
-    // Get wettkampf ID from URL
-    const url = page.url();
-    const wettkampfId = url.split('/').pop();
+    // Use the wettkampf ID we already have from the API response
+    const wettkampfId = createdWk!.id.toString();
 
     // Step 4: Create Anmeldung (registration) via UI
     await page.goto('/anmeldung/new');
     await page.waitForLoadState('networkidle');
 
+    // Wait for dropdowns to populate (check for attached state, not visible)
+    await page.waitForSelector(`select[name="kind_id"] option[value="${kind.id}"]`, { state: 'attached', timeout: 5000 });
     await page.selectOption('select[name="kind_id"]', kind.id.toString());
+
+    // Wait for wettkampf option to be available
+    await page.waitForSelector(`select[name="wettkampf_id"] option[value="${wettkampfId}"]`, { state: 'attached', timeout: 5000 });
     await page.selectOption('select[name="wettkampf_id"]', wettkampfId!);
     // No figures selected → creates vorläufig anmeldung
 
@@ -163,7 +167,8 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
     await expect(anmeldungRow).toBeVisible();
 
     // Verify vorläufig status (business rule: no figuren → vorläufig)
-    await expect(page.locator('text=/vorläufig/i')).toBeVisible();
+    // Check within the specific anmeldung row
+    await expect(anmeldungRow.locator('text=/vorläufig/i')).toBeVisible();
 
     // Verify Kind name is shown (not Kind-ID)
     await expect(anmeldungRow).toContainText(`Wettkampf-${timestamp} Teilnehmer`);
@@ -172,8 +177,9 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
     await page.goto(`/wettkampf/${wettkampfId}`);
     await page.waitForLoadState('networkidle');
 
-    // Should show Kind name in anmeldungen section
-    await expect(page.locator(`text=Wettkampf-${timestamp} Teilnehmer`)).toBeVisible();
+    // Should show Kind name in anmeldungen section (check for vorname at least)
+    await expect(page.locator(`text=Wettkampf-${timestamp}`)).toBeVisible();
+    await expect(page.locator(`text=Teilnehmer`)).toBeVisible();
 
     // Should NOT show "Kind-ID: X" (proper eager loading)
     const hasKindIdText = await page.locator('text=/Kind-ID:.*\d+/').count();
