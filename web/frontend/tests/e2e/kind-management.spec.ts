@@ -15,6 +15,19 @@ import { test, expect } from '@playwright/test';
  */
 
 test.describe('Kind Management Workflow', () => {
+  // Store created IDs for cleanup
+  const createdIds: { kind: number[]; verein: number[] } = { kind: [], verein: [] };
+
+  test.afterAll(async ({ request }) => {
+    // Cleanup any created entities, regardless of test success/failure
+    for (const id of createdIds.kind) {
+      await request.delete(`http://localhost:8000/api/kind/${id}`).catch(() => {});
+    }
+    for (const id of createdIds.verein) {
+      await request.delete(`http://localhost:8000/api/verein/${id}`).catch(() => {});
+    }
+  });
+
   test('create, search, edit, and delete kind', async ({ page, request }) => {
     const timestamp = Date.now();
     const uniqueName = `E2E-Kind-${timestamp}`;
@@ -30,6 +43,7 @@ test.describe('Kind Management Workflow', () => {
     });
     expect(vereinResponse.ok()).toBeTruthy();
     const verein = await vereinResponse.json();
+    createdIds.verein.push(verein.id);
 
     // Step 2: Create Kind via UI
     await page.goto('/kind/new');
@@ -43,6 +57,18 @@ test.describe('Kind Management Workflow', () => {
 
     await page.click('button[type="submit"]');
     await page.waitForURL('/kind');
+
+    // We need to fetch the ID of the created Kind for cleanup
+    // We can infer it by searching for it
+    const searchResponse = await request.get('http://localhost:8000/api/kind', {
+      params: { search: uniqueName }
+    });
+    if (searchResponse.ok()) {
+      const results = await searchResponse.json();
+      if (results.length > 0) {
+        createdIds.kind.push(results[0].id);
+      }
+    }
 
     // Step 3: Verify Kind appears in list with insurance indicator
     await page.goto('/kind');
@@ -109,9 +135,6 @@ test.describe('Kind Management Workflow', () => {
     await page.goto('/kind');
     await page.waitForLoadState('networkidle');
     await expect(page.locator('a').filter({ hasText: uniqueName })).not.toBeVisible();
-
-    // Cleanup: Delete Verein
-    await request.delete(`http://localhost:8000/api/verein/${verein.id}`);
   });
 
   test('insurance logic displays correctly', async ({ page, request }) => {
@@ -127,6 +150,7 @@ test.describe('Kind Management Workflow', () => {
       }
     });
     const verein = await vereinResponse.json();
+    createdIds.verein.push(verein.id);
 
     const insuredKindResponse = await request.post('http://localhost:8000/api/kind', {
       data: {
@@ -137,6 +161,7 @@ test.describe('Kind Management Workflow', () => {
       }
     });
     const insuredKind = await insuredKindResponse.json();
+    createdIds.kind.push(insuredKind.id);
 
     // Test 2: Kind without any insurance
     const uninsuredKindResponse = await request.post('http://localhost:8000/api/kind', {
@@ -147,6 +172,7 @@ test.describe('Kind Management Workflow', () => {
       }
     });
     const uninsuredKind = await uninsuredKindResponse.json();
+    createdIds.kind.push(uninsuredKind.id);
 
     // Verify UI shows insurance status correctly
     await page.goto('/kind');
@@ -159,11 +185,6 @@ test.describe('Kind Management Workflow', () => {
     // Uninsured Kind should have red dot
     const uninsuredCard = page.locator('div').filter({ hasText: `Uninsured-${timestamp}` }).first();
     await expect(uninsuredCard.locator('.bg-red-500')).toBeVisible();
-
-    // Cleanup
-    await request.delete(`http://localhost:8000/api/kind/${insuredKind.id}`);
-    await request.delete(`http://localhost:8000/api/kind/${uninsuredKind.id}`);
-    await request.delete(`http://localhost:8000/api/verein/${verein.id}`);
   });
 
   test('sorting and pagination work correctly', async ({ page, request }) => {
@@ -182,6 +203,7 @@ test.describe('Kind Management Workflow', () => {
 
     const kinderResponses = await Promise.all(kinderPromises);
     const kinder = await Promise.all(kinderResponses.map(r => r.json()));
+    kinder.forEach(k => createdIds.kind.push(k.id));
 
     // Navigate to Kind list
     await page.goto('/kind');
@@ -202,15 +224,19 @@ test.describe('Kind Management Workflow', () => {
     await page.click('button:has-text("Aufsteigend")');
     await page.waitForTimeout(500);
     await expect(page.locator('button:has-text("Absteigend")')).toBeVisible();
-
-    // Cleanup
-    for (const kind of kinder) {
-      await request.delete(`http://localhost:8000/api/kind/${kind.id}`);
-    }
   });
 });
 
 test.describe('Kind API Integration', () => {
+  // Store created IDs for cleanup
+  const createdIds: { kind: number[] } = { kind: [] };
+
+  test.afterAll(async ({ request }) => {
+     for (const id of createdIds.kind) {
+      await request.delete(`http://localhost:8000/api/kind/${id}`).catch(() => {});
+    }
+  });
+
   test('frontend API service communicates correctly with backend', async ({ request }) => {
     const timestamp = Date.now();
 
@@ -227,6 +253,8 @@ test.describe('Kind API Integration', () => {
     });
     expect(createResponse.ok()).toBeTruthy();
     const created = await createResponse.json();
+    createdIds.kind.push(created.id);
+    
     expect(created.id).toBeDefined();
     expect(created.vorname).toBe(`API-Test-${timestamp}`);
 

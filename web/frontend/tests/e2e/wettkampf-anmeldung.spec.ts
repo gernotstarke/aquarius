@@ -11,6 +11,38 @@ import { test, expect } from '@playwright/test';
  */
 
 test.describe('Wettkampf and Anmeldung Flow', () => {
+  // Store created IDs for cleanup
+  // Order matters for deletion due to Foreign Keys:
+  // Anmeldung -> Wettkampf -> (Kind, Saison, Schwimmbad, Verein, Figur)
+  const createdIds: { 
+    anmeldung: number[], 
+    wettkampf: number[], 
+    kind: number[], 
+    verein: number[],
+    saison: number[],
+    schwimmbad: number[],
+    figur: number[] 
+  } = { 
+    anmeldung: [], 
+    wettkampf: [], 
+    kind: [], 
+    verein: [],
+    saison: [],
+    schwimmbad: [],
+    figur: [] 
+  };
+
+  test.afterAll(async ({ request }) => {
+    // Cleanup in correct order to avoid Foreign Key Constraint errors
+    for (const id of createdIds.anmeldung) await request.delete(`http://localhost:8000/api/anmeldung/${id}`).catch(() => {});
+    for (const id of createdIds.wettkampf) await request.delete(`http://localhost:8000/api/wettkampf/${id}`).catch(() => {});
+    for (const id of createdIds.kind) await request.delete(`http://localhost:8000/api/kind/${id}`).catch(() => {});
+    for (const id of createdIds.verein) await request.delete(`http://localhost:8000/api/verein/${id}`).catch(() => {});
+    for (const id of createdIds.figur) await request.delete(`http://localhost:8000/api/figur/${id}`).catch(() => {});
+    for (const id of createdIds.schwimmbad) await request.delete(`http://localhost:8000/api/schwimmbad/${id}`).catch(() => {});
+    for (const id of createdIds.saison) await request.delete(`http://localhost:8000/api/saison/${id}`).catch(() => {});
+  });
+
   test('create wettkampf and register kind with figuren', async ({ page, request }) => {
     const timestamp = Date.now();
 
@@ -23,6 +55,7 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
       }
     });
     const saison = await saisonResponse.json();
+    createdIds.saison.push(saison.id);
 
     const schwimmbadResponse = await request.post('http://localhost:8000/api/schwimmbad', {
       data: {
@@ -31,6 +64,7 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
       }
     });
     const schwimmbad = await schwimmbadResponse.json();
+    createdIds.schwimmbad.push(schwimmbad.id);
 
     const vereinResponse = await request.post('http://localhost:8000/api/verein', {
       data: {
@@ -41,6 +75,7 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
       }
     });
     const verein = await vereinResponse.json();
+    createdIds.verein.push(verein.id);
 
     const kindResponse = await request.post('http://localhost:8000/api/kind', {
       data: {
@@ -51,6 +86,7 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
       }
     });
     const kind = await kindResponse.json();
+    createdIds.kind.push(kind.id);
 
     // Step 1: Create Wettkampf via UI
     await page.goto('/wettkampf/new');
@@ -64,6 +100,12 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
 
     await page.click('button[type="submit"]');
     await page.waitForURL('/wettkampf');
+
+    // Infer Wettkampf ID via API list for cleanup
+    const wkListResponse = await request.get('http://localhost:8000/api/wettkampf');
+    const wkList = await wkListResponse.json();
+    const createdWk = wkList.find((w: any) => w.name === `E2E Wettkampf ${timestamp}`);
+    if (createdWk) createdIds.wettkampf.push(createdWk.id);
 
     // Step 2: Verify Wettkampf appears in list
     await page.goto('/wettkampf');
@@ -99,6 +141,20 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
     await page.click('button[type="submit"]');
     await page.waitForURL('/anmeldung/liste');
 
+    // Infer Anmeldung ID for cleanup
+    // We can assume it's created if we are here
+    // But since we can't easily query by "name", we might rely on CASCADE delete from Wettkampf/Kind
+    // Or fetch all anmeldungen for this wettkampf
+    const anmeldungResponse = await request.get('http://localhost:8000/api/anmeldung');
+    const anmeldungen = await anmeldungResponse.json();
+    // Filter locally or just rely on cascade delete. 
+    // Ideally we should track it. 
+    // Let's rely on cascade delete for Anmeldung (it belongs to Wettkampf), 
+    // but just in case, let's try to find it.
+    const myAnmeldung = anmeldungen.find((a: any) => a.wettkampf_id == wettkampfId && a.kind_id == kind.id);
+    if (myAnmeldung) createdIds.anmeldung.push(myAnmeldung.id);
+
+
     // Step 5: Verify Anmeldung appears with Kind name (not ID)
     await page.goto('/anmeldung/liste');
     await page.waitForLoadState('networkidle');
@@ -120,16 +176,8 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
     await expect(page.locator(`text=Wettkampf-${timestamp} Teilnehmer`)).toBeVisible();
 
     // Should NOT show "Kind-ID: X" (proper eager loading)
-    const hasKindIdText = await page.locator('text=/Kind-ID:.*\\d+/').count();
+    const hasKindIdText = await page.locator('text=/Kind-ID:.*\d+/').count();
     expect(hasKindIdText).toBe(0);
-
-    // Cleanup
-    // Note: Anmeldung will be deleted cascade when Wettkampf is deleted
-    await request.delete(`http://localhost:8000/api/wettkampf/${wettkampfId}`);
-    await request.delete(`http://localhost:8000/api/kind/${kind.id}`);
-    await request.delete(`http://localhost:8000/api/verein/${verein.id}`);
-    await request.delete(`http://localhost:8000/api/schwimmbad/${schwimmbad.id}`);
-    await request.delete(`http://localhost:8000/api/saison/${saison.id}`);
   });
 
   test('anmeldung business rules - vorläufig status', async ({ request }) => {
@@ -145,6 +193,7 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
       }
     });
     const verein = await vereinResponse.json();
+    createdIds.verein.push(verein.id);
 
     const kindResponse = await request.post('http://localhost:8000/api/kind', {
       data: {
@@ -155,6 +204,7 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
       }
     });
     const kind = await kindResponse.json();
+    createdIds.kind.push(kind.id);
 
     const saisonResponse = await request.post('http://localhost:8000/api/saison', {
       data: {
@@ -164,6 +214,7 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
       }
     });
     const saison = await saisonResponse.json();
+    createdIds.saison.push(saison.id);
 
     const schwimmbadResponse = await request.post('http://localhost:8000/api/schwimmbad', {
       data: {
@@ -172,6 +223,7 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
       }
     });
     const schwimmbad = await schwimmbadResponse.json();
+    createdIds.schwimmbad.push(schwimmbad.id);
 
     const wettkampfResponse = await request.post('http://localhost:8000/api/wettkampf', {
       data: {
@@ -182,6 +234,7 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
       }
     });
     const wettkampf = await wettkampfResponse.json();
+    createdIds.wettkampf.push(wettkampf.id);
 
     // Test 1: Anmeldung without figuren should be vorläufig
     const anmeldung1Response = await request.post('http://localhost:8000/api/anmeldung', {
@@ -193,6 +246,7 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
     });
     expect(anmeldung1Response.ok()).toBeTruthy();
     const anmeldung1 = await anmeldung1Response.json();
+    createdIds.anmeldung.push(anmeldung1.id);
 
     // Verify business rule: no figuren → vorläufig
     expect(anmeldung1.vorlaeufig).toBe(1);
@@ -214,6 +268,7 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
       }
     });
     const figur = await figurResponse.json();
+    createdIds.figur.push(figur.id);
 
     const anmeldung2Response = await request.post('http://localhost:8000/api/anmeldung', {
       data: {
@@ -224,6 +279,7 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
     });
     expect(anmeldung2Response.ok()).toBeTruthy();
     const anmeldung2 = await anmeldung2Response.json();
+    createdIds.anmeldung.push(anmeldung2.id);
 
     // Verify business rule: figuren present → aktiv
     expect(anmeldung2.vorlaeufig).toBe(0);
@@ -233,16 +289,6 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
     expect(anmeldung2.figuren).toBeDefined();
     expect(anmeldung2.figuren.length).toBe(1);
     expect(anmeldung2.figuren[0].name).toBe(`Test Figur ${timestamp}`);
-
-    // Cleanup
-    await request.delete(`http://localhost:8000/api/anmeldung/${anmeldung1.id}`);
-    await request.delete(`http://localhost:8000/api/anmeldung/${anmeldung2.id}`);
-    await request.delete(`http://localhost:8000/api/figur/${figur.id}`);
-    await request.delete(`http://localhost:8000/api/wettkampf/${wettkampf.id}`);
-    await request.delete(`http://localhost:8000/api/kind/${kind.id}`);
-    await request.delete(`http://localhost:8000/api/verein/${verein.id}`);
-    await request.delete(`http://localhost:8000/api/schwimmbad/${schwimmbad.id}`);
-    await request.delete(`http://localhost:8000/api/saison/${saison.id}`);
   });
 
   test('getWettkampfWithDetails returns complete nested data', async ({ request }) => {
@@ -252,10 +298,12 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
     const saison = await (await request.post('http://localhost:8000/api/saison', {
       data: { name: `Nested Saison ${timestamp}`, from_date: '2024-01-01', to_date: '2024-12-31' }
     })).json();
+    createdIds.saison.push(saison.id);
 
     const schwimmbad = await (await request.post('http://localhost:8000/api/schwimmbad', {
       data: { name: `Nested Schwimmbad ${timestamp}`, adresse: 'Nested Str. 1' }
     })).json();
+    createdIds.schwimmbad.push(schwimmbad.id);
 
     const wettkampf = await (await request.post('http://localhost:8000/api/wettkampf', {
       data: {
@@ -265,6 +313,7 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
         schwimmbad_id: schwimmbad.id
       }
     })).json();
+    createdIds.wettkampf.push(wettkampf.id);
 
     // Fetch with details endpoint
     const detailsResponse = await request.get(`http://localhost:8000/api/wettkampf/${wettkampf.id}/details`);
@@ -281,10 +330,5 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
     expect(Array.isArray(details.figuren)).toBeTruthy();
     expect(details.anmeldungen).toBeDefined();
     expect(Array.isArray(details.anmeldungen)).toBeTruthy();
-
-    // Cleanup
-    await request.delete(`http://localhost:8000/api/wettkampf/${wettkampf.id}`);
-    await request.delete(`http://localhost:8000/api/schwimmbad/${schwimmbad.id}`);
-    await request.delete(`http://localhost:8000/api/saison/${saison.id}`);
   });
 });

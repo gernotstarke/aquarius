@@ -4,6 +4,7 @@ Populates the database with sample data for testing.
 """
 import json
 import os
+import sys
 import random
 import shutil
 from datetime import date, timedelta
@@ -75,8 +76,13 @@ def reset_database():
     Base.metadata.create_all(bind=engine)
     print("✅ Database reset complete")
 
-def seed_data():
-    """Seed the database with sample data."""
+def seed_data(minimal=False):
+    """
+    Seed the database with sample data.
+    
+    Args:
+        minimal (bool): If True, only seed essential master data (Admin, Verbände, Versicherungen).
+    """
     db = SessionLocal()
     try:
         print("\n📋 Seeding database with sample data...")
@@ -106,6 +112,10 @@ def seed_data():
         print("\n🛡️  Creating versicherungen...")
         versicherungen_created, versicherungen_total = ensure_versicherungen(db)
         print(f"   ✓ Versicherungen loaded: {versicherungen_created} new, {versicherungen_total} total")
+
+        if minimal:
+            print("\n🛑 Minimal mode: Skipping sample data (Saisons, Kinder, etc.)")
+            return
 
         # Create Saisons
         print("\n📅 Creating saisons...")
@@ -420,6 +430,8 @@ if __name__ == "__main__":
     print("=" * 60)
     print("Aquarius Database Seeding")
     print("=" * 60)
+    
+    minimal_mode = "--minimal" in sys.argv
     reset_database()
-    seed_data()
+    seed_data(minimal=minimal_mode)
     print("\n" + "=" * 60)
