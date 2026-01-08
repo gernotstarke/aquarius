@@ -321,6 +321,22 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
     })).json();
     createdIds.wettkampf.push(wettkampf.id);
 
+    // Create an Anmeldung to verify it is included
+    const verein = await (await request.post('http://localhost:8000/api/verein', {
+      data: { name: `Nested Verein ${timestamp}`, ort: 'Test', register_id: `N-${timestamp}`, contact: 'c' }
+    })).json();
+    createdIds.verein.push(verein.id);
+
+    const kind = await (await request.post('http://localhost:8000/api/kind', {
+      data: { vorname: 'Max', nachname: 'Nested', geburtsdatum: '2010-01-01', verein_id: verein.id }
+    })).json();
+    createdIds.kind.push(kind.id);
+
+    const anmeldung = await (await request.post('http://localhost:8000/api/anmeldung', {
+      data: { kind_id: kind.id, wettkampf_id: wettkampf.id, figur_ids: [] }
+    })).json();
+    createdIds.anmeldung.push(anmeldung.id);
+
     // Fetch with details endpoint
     const detailsResponse = await request.get(`http://localhost:8000/api/wettkampf/${wettkampf.id}/details`);
     expect(detailsResponse.ok()).toBeTruthy();
@@ -336,5 +352,10 @@ test.describe('Wettkampf and Anmeldung Flow', () => {
     expect(Array.isArray(details.figuren)).toBeTruthy();
     expect(details.anmeldungen).toBeDefined();
     expect(Array.isArray(details.anmeldungen)).toBeTruthy();
+    
+    // Verify Kind is present in Anmeldung
+    expect(details.anmeldungen.length).toBeGreaterThan(0);
+    expect(details.anmeldungen[0].kind).toBeDefined();
+    expect(details.anmeldungen[0].kind.vorname).toBe('Max');
   });
 });

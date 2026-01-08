@@ -12,6 +12,11 @@ def kind_has_insurance(kind: models.Kind) -> bool:
 
 def anmeldung_with_insurance_ok(db_anmeldung: models.Anmeldung) -> schemas.Anmeldung:
     """Build Anmeldung schema with derived insurance status."""
+    kind_dto = None
+    if db_anmeldung.kind:
+        # Explicitly convert ORM model to Pydantic model to ensure it's included
+        kind_dto = schemas.Kind.model_validate(db_anmeldung.kind)
+
     return schemas.Anmeldung(
         id=db_anmeldung.id,
         kind_id=db_anmeldung.kind_id,
@@ -22,5 +27,5 @@ def anmeldung_with_insurance_ok(db_anmeldung: models.Anmeldung) -> schemas.Anmel
         status=db_anmeldung.status,
         figuren=db_anmeldung.figuren,
         insurance_ok=kind_has_insurance(db_anmeldung.kind),
-        kind=db_anmeldung.kind,
+        kind=kind_dto,
     )

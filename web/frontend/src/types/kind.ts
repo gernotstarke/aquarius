@@ -25,9 +25,9 @@ export interface KindCreate {
   vorname: string;
   nachname: string;
   geburtsdatum: string;
-  geschlecht?: string;
-  verein_id?: number;
-  verband_id?: number;
-  versicherung_id?: number;
-  vertrag?: string;
+  geschlecht?: string | null;
+  verein_id?: number | null;
+  verband_id?: number | null;
+  versicherung_id?: number | null;
+  vertrag?: string | null;
 }

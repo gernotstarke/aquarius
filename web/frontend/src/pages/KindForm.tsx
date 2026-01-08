@@ -14,6 +14,7 @@ const KindForm: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isEdit = Boolean(id);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const [formData, setFormData] = useState<KindCreate>({
     vorname: '',
@@ -41,14 +42,19 @@ const KindForm: React.FC = () => {
     queryFn: () => listVersicherungen(),
   });
 
-  const { data: kind } = useQuery<Kind>({
+  const { data: kind, isLoading: isKindLoading } = useQuery<Kind>({
     queryKey: ['kind', id],
     queryFn: () => getKind(Number(id)),
     enabled: isEdit,
   });
 
+  // Reset initialization when ID changes (e.g. navigation between kinds)
   useEffect(() => {
-    if (kind) {
+    setIsInitialized(false);
+  }, [id]);
+
+  useEffect(() => {
+    if (kind && !isInitialized) {
       setFormData({
         vorname: kind.vorname,
         nachname: kind.nachname,
@@ -59,8 +65,9 @@ const KindForm: React.FC = () => {
         versicherung_id: kind.versicherung_id,
         vertrag: kind.vertrag || '',
       });
+      setIsInitialized(true);
     }
-  }, [kind]);
+  }, [kind, isInitialized]);
 
   const createMutation = useMutation({
     mutationFn: createKind,
@@ -87,6 +94,10 @@ const KindForm: React.FC = () => {
       createMutation.mutate(formData);
     }
   };
+
+  if (isEdit && (!kind || !isInitialized)) {
+    return <div className="text-center py-12">Lädt...</div>;
+  }
 
   return (
     <div className="max-w-2xl space-y-8">
@@ -150,7 +161,7 @@ const KindForm: React.FC = () => {
               name="verein_id"
               className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
               value={formData.verein_id || ''}
-              onChange={(e) => setFormData({ ...formData, verein_id: e.target.value ? Number(e.target.value) : undefined })}
+              onChange={(e) => setFormData({ ...formData, verein_id: e.target.value ? Number(e.target.value) : null })}
             >
               <option value="">Kein Verein</option>
               {vereine?.map((verein) => (
@@ -169,7 +180,7 @@ const KindForm: React.FC = () => {
               name="verband_id"
               className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
               value={formData.verband_id || ''}
-              onChange={(e) => setFormData({ ...formData, verband_id: e.target.value ? Number(e.target.value) : undefined })}
+              onChange={(e) => setFormData({ ...formData, verband_id: e.target.value ? Number(e.target.value) : null })}
             >
               <option value="">Kein Verband</option>
               {verbaende?.map((verband) => (
@@ -188,7 +199,7 @@ const KindForm: React.FC = () => {
               name="versicherung_id"
               className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
               value={formData.versicherung_id || ''}
-              onChange={(e) => setFormData({ ...formData, versicherung_id: e.target.value ? Number(e.target.value) : undefined })}
+              onChange={(e) => setFormData({ ...formData, versicherung_id: e.target.value ? Number(e.target.value) : null })}
             >
               <option value="">Keine Versicherung</option>
               {versicherungen?.map((versicherung) => (

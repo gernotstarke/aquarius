@@ -107,7 +107,7 @@ class Wettkampf(Base):
     saison = relationship("Saison", back_populates="wettkämpfe")
     schwimmbad = relationship("Schwimmbad", back_populates="wettkämpfe")
     figuren = relationship("Figur", secondary=wettkampf_figur_association)
-    anmeldungen = relationship("Anmeldung", back_populates="wettkampf")
+    anmeldungen = relationship("Anmeldung", back_populates="wettkampf", cascade="all, delete-orphan")
 
 
 class Kind(Base):
