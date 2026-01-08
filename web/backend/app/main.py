@@ -32,6 +32,13 @@ DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./aquarius.db")
 logger.info(f"🔧 DATABASE_URL: {DATABASE_URL}")
 logger.info(f"🔧 TURSO_AUTH_TOKEN present: {bool(os.getenv('TURSO_AUTH_TOKEN'))}")
 
+# Log authentication configuration
+ENABLE_APP_AUTH = os.getenv("ENABLE_APP_AUTH", "false").lower() == "true"
+DEFAULT_APP_USER = os.getenv("DEFAULT_APP_USER", "testuser")
+logger.info(f"🔧 ENABLE_APP_AUTH: {ENABLE_APP_AUTH}")
+if not ENABLE_APP_AUTH:
+    logger.info(f"🔧 DEFAULT_APP_USER: {DEFAULT_APP_USER}")
+
 # Create tables
 Base.metadata.create_all(bind=engine)
 
@@ -40,6 +47,28 @@ app = FastAPI(
     description="Simple CRUD API for testing the tech stack",
     version=AQUARIUS_BACKEND_VERSION
 )
+
+# Startup event to initialize app user
+@app.on_event("startup")
+def startup_event():
+    """Initialize app user authentication on startup."""
+    # Skip initialization if running tests (PYTEST_CURRENT_TEST env var is set)
+    if "PYTEST_CURRENT_TEST" in os.environ:
+        return
+    
+    if not ENABLE_APP_AUTH:
+        logger.info(f"📝 Development mode: Creating default app user '{DEFAULT_APP_USER}' if needed...")
+        from app import auth as auth_module
+        db = SessionLocal()
+        try:
+            auth_module.get_or_create_default_app_user(db)
+        except Exception as e:
+            logger.warning(f"⚠️  Error initializing default app user: {e}")
+        finally:
+            db.close()
+
+# Import SessionLocal for startup event
+from app.database import SessionLocal
 
 # CORS middleware for frontend and documentation site
 app.add_middleware(

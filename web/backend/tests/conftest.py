@@ -6,6 +6,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
+# Disable app authentication for tests
+os.environ["ENABLE_APP_AUTH"] = "false"
+
 # Add the backend directory to sys.path so 'app' module can be found
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -58,7 +61,10 @@ def admin_token_headers(client, db):
         username="admin_test",
         hashed_password=get_password_hash(password),
         role="ROOT",
-        is_active=True
+        is_active=True,
+        is_app_user=False,
+        can_read_all=True,
+        can_write_all=False,
     )
     db.add(admin_user)
     db.commit()
@@ -71,3 +77,4 @@ def admin_token_headers(client, db):
     response = client.post("/api/auth/token", data=login_data)
     token = response.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}
+
