@@ -1,0 +1,420 @@
+== 9 Querschnittliche Konzepte: App-Benutzer-Authentifizierung und Autorisierung
+
+=== 9.1 Übersicht
+
+Das Aquarius-System unterscheidet zwischen zwei Benutzerklassen:
+
+1. **Admin-Benutzer** (Rolle: ROOT)
+   - Verwaltung von Systemkonfiguration, Benutzern, Monitoring
+   - Zugriff nur über spezielle Admin-Endpunkte (`/admin`)
+   - Benötigt 2FA/TOTP-Authentifizierung
+   - Existiert bereits seit Projektbeginn
+
+2. **App-Benutzer** (Rolle: OFFIZIELLER, PLANER)
+   - Zugriff auf Wettkampf-Verwaltungsanwendung
+   - Granulare Berechtigungen: Lesen vs. Schreiben
+   - Umgebungsabhängiges Login-Verhalten
+   - NEU in Phase 1 der Implementierung
+
+=== 9.2 Umgebungsgestütztes Authentifizierungssystem
+
+Das System bietet zwei Modi, gesteuert durch die Umgebungsvariable `ENABLE_APP_AUTH`:
+
+==== Entwicklungsmodus (`ENABLE_APP_AUTH=false`)
+
+.Automatische Authentifizierung ohne Token-Verwaltung
+[source]
+----
+Browser Request → GET /api/kind
+                    ↓
+              Kein Token vorhanden
+                    ↓
+       Backend: ENABLE_APP_AUTH=false?
+              ↓ ja
+      Automatischer Login mit DEFAULT_APP_USER
+              ↓
+       Default-User hat READ + WRITE Zugriff
+              ↓
+       Response: 200 OK mit Daten
+----
+
+**Ziel:** Entwickler können die Anwendung lokal ohne komplexe Auth-Konfiguration nutzen.
+
+**Konfiguration:**
+[source,properties]
+----
+# .env.local
+ENABLE_APP_AUTH=false
+DEFAULT_APP_USER=testuser
+----
+
+**Verhalten:**
+- Beim ersten Startup wird automatisch ein Standardbenutzer erstellt
+- Benutzername: `testuser`, Passwort: `dev-password` (hardcodiert)
+- Dieser Benutzer hat `is_app_user=true`, `can_read_all=true`, `can_write_all=true`
+- Frontend benötigt keinen Token in localStorage
+
+==== Produktionsmodus (`ENABLE_APP_AUTH=true`)
+
+.Vollständige JWT-basierte Authentifizierung
+[source]
+----
+Browser Request → GET /api/kind (kein Token)
+                    ↓
+              Kein Token vorhanden
+                    ↓
+       Backend: ENABLE_APP_AUTH=true
+              ↓ ja
+       HTTPException 401: Authentication required
+              ↓
+       Frontend: Redirect to /app/login
+              ↓
+         Benutzer gibt Credentials ein
+              ↓
+       POST /api/auth/token
+              ↓
+       Backend: Validate credentials + permissions
+              ↓
+       Response: JWT Token
+              ↓
+    Frontend: Store in localStorage, retry request
+              ↓
+    Request: GET /api/kind (mit Token)
+              ↓
+       Validation erfolgreich
+              ↓
+       Response: 200 OK mit Daten
+----
+
+**Ziel:** Sichere Authentifizierung für Public Cloud-Deployments.
+
+**Konfiguration:**
+[source,properties]
+----
+# .env (Produktion auf fly.io)
+ENABLE_APP_AUTH=true
+----
+
+**Verhalten:**
+- Alle Anfragen ohne gültigen JWT-Token werden mit 401 abgelehnt
+- Admin erstellt App-Benutzer über Admin-Panel
+- Benutzer loggen sich über `/app/login` ein
+
+=== 9.3 Datenmodell: Benutzerberechtigungen
+
+==== User-Modell-Erweiterungen
+
+[source,python]
+----
+class User(Base):
+    # ... existierende Felder ...
+    role: str  # ROOT, PLANER, OFFIZIELLER
+    
+    # NEU in Phase 1:
+    is_app_user: bool        # Kann diese Benutzer auf App zugreifen?
+    can_read_all: bool       # Hat Lesezugriff auf App-Daten?
+    can_write_all: bool      # Hat Schreib-/Änderungszugriff?
+----
+
+==== Berechtigungslogik
+
+[source]
+----
+┌─────────────────────────────────────────────────────┐
+│         Authentifizierungs-Entscheidungsbaum         │
+└─────────────────────────────────────────────────────┘
+
+Benutzer stellt Anfrage:
+        │
+        ├─→ Hat gültigen Token? (oder ENABLE_APP_AUTH=false)
+        │      │
+        │      ├─→ NEIN: 401 Unauthorized
+        │      │
+        │      └─→ JA: Weiter
+        │
+        ├─→ ist_app_user=true ODER role=ROOT?
+        │      │
+        │      ├─→ NEIN: 403 Forbidden ("Not an app user")
+        │      │
+        │      └─→ JA: Weiter
+        │
+        ├─→ Lese-Operation?
+        │      │
+        │      ├─→ role=ROOT: ✅ Erlaubt (Admin umgeht alle Checks)
+        │      │
+        │      └─→ can_read_all=true: ✅ Erlaubt, sonst 403
+        │
+        └─→ Schreib-Operation (POST/PUT/DELETE)?
+               │
+               ├─→ role=ROOT: ✅ Erlaubt (Admin umgeht alle Checks)
+               │
+               └─→ can_write_all=true: ✅ Erlaubt, sonst 403
+----
+
+=== 9.4 Backend-Implementierung
+
+==== Authentifizierungs-Dependencies
+
+Das System implementiert drei Stufen der Dependency Injection (FastAPI):
+
+[source,python]
+----
+# Stufe 1: Intelligenter Benutzer-Resolver
+async def get_current_app_user(
+    db: Session = Depends(get_db),
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_http_bearer),
+) -> models.User:
+    """
+    - ENABLE_APP_AUTH=false: Gibt DEFAULT_APP_USER zurück
+    - ENABLE_APP_AUTH=true: Validiert JWT Token
+    """
+
+# Stufe 2: Lesezugriff-Gatekeeper
+async def require_app_read_permission(
+    current_user: models.User = Depends(get_current_app_user),
+) -> models.User:
+    """
+    - Admin (ROOT): ✅ Immer erlaubt
+    - App-Benutzer: ✅ Wenn can_read_all=true
+    """
+
+# Stufe 3: Schreibzugriff-Gatekeeper
+async def require_app_write_permission(
+    current_user: models.User = Depends(get_current_app_user),
+) -> models.User:
+    """
+    - Admin (ROOT): ✅ Immer erlaubt
+    - App-Benutzer: ✅ Wenn can_write_all=true
+    """
+----
+
+==== Endpoint-Schutz
+
+Jeder Domain-Router schützt seine Endpunkte:
+
+[source,python]
+----
+# Router: kind/router.py
+
+@router.get("/kind", response_model=List[KindDTO])
+def list_kind(
+    # ...
+    current_user: models.User = Depends(auth.require_app_read_permission),
+):
+    """GET benötigt Lesezugriff"""
+    # ...
+
+@router.post("/kind", response_model=KindDTO, status_code=201)
+def create_kind(
+    # ...
+    current_user: models.User = Depends(auth.require_app_write_permission),
+):
+    """POST benötigt Schreibzugriff"""
+    # ...
+
+@router.put("/kind/{kind_id}", response_model=KindDTO)
+def update_kind(
+    # ...
+    current_user: models.User = Depends(auth.require_app_write_permission),
+):
+    """PUT benötigt Schreibzugriff"""
+    # ...
+
+@router.delete("/kind/{kind_id}", status_code=204)
+def delete_kind(
+    # ...
+    current_user: models.User = Depends(auth.require_app_write_permission),
+):
+    """DELETE benötigt Schreibzugriff"""
+    # ...
+----
+
+=== 9.5 Frontend-Implementierung (Phase 2)
+
+==== Auth-Context
+
+[source,typescript]
+----
+// src/context/AuthContext.tsx
+interface AuthContextType {
+  user: User | null;
+  token: string | null;
+  isLoading: boolean;
+  canRead: boolean;      // Abgeleitet aus user
+  canWrite: boolean;     // Abgeleitet aus user
+  login: (username: string, password: string) => Promise<void>;
+  logout: () => void;
+}
+
+export const useAuth = () => useContext(AuthContext);
+----
+
+==== Routen-Schutz
+
+[source,typescript]
+----
+// src/components/AppLoginGuard.tsx
+const AppLoginGuard: React.FC = () => {
+  const auth = useAuth();
+  
+  if (auth.isLoading) return <LoadingSpinner />;
+  if (!auth.token) return <Navigate to="/app/login" replace />;
+  
+  return <Outlet />;
+};
+
+// In App.tsx:
+<Route path="/" element={<AppLoginGuard />}>
+  {/* Alle App-Routen hier */}
+</Route>
+----
+
+==== Permission-Basierte UI
+
+[source,typescript]
+----
+// In Pages und Components:
+const KindForm: React.FC = () => {
+  const auth = useAuth();
+  
+  return (
+    <>
+      {/* Felder immer sichtbar */}
+      <Input value={kind.name} disabled={!auth.canWrite} />
+      
+      {/* Buttons basierend auf Berechtigung */}
+      {auth.canWrite ? (
+        <Button onClick={handleSave}>Speichern</Button>
+      ) : (
+        <Alert>Nur-Lese-Zugriff</Alert>
+      )}
+    </>
+  );
+};
+----
+
+=== 9.6 Bootstrap-Verfahren
+
+==== Neue Installation (Produktion)
+
+1. Deployment auf fly.io mit `ENABLE_APP_AUTH=true`
+2. Admin loggt sich über `/admin/login` ein (existiert bereits)
+3. Admin navigiert zu Admin-Panel → "App-Benutzer verwalten"
+4. Admin erstellt ersten App-Benutzer
+5. App-Benutzer loggt sich über `/app/login` ein
+
+Zukünftige Erweiterung: Self-Service-Registrierung mit Einladungslinks
+
+==== Entwickler-Workflow
+
+[source,bash]
+----
+# 1. Repository klonen
+git clone ...
+cd web
+
+# 2. Development-Server starten
+make dev
+
+# 3. Frontend automatisch unter http://localhost:5173 aufrufbar
+# 4. Kein Login erforderlich, Default-Benutzer wird automatisch verwendet
+# 5. Voller Lese-/Schreibzugriff auf alle App-Daten
+
+# 6. Optional: Admin-Panel unter http://localhost:8000/admin
+# Admin-User: admin_test, Passwort: admin_test_password (aus conftest.py)
+----
+
+=== 9.7 Sicherheitsüberlegungen
+
+==== Passwort-Handling
+
+- Alle Passwörter werden mit bcrypt gehasht (passlib-Library)
+- Niemals Passwörter in Logdatei oder Code speichern
+- Development-Passwort `dev-password` für testuser ist hardcodiert (nur in Dev-Modus)
+
+==== Token-Management
+
+- JWT-Tokens haben 24 Stunden Gültigkeitsdauer
+- Frontend speichert Token in localStorage (nicht sicher für sensitive Daten, aber ausreichend für interne App)
+- Bei 401-Fehler: Frontend leitet zu `/app/login` um
+- Bei 403-Fehler: Benutzer hat unzureichende Berechtigungen (UI zeigt Fehlermeldung)
+
+==== Datenschutz
+
+- Keine persönlichen Daten von Benutzern werden exponiert
+- Permission-Checks auf Server durchgeführt (nicht auf Client vertraut)
+- Frontend-Checks dienen nur UX-Verbesserung, nicht Sicherheit
+
+=== 9.8 Erweiterungspunkte
+
+Zukünftige Verbesserungen:
+
+1. **Rollenbasierte Zugriffskontrolle (RBAC)**
+   - Granularere Rollen als nur true/false für read/write
+   - z.B.: Nur "eigene Wettkämpfe" bearbeiten
+
+2. **Token-Refresh-Mechanismus**
+   - Refresh-Tokens für langlebige Sessions
+   - Automatische Token-Erneuerung
+
+3. **2FA für App-Benutzer**
+   - Optional TOTP für sensible Daten
+   - Backup-Codes wie bei Admin-Benutzern
+
+4. **Audit-Logging**
+   - Alle Änderungen tracken (Wer? Wann? Was?)
+   - Für Compliance und Debugging
+
+5. **Self-Service-Registrierung**
+   - Einladungslinks für neue App-Benutzer
+   - Email-Verifizierung
+
+=== 9.9 Implementierungsplan
+
+[cols="1,3,4", options="header"]
+|===
+| Phase | Komponenten | Status
+
+| 1
+| Backend-Infrastruktur
+| ✅ DONE
+- User-Modell erweitern
+- Auth-Dependencies
+- Kind-Router als Beispiel
+- Alle Tests grün
+
+| 2
+| Frontend-Foundation
+| 🔄 IN PROGRESS
+- AuthContext
+- AppLoginGuard
+- AppLogin-Seite
+- UserMenu
+
+| 3
+| UI Permission Gates
+| ⏳ PLANNED
+- Read-Only Formulare
+- Buttons ausblenden
+- Visuelle Indikatoren
+
+| 4
+| Verbleibende Router
+| ⏳ PLANNED
+- Alle Domain-Router schützen
+- Wettkampf, Anmeldung, Grunddaten, etc.
+
+| 5
+| Production Ready
+| ⏳ GEPLANT
+- E2E-Tests für Auth-Flows
+- Performance-Tests
+- Deployment-Checkliste
+|===
+
+=== 9.10 Referenzen
+
+- link:ADR-032-app-user-authentication.md[ADR-032: App User Authentication & Authorization]
+- link:09-user-management-admin-concept.adoc[09-user-management-admin-concept.adoc] - Admin-Konzept (verwandt)
+- https://fastapi.tiangolo.com/tutorial/security/[FastAPI Security Docs]
+- https://react.dev/reference/react/useContext[React useContext API]

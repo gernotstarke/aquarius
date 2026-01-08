@@ -1,7 +1,10 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthProvider } from './context/AuthContext';
 import NewLayout from './components/NewLayout';
+import AppLoginGuard from './components/AppLoginGuard';
+import AppLogin from './pages/AppLogin';
 import Home from './pages/Home';
 import Grunddaten from './pages/Grunddaten';
 import SaisonList from './pages/SaisonList';
@@ -42,7 +45,7 @@ const queryClient = new QueryClient({
   },
 });
 
-// Simple Auth Guard
+// Simple Auth Guard for admin routes
 const RequireAuth: React.FC = () => {
   const token = localStorage.getItem('token');
   if (!token) {
@@ -54,14 +57,19 @@ const RequireAuth: React.FC = () => {
 const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <Routes>
-          {/* Main Public App */}
-          <Route path="/" element={<NewLayout><Outlet /></NewLayout>}>
-            <Route index element={<Home />} />
+      <AuthProvider>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <Routes>
+            {/* App Login */}
+            <Route path="/app/login" element={<AppLogin />} />
 
-            {/* Grunddaten */}
-            <Route path="/grunddaten" element={<Grunddaten />} />
+            {/* Main App Routes - Protected */}
+            <Route path="/" element={<AppLoginGuard />}>
+              <Route element={<NewLayout><Outlet /></NewLayout>}>
+                <Route index element={<Home />} />
+
+                {/* Grunddaten */}
+                <Route path="/grunddaten" element={<Grunddaten />} />
             <Route path="/grunddaten/saisons" element={<SaisonList />} />
             <Route path="/grunddaten/saisons/new" element={<SaisonForm />} />
             <Route path="/grunddaten/saisons/:id" element={<SaisonForm />} />
@@ -126,23 +134,25 @@ const App: React.FC = () => {
             <Route path="/kind/new" element={<KindForm />} />
             <Route path="/kind/:id" element={<KindForm />} />
             <Route path="/kind" element={<KindList />} />
-          </Route>
-
-          {/* Admin App */}
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/totp-setup" element={<TOTPSetup />} />
-
-          <Route path="/admin" element={<RequireAuth />}>
-            <Route element={<AdminLayout />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="users" element={<UserList />} />
-              <Route path="health" element={<SystemHealth />} />
-              <Route path="database" element={<DatabaseStats />} />
+              </Route>
             </Route>
-          </Route>
 
-        </Routes>
-      </BrowserRouter>
+            {/* Admin App */}
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/totp-setup" element={<TOTPSetup />} />
+
+            <Route path="/admin" element={<RequireAuth />}>
+              <Route element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="users" element={<UserList />} />
+                <Route path="health" element={<SystemHealth />} />
+                <Route path="database" element={<DatabaseStats />} />
+              </Route>
+            </Route>
+
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </QueryClientProvider>
   );
 };
