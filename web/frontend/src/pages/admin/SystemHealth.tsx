@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '../../api/client';
-import { Activity, Database, Server, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Activity, Database, Server, Clock, AlertTriangle, CheckCircle, Users } from 'lucide-react';
 
 interface SystemHealthData {
   status: string;
@@ -22,6 +22,12 @@ interface SystemHealthData {
   };
 }
 
+interface ActiveUserCountResponse {
+  active_users: number;
+  window_minutes: number;
+  timestamp: string;
+}
+
 const formatBytes = (bytes: number) => {
   if (bytes === 0) return '0 Bytes';
   const k = 1024;
@@ -38,6 +44,15 @@ const SystemHealth: React.FC = () => {
       return response.data;
     },
     refetchInterval: 5000 // Refresh every 5 seconds
+  });
+
+  const { data: activeUsers } = useQuery<ActiveUserCountResponse>({
+    queryKey: ['activeUsers'],
+    queryFn: async () => {
+      const response = await apiClient.get('/admin/users/active-count?minutes=15');
+      return response.data;
+    },
+    refetchInterval: 10000 // Refresh every 10 seconds
   });
 
   if (isLoading && !health) {
@@ -72,7 +87,7 @@ const SystemHealth: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         
         {/* System Info Card */}
         <div className="bg-white rounded-lg shadow border-t-4 border-blue-500 p-6">
@@ -140,14 +155,32 @@ const SystemHealth: React.FC = () => {
                 {health?.database.table_count}
               </span>
             </div>
-             <div className="mt-4 p-3 bg-gray-50 rounded text-xs text-gray-500">
-               <p>Connected via SQLAlchemy to local SQLite instance (Prototype Mode).</p>
-             </div>
+          </div>
+        </div>
+
+        {/* User Activity Card */}
+        <div className="bg-white rounded-lg shadow border-t-4 border-green-500 p-6">
+          <div className="flex items-center justify-between mb-4 border-b pb-2">
+            <h2 className="text-lg font-semibold text-gray-800 flex items-center">
+              <Users className="mr-2 text-green-500" /> User Activity
+            </h2>
+            <span className="text-sm text-gray-500">Live</span>
+          </div>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Active Users</span>
+              <span className="text-2xl font-bold text-green-600">
+                {activeUsers?.active_users !== undefined ? activeUsers.active_users : '—'}
+              </span>
+            </div>
+            <p className="text-sm text-gray-500">
+              Users active in the last {activeUsers?.window_minutes || 15} minutes.
+            </p>
           </div>
         </div>
 
         {/* Last Updated */}
-        <div className="md:col-span-2 text-center text-sm text-gray-500 flex justify-center items-center mt-4">
+        <div className="md:col-span-2 lg:col-span-3 text-center text-sm text-gray-500 flex justify-center items-center mt-4">
           <Clock size={16} className="mr-1" />
           Last updated: {new Date(health?.timestamp || '').toLocaleString()}
         </div>
