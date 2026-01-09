@@ -72,7 +72,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const userResponse = await apiClient.get('/auth/me');
       setUser(userResponse.data);
     } catch (error: any) {
-      throw new Error(error.response?.data?.detail || 'Login failed');
+      // Extract error message from various error formats
+      let errorMessage = 'Login failed';
+      
+      if (error?.response?.data?.detail) {
+        errorMessage = error.response.data.detail;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
+      throw new Error(errorMessage);
     }
   };
 
