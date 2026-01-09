@@ -47,7 +47,7 @@ const UserMenu: React.FC = () => {
         <img
           src="/user-glyph.png"
           alt="User"
-          className="w-12 h-12 object-contain"
+          className="w-16 h-16 object-contain"
         />
         <span className="text-sm text-gray-700">{user.username}</span>
       </button>
