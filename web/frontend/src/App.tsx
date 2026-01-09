@@ -47,7 +47,7 @@ const queryClient = new QueryClient({
 
 // Simple Auth Guard for admin routes
 const RequireAuth: React.FC = () => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('admin_token');
   if (!token) {
     return <Navigate to="/admin/login" replace />;
   }

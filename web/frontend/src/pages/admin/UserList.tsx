@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import apiClient from '../../api/client';
+import adminApiClient from '../../api/adminClient';
 import { UserPlus, Trash2, User as UserIcon, Edit2, Shield } from 'lucide-react';
 
 interface User {
@@ -43,14 +43,14 @@ const UserList: React.FC = () => {
   const { data: users, isLoading, error } = useQuery<User[]>({
     queryKey: ['users'],
     queryFn: async () => {
-      const response = await apiClient.get('/users/');
+      const response = await adminApiClient.get('/users/');
       return response.data;
     }
   });
 
   const createMutation = useMutation({
     mutationFn: async (newUser: any) => {
-      await apiClient.post('/users/', newUser);
+      await adminApiClient.post('/users/', newUser);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
@@ -61,7 +61,7 @@ const UserList: React.FC = () => {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: any }) => {
-      await apiClient.put(`/users/${id}`, data);
+      await adminApiClient.put(`/users/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
@@ -73,7 +73,7 @@ const UserList: React.FC = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (userId: number) => {
-      await apiClient.delete(`/users/${userId}`);
+      await adminApiClient.delete(`/users/${userId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });

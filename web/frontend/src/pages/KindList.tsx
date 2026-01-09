@@ -5,9 +5,11 @@ import { listKinder, deleteKind, isKindInsured } from '../api/kind';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import Input from '../components/Input';
+import { useAuth } from '../context/AuthContext';
 
 const KindList: React.FC = () => {
   const queryClient = useQueryClient();
+  const { canWrite } = useAuth();
 
   // State for List controls
   const [page, setPage] = useState(1);
@@ -61,9 +63,11 @@ const KindList: React.FC = () => {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h2 className="text-h1 font-bold text-neutral-900">Kinder</h2>
-        <Link to="/kind/new">
-          <Button size="lg">Neues Kind</Button>
-        </Link>
+        {canWrite ? (
+          <Link to="/kind/new">
+            <Button size="lg">Neues Kind</Button>
+          </Link>
+        ) : null}
       </div>
 
       {/* Controls: Search and Sort */}
@@ -126,21 +130,23 @@ const KindList: React.FC = () => {
                   )}
                 </div>
               </Link>
-              <div className="flex gap-4 ml-4">
-                <Link to={`/kind/${kind.id}`}>
-                  <Button variant="secondary">Bearbeiten</Button>
-                </Link>
-                <Button
-                  variant="danger"
-                  onClick={() => {
-                    if (confirm('Kind wirklich löschen?')) {
-                      deleteMutation.mutate(kind.id);
-                    }
-                  }}
-                >
-                  Löschen
-                </Button>
-              </div>
+              {canWrite ? (
+                <div className="flex gap-4 ml-4">
+                  <Link to={`/kind/${kind.id}`}>
+                    <Button variant="secondary">Bearbeiten</Button>
+                  </Link>
+                  <Button
+                    variant="danger"
+                    onClick={() => {
+                      if (confirm('Kind wirklich löschen?')) {
+                        deleteMutation.mutate(kind.id);
+                      }
+                    }}
+                  >
+                    Löschen
+                  </Button>
+                </div>
+              ) : null}
             </div>
           </Card>
         ))}

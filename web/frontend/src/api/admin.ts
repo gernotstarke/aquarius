@@ -4,7 +4,7 @@
  * Encapsulates all API calls related to admin domain (auth, users, database).
  */
 
-import apiClient from './client';
+import adminApiClient from './adminClient';
 
 // ===== Auth API =====
 
@@ -54,7 +54,7 @@ export interface UserCreate {
  * Get current authenticated user
  */
 export const getCurrentUser = async (): Promise<User> => {
-  const response = await apiClient.get<User>('/auth/me');
+  const response = await adminApiClient.get<User>('/auth/me');
   return response.data;
 };
 
@@ -66,7 +66,7 @@ export const login = async (credentials: LoginCredentials): Promise<LoginRespons
   params.append('username', credentials.username);
   params.append('password', credentials.password);
 
-  const response = await apiClient.post<LoginResponse>('/auth/token', params, {
+  const response = await adminApiClient.post<LoginResponse>('/auth/token', params, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
@@ -78,7 +78,7 @@ export const login = async (credentials: LoginCredentials): Promise<LoginRespons
  * Setup TOTP (2FA) for current user
  */
 export const setupTOTP = async (): Promise<TOTPSetupResponse> => {
-  const response = await apiClient.post<TOTPSetupResponse>('/auth/totp/setup');
+  const response = await adminApiClient.post<TOTPSetupResponse>('/auth/totp/setup');
   return response.data;
 };
 
@@ -86,14 +86,14 @@ export const setupTOTP = async (): Promise<TOTPSetupResponse> => {
  * Enable TOTP with verification token
  */
 export const enableTOTP = async (request: TOTPEnableRequest): Promise<void> => {
-  await apiClient.post('/auth/totp/enable', request);
+  await adminApiClient.post('/auth/totp/enable', request);
 };
 
 /**
  * Verify TOTP token
  */
 export const verifyTOTP = async (request: TOTPVerifyRequest): Promise<LoginResponse> => {
-  const response = await apiClient.post<LoginResponse>('/auth/totp/verify', request);
+  const response = await adminApiClient.post<LoginResponse>('/auth/totp/verify', request);
   return response.data;
 };
 
@@ -101,7 +101,7 @@ export const verifyTOTP = async (request: TOTPVerifyRequest): Promise<LoginRespo
  * Verify TOTP backup code
  */
 export const verifyTOTPBackup = async (request: TOTPVerifyBackupRequest): Promise<LoginResponse> => {
-  const response = await apiClient.post<LoginResponse>('/auth/totp/verify-backup', request);
+  const response = await adminApiClient.post<LoginResponse>('/auth/totp/verify-backup', request);
   return response.data;
 };
 
@@ -111,7 +111,7 @@ export const verifyTOTPBackup = async (request: TOTPVerifyBackupRequest): Promis
  * Fetch list of users
  */
 export const listUsers = async (): Promise<User[]> => {
-  const response = await apiClient.get<User[]>('/users/');
+  const response = await adminApiClient.get<User[]>('/users/');
   return response.data;
 };
 
@@ -119,7 +119,7 @@ export const listUsers = async (): Promise<User[]> => {
  * Create a new user
  */
 export const createUser = async (user: UserCreate): Promise<User> => {
-  const response = await apiClient.post<User>('/users/', user);
+  const response = await adminApiClient.post<User>('/users/', user);
   return response.data;
 };
 
@@ -127,7 +127,7 @@ export const createUser = async (user: UserCreate): Promise<User> => {
  * Update an existing user
  */
 export const updateUser = async (id: number, user: Partial<UserCreate>): Promise<User> => {
-  const response = await apiClient.put<User>(`/users/${id}`, user);
+  const response = await adminApiClient.put<User>(`/users/${id}`, user);
   return response.data;
 };
 
@@ -135,7 +135,7 @@ export const updateUser = async (id: number, user: Partial<UserCreate>): Promise
  * Delete a user by ID
  */
 export const deleteUser = async (id: number): Promise<void> => {
-  await apiClient.delete(`/users/${id}`);
+  await adminApiClient.delete(`/users/${id}`);
 };
 
 // ===== Database Admin API =====
@@ -160,7 +160,7 @@ export interface SystemHealth {
  * Get database statistics
  */
 export const getDatabaseStats = async (): Promise<DatabaseStats> => {
-  const response = await apiClient.get<DatabaseStats>('/admin/database/stats');
+  const response = await adminApiClient.get<DatabaseStats>('/admin/database/stats');
   return response.data;
 };
 
@@ -168,6 +168,6 @@ export const getDatabaseStats = async (): Promise<DatabaseStats> => {
  * Get system health status
  */
 export const getSystemHealth = async (): Promise<SystemHealth> => {
-  const response = await apiClient.get<SystemHealth>('/health/');
+  const response = await adminApiClient.get<SystemHealth>('/health/');
   return response.data;
 };

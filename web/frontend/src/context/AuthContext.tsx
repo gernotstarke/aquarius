@@ -28,7 +28,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+  const [token, setToken] = useState<string | null>(localStorage.getItem('app_token'));
   const [isLoading, setIsLoading] = useState(true);
 
   // Load user on mount and token change
@@ -40,7 +40,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const response = await apiClient.get('/auth/app-me');
         setUser(response.data);
       } catch (error) {
-        localStorage.removeItem('token');
+        localStorage.removeItem('app_token');
         setToken(null);
         setUser(null);
       } finally {
@@ -64,7 +64,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       });
       const { access_token } = response.data;
 
-      localStorage.setItem('token', access_token);
+      localStorage.setItem('app_token', access_token);
       setToken(access_token);
 
       // Fetch user info
@@ -85,7 +85,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('app_token');
     setToken(null);
     setUser(null);
   };

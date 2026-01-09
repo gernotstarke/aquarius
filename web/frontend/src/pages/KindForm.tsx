@@ -8,11 +8,13 @@ import { Verein, Verband, Versicherung } from '../types/grunddaten';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
+import { useAuth } from '../context/AuthContext';
 
 const KindForm: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { canWrite } = useAuth();
   const isEdit = Boolean(id);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -88,6 +90,8 @@ const KindForm: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!canWrite) return;
+
     if (isEdit) {
       updateMutation.mutate(formData);
     } else {
@@ -107,12 +111,18 @@ const KindForm: React.FC = () => {
 
       <Card>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {!canWrite && (
+            <div className="px-4 py-3 rounded bg-orange-50 border border-orange-200 text-orange-700">
+              Keine Schreibrechte.
+            </div>
+          )}
           <Input
             label="Vorname"
             name="vorname"
             type="text"
             value={formData.vorname}
             onChange={(e) => setFormData({ ...formData, vorname: e.target.value })}
+            disabled={!canWrite}
             required
             placeholder="z.B. Max"
           />
@@ -123,6 +133,7 @@ const KindForm: React.FC = () => {
             type="text"
             value={formData.nachname}
             onChange={(e) => setFormData({ ...formData, nachname: e.target.value })}
+            disabled={!canWrite}
             required
             placeholder="z.B. Mustermann"
           />
@@ -133,6 +144,7 @@ const KindForm: React.FC = () => {
             type="date"
             value={formData.geburtsdatum}
             onChange={(e) => setFormData({ ...formData, geburtsdatum: e.target.value })}
+            disabled={!canWrite}
             required
           />
 
@@ -145,6 +157,7 @@ const KindForm: React.FC = () => {
               className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
               value={formData.geschlecht}
               onChange={(e) => setFormData({ ...formData, geschlecht: e.target.value })}
+              disabled={!canWrite}
             >
               <option value="">Bitte wählen...</option>
               <option value="M">Männlich</option>
@@ -162,6 +175,7 @@ const KindForm: React.FC = () => {
               className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
               value={formData.verein_id || ''}
               onChange={(e) => setFormData({ ...formData, verein_id: e.target.value ? Number(e.target.value) : null })}
+              disabled={!canWrite}
             >
               <option value="">Kein Verein</option>
               {vereine?.map((verein) => (
@@ -181,6 +195,7 @@ const KindForm: React.FC = () => {
               className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
               value={formData.verband_id || ''}
               onChange={(e) => setFormData({ ...formData, verband_id: e.target.value ? Number(e.target.value) : null })}
+              disabled={!canWrite}
             >
               <option value="">Kein Verband</option>
               {verbaende?.map((verband) => (
@@ -200,6 +215,7 @@ const KindForm: React.FC = () => {
               className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
               value={formData.versicherung_id || ''}
               onChange={(e) => setFormData({ ...formData, versicherung_id: e.target.value ? Number(e.target.value) : null })}
+              disabled={!canWrite}
             >
               <option value="">Keine Versicherung</option>
               {versicherungen?.map((versicherung) => (
@@ -216,11 +232,12 @@ const KindForm: React.FC = () => {
             type="text"
             value={formData.vertrag || ''}
             onChange={(e) => setFormData({ ...formData, vertrag: e.target.value })}
+            disabled={!canWrite}
             placeholder="z.B. VK-2024-1234"
           />
 
           <div className="flex gap-4 pt-4">
-            <Button type="submit" size="lg">
+            <Button type="submit" size="lg" disabled={!canWrite}>
               {isEdit ? 'Speichern' : 'Erstellen'}
             </Button>
             <Button

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
-import apiClient from '../api/client';
+import adminApiClient from '../api/adminClient';
 
 const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
@@ -8,7 +8,7 @@ const AdminLayout: React.FC = () => {
 
   useEffect(() => {
     // Fetch current user info
-    apiClient.get('/auth/me')
+    adminApiClient.get('/auth/me')
       .then(response => {
         setUsername(response.data.username);
       })
@@ -18,7 +18,7 @@ const AdminLayout: React.FC = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('admin_token');
     navigate('/admin/login');
   };
 

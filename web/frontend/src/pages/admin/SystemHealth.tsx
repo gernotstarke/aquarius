@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import apiClient from '../../api/client';
+import adminApiClient from '../../api/adminClient';
 import { Activity, Database, Server, Clock, AlertTriangle, CheckCircle, Users } from 'lucide-react';
 
 interface SystemHealthData {
@@ -40,7 +40,7 @@ const SystemHealth: React.FC = () => {
   const { data: health, isLoading, error } = useQuery<SystemHealthData>({
     queryKey: ['health'],
     queryFn: async () => {
-      const response = await apiClient.get('/health/');
+      const response = await adminApiClient.get('/health/');
       return response.data;
     },
     refetchInterval: 5000 // Refresh every 5 seconds
@@ -49,7 +49,7 @@ const SystemHealth: React.FC = () => {
   const { data: activeUsers } = useQuery<ActiveUserCountResponse>({
     queryKey: ['activeUsers'],
     queryFn: async () => {
-      const response = await apiClient.get('/admin/users/active-count?minutes=15');
+      const response = await adminApiClient.get('/admin/users/active-count?minutes=15');
       return response.data;
     },
     refetchInterval: 10000 // Refresh every 10 seconds

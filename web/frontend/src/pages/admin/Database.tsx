@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import apiClient from '../../api/client';
+import adminApiClient from '../../api/adminClient';
 
 interface TableStat {
   table_name: string;
@@ -19,7 +19,7 @@ const DatabaseStats: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await apiClient.get('/admin/database/stats');
+      const response = await adminApiClient.get('/admin/database/stats');
       setStats(response.data.tables);
     } catch (err: any) {
       console.error('Failed to fetch database stats:', err);

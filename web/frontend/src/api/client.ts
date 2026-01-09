@@ -10,7 +10,7 @@ const apiClient = axios.create({
 // Add a request interceptor to inject the token
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('app_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -28,7 +28,7 @@ apiClient.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       // If we get a 401, it might mean the token is expired.
       // We could redirect to login here, but for now let the component handle it.
-      // localStorage.removeItem('token'); 
+      // localStorage.removeItem('app_token'); 
     }
     return Promise.reject(error);
   }

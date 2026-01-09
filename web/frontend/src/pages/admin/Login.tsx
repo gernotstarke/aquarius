@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import apiClient from '../../api/client';
+import adminApiClient from '../../api/adminClient';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -14,17 +14,17 @@ const Login: React.FC = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('admin_token');
     if (token) {
       // Verify token by calling /me
-      apiClient.get('/auth/me')
+      adminApiClient.get('/auth/me')
         .then(() => {
           const from = (location.state as any)?.from?.pathname || "/admin";
           navigate(from, { replace: true });
         })
         .catch(() => {
           // Token is invalid/expired, clear it
-          localStorage.removeItem('token');
+          localStorage.removeItem('admin_token');
         });
     }
   }, [navigate, location]);
@@ -39,12 +39,12 @@ const Login: React.FC = () => {
       params.append('username', username);
       params.append('password', password);
 
-      const response = await apiClient.post('/auth/token', params, {
+      const response = await adminApiClient.post('/auth/token', params, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
       });
 
       const { access_token, requires_2fa_setup } = response.data;
-      localStorage.setItem('token', access_token);
+      localStorage.setItem('admin_token', access_token);
 
       // Check if 2FA setup is required
       if (requires_2fa_setup) {
@@ -78,7 +78,7 @@ const Login: React.FC = () => {
 
     try {
       console.log('Submitting TOTP code...');
-      const response = await apiClient.post('/auth/totp/verify', {
+      const response = await adminApiClient.post('/auth/totp/verify', {
         username,
         password,
         code: totpCode
@@ -90,7 +90,7 @@ const Login: React.FC = () => {
       if (!access_token) {
         throw new Error('No access token received');
       }
-      localStorage.setItem('token', access_token);
+      localStorage.setItem('admin_token', access_token);
 
       const from = (location.state as any)?.from?.pathname || "/admin";
       console.log('Navigating to:', from);
@@ -110,14 +110,14 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      const response = await apiClient.post('/auth/totp/verify-backup', {
+      const response = await adminApiClient.post('/auth/totp/verify-backup', {
         username,
         password,
         backup_code: backupCode
       });
 
       const { access_token, warning } = response.data;
-      localStorage.setItem('token', access_token);
+      localStorage.setItem('admin_token', access_token);
 
       if (warning) {
         alert(warning);

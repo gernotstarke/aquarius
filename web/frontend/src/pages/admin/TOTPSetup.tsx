@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiClient from '../../api/client';
+import adminApiClient from '../../api/adminClient';
 import { Shield, Download, Copy, Check } from 'lucide-react';
 
 const TOTPSetup: React.FC = () => {
@@ -17,7 +17,7 @@ const TOTPSetup: React.FC = () => {
     let ignore = false;
 
     // Fetch TOTP setup data
-    apiClient.post('/auth/totp/setup')
+    adminApiClient.post('/auth/totp/setup')
       .then(response => {
         if (!ignore) {
           setQrCode(response.data.qr_code);
@@ -43,7 +43,7 @@ const TOTPSetup: React.FC = () => {
     setError('');
 
     try {
-      await apiClient.post('/auth/totp/enable', {
+      await adminApiClient.post('/auth/totp/enable', {
         code: verificationCode
       });
       setStep('complete');
