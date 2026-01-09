@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Settings, Shield } from 'lucide-react';
+import { LogOut, Settings, Users } from 'lucide-react';
 
 const UserMenu: React.FC = () => {
   const navigate = useNavigate();
@@ -38,21 +38,23 @@ const UserMenu: React.FC = () => {
 
   return (
     <div className="relative" ref={menuRef}>
-      {/* User Avatar Button */}
+      {/* User Avatar Button with Glyph */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-200 transition"
+        className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition"
         title={user.full_name || user.username}
       >
-        <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
-          {user.username.charAt(0).toUpperCase()}
-        </div>
-        <span className="text-sm text-gray-700 hidden sm:inline">{user.username}</span>
+        <img
+          src="/user-glyph.png"
+          alt="User"
+          className="w-8 h-8 object-contain"
+        />
+        <span className="text-sm text-gray-700">{user.username}</span>
       </button>
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
           {/* User Info */}
           <div className="px-4 py-2 border-b border-gray-200">
             <p className="text-sm font-medium text-gray-900">{user.full_name || user.username}</p>
@@ -64,13 +66,25 @@ const UserMenu: React.FC = () => {
 
           {/* Menu Items */}
           <div className="py-2">
+            {/* Aktuelle User - Show concurrent users count */}
+            <button
+              onClick={() => setIsOpen(false)}
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2 transition"
+            >
+              <Users size={16} />
+              <div className="flex-1">
+                <span>Aktuelle User</span>
+                <span className="text-xs text-gray-400 ml-1">(coming soon)</span>
+              </div>
+            </button>
+
             {/* Admin Link - only show if admin */}
             {isAdmin && (
               <button
                 onClick={handleAdminClick}
                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2 transition"
               >
-                <Shield size={16} />
+                <Settings size={16} />
                 <span>Admin-Dashboard</span>
               </button>
             )}
