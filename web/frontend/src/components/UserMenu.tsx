@@ -41,13 +41,13 @@ const UserMenu: React.FC = () => {
       {/* User Avatar Button with Glyph */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition"
+        className="flex items-center space-x-3 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
         title={user.full_name || user.username}
       >
         <img
           src="/user-glyph.png"
           alt="User"
-          className="w-8 h-8 object-contain"
+          className="w-12 h-12 object-contain"
         />
         <span className="text-sm text-gray-700">{user.username}</span>
       </button>
