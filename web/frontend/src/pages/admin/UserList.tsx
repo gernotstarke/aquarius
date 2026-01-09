@@ -9,6 +9,9 @@ interface User {
   full_name: string;
   role: 'ROOT' | 'PLANER' | 'OFFIZIELLER';
   is_active: boolean;
+  is_app_user?: boolean;
+  can_read_all?: boolean;
+  can_write_all?: boolean;
   totp_enabled: boolean;
   created_at: string;
 }
@@ -31,7 +34,10 @@ const UserList: React.FC = () => {
     password: '',
     full_name: '',
     role: 'OFFIZIELLER',
-    is_active: true
+    is_active: true,
+    is_app_user: false,
+    can_read_all: true,
+    can_write_all: false
   });
 
   const { data: users, isLoading, error } = useQuery<User[]>({
@@ -49,7 +55,7 @@ const UserList: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       setIsCreateModalOpen(false);
-      setFormData({ username: '', password: '', full_name: '', role: 'OFFIZIELLER', is_active: true });
+      setFormData({ username: '', password: '', full_name: '', role: 'OFFIZIELLER', is_active: true, is_app_user: false, can_read_all: true, can_write_all: false });
     }
   });
 
@@ -61,7 +67,7 @@ const UserList: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       setIsEditModalOpen(false);
       setEditingUser(null);
-      setFormData({ username: '', password: '', full_name: '', role: 'OFFIZIELLER', is_active: true });
+      setFormData({ username: '', password: '', full_name: '', role: 'OFFIZIELLER', is_active: true, is_app_user: false, can_read_all: true, can_write_all: false });
     }
   });
 
@@ -104,7 +110,10 @@ const UserList: React.FC = () => {
       password: '',
       full_name: user.full_name || '',
       role: user.role,
-      is_active: user.is_active
+      is_active: user.is_active,
+      is_app_user: user.is_app_user || false,
+      can_read_all: user.can_read_all !== undefined ? user.can_read_all : true,
+      can_write_all: user.can_write_all || false
     });
     setIsEditModalOpen(true);
   };
@@ -268,6 +277,40 @@ const UserList: React.FC = () => {
                   <span className="text-sm text-gray-700">Active</span>
                 </label>
               </div>
+
+              {/* App Access Section */}
+              <div className="mb-6 p-4 bg-blue-50 rounded border border-blue-200">
+                <h3 className="font-bold text-sm text-blue-900 mb-3">App Access</h3>
+                <label className="flex items-center mb-3">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_app_user}
+                    onChange={e => setFormData({...formData, is_app_user: e.target.checked})}
+                    className="mr-2"
+                  />
+                  <span className="text-sm text-gray-700">App User (can access Aquarius app)</span>
+                </label>
+                <label className="flex items-center mb-3">
+                  <input
+                    type="checkbox"
+                    checked={formData.can_read_all}
+                    onChange={e => setFormData({...formData, can_read_all: e.target.checked})}
+                    disabled={!formData.is_app_user}
+                    className="mr-2 disabled:opacity-50"
+                  />
+                  <span className="text-sm text-gray-700">Read Permission</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.can_write_all}
+                    onChange={e => setFormData({...formData, can_write_all: e.target.checked})}
+                    disabled={!formData.is_app_user}
+                    className="mr-2 disabled:opacity-50"
+                  />
+                  <span className="text-sm text-gray-700">Write Permission (edit/create/delete)</span>
+                </label>
+              </div>
               <div className="flex justify-end space-x-4">
                 <button
                   type="button"
@@ -347,6 +390,40 @@ const UserList: React.FC = () => {
                     className="mr-2"
                   />
                   <span className="text-sm text-gray-700">Active</span>
+                </label>
+              </div>
+
+              {/* App Access Section */}
+              <div className="mb-6 p-4 bg-blue-50 rounded border border-blue-200">
+                <h3 className="font-bold text-sm text-blue-900 mb-3">App Access</h3>
+                <label className="flex items-center mb-3">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_app_user}
+                    onChange={e => setFormData({...formData, is_app_user: e.target.checked})}
+                    className="mr-2"
+                  />
+                  <span className="text-sm text-gray-700">App User (can access Aquarius app)</span>
+                </label>
+                <label className="flex items-center mb-3">
+                  <input
+                    type="checkbox"
+                    checked={formData.can_read_all}
+                    onChange={e => setFormData({...formData, can_read_all: e.target.checked})}
+                    disabled={!formData.is_app_user}
+                    className="mr-2 disabled:opacity-50"
+                  />
+                  <span className="text-sm text-gray-700">Read Permission</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.can_write_all}
+                    onChange={e => setFormData({...formData, can_write_all: e.target.checked})}
+                    disabled={!formData.is_app_user}
+                    className="mr-2 disabled:opacity-50"
+                  />
+                  <span className="text-sm text-gray-700">Write Permission (edit/create/delete)</span>
                 </label>
               </div>
               <div className="flex justify-end space-x-4">
