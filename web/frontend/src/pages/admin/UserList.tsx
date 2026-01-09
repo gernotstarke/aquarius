@@ -92,7 +92,10 @@ const UserList: React.FC = () => {
     const updateData: any = {
       full_name: formData.full_name,
       role: formData.role,
-      is_active: formData.is_active
+      is_active: formData.is_active,
+      is_app_user: formData.is_app_user,
+      can_read_all: formData.can_read_all,
+      can_write_all: formData.can_write_all
     };
 
     // Only include password if it's been changed

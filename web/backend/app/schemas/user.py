@@ -8,6 +8,9 @@ class UserBase(BaseModel):
     role: str = "OFFIZIELLER"
     is_active: bool = True
     totp_enabled: bool = False
+    is_app_user: Optional[bool] = False
+    can_read_all: Optional[bool] = True
+    can_write_all: Optional[bool] = False
 
 class UserCreate(UserBase):
     password: str
@@ -17,6 +20,9 @@ class UserUpdate(BaseModel):
     password: Optional[str] = None
     role: Optional[str] = None
     is_active: Optional[bool] = None
+    is_app_user: Optional[bool] = None
+    can_read_all: Optional[bool] = None
+    can_write_all: Optional[bool] = None
 
 class User(UserBase):
     model_config = ConfigDict(from_attributes=True)

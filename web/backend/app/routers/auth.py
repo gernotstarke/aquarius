@@ -268,3 +268,8 @@ async def disable_totp(
 @router.get("/me", response_model=schemas.User)
 async def read_users_me(current_user: models.User = Depends(auth.get_current_active_user)):
     return current_user
+
+
+@router.get("/app-me", response_model=schemas.User)
+async def read_app_users_me(current_user: models.User = Depends(auth.get_current_app_user)):
+    return current_user

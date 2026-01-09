@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import apiClient from '../api/client';
-import NewLayout from '../components/NewLayout';
 
 const Home: React.FC = () => {
   const [backendVersion, setBackendVersion] = useState<string>('0.0.0');
@@ -59,10 +58,9 @@ const Home: React.FC = () => {
   ];
 
   return (
-    <NewLayout>
-      <div className="min-h-screen flex flex-col">
-        {/* Main Content */}
-        <div className="flex-1 space-y-12 pb-16">
+    <div className="min-h-screen flex flex-col">
+      {/* Main Content */}
+      <div className="flex-1 space-y-12 pb-16">
           {/* Logo and Title */}
           <div className="text-center space-y-6">
             <h1 className="text-display font-bold text-neutral-900">
@@ -107,20 +105,19 @@ const Home: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <div className="border-t border-neutral-200 py-6 mt-12">
-          <div className="flex items-center justify-center gap-4 flex-wrap">
-            <p className="text-sm text-neutral-500">
-              made with passion in Cologne
-            </p>
-            <img
-              src={`https://img.shields.io/badge/version-${backendVersion}-blue`}
-              alt={`Version ${backendVersion}`}
-              className="h-5"
-            />
-          </div>
+      <div className="border-t border-neutral-200 py-6 mt-12">
+        <div className="flex items-center justify-center gap-4 flex-wrap">
+          <p className="text-sm text-neutral-500">
+            made with passion in Cologne
+          </p>
+          <img
+            src={`https://img.shields.io/badge/version-${backendVersion}-blue`}
+            alt={`Version ${backendVersion}`}
+            className="h-5"
+          />
         </div>
       </div>
-    </NewLayout>
+    </div>
   );
 };
 

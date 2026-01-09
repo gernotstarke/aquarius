@@ -62,13 +62,13 @@ export const getCurrentUser = async (): Promise<User> => {
  * Login with username and password
  */
 export const login = async (credentials: LoginCredentials): Promise<LoginResponse> => {
-  const formData = new FormData();
-  formData.append('username', credentials.username);
-  formData.append('password', credentials.password);
+  const params = new URLSearchParams();
+  params.append('username', credentials.username);
+  params.append('password', credentials.password);
 
-  const response = await apiClient.post<LoginResponse>('/auth/token', formData, {
+  const response = await apiClient.post<LoginResponse>('/auth/token', params, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
   return response.data;

@@ -35,12 +35,12 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      const formData = new FormData();
-      formData.append('username', username);
-      formData.append('password', password);
+      const params = new URLSearchParams();
+      params.append('username', username);
+      params.append('password', password);
 
-      const response = await apiClient.post('/auth/token', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      const response = await apiClient.post('/auth/token', params, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
       });
 
       const { access_token, requires_2fa_setup } = response.data;

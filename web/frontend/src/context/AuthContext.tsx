@@ -34,17 +34,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Load user on mount and token change
   useEffect(() => {
     const loadUser = async () => {
-      if (!token) {
-        setIsLoading(false);
-        setUser(null);
-        return;
-      }
+      setIsLoading(true);
 
       try {
-        const response = await apiClient.get('/auth/me');
+        const response = await apiClient.get('/auth/app-me');
         setUser(response.data);
       } catch (error) {
-        // Token is invalid, clear it
         localStorage.removeItem('token');
         setToken(null);
         setUser(null);
@@ -58,18 +53,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const login = async (username: string, password: string) => {
     try {
-      const formData = new FormData();
-      formData.append('username', username);
-      formData.append('password', password);
+      const params = new URLSearchParams();
+      params.append('username', username);
+      params.append('password', password);
 
-      const response = await apiClient.post('/auth/token', formData);
+      const response = await apiClient.post('/auth/token', params, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        }
+      });
       const { access_token } = response.data;
 
       localStorage.setItem('token', access_token);
       setToken(access_token);
 
       // Fetch user info
-      const userResponse = await apiClient.get('/auth/me');
+      const userResponse = await apiClient.get('/auth/app-me');
       setUser(userResponse.data);
     } catch (error: any) {
       // Extract error message from various error formats
@@ -91,7 +90,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setUser(null);
   };
 
-  const isAuthenticated = !!user && !!token;
+  const isAuthenticated = !!user;
   const isAdmin = user?.role === 'ROOT' || false;
   const canRead = isAdmin || user?.can_read_all || false;
   const canWrite = isAdmin || user?.can_write_all || false;

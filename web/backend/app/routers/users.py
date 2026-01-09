@@ -35,7 +35,10 @@ def create_user(
         full_name=user.full_name,
         hashed_password=hashed_password,
         role=user.role,
-        is_active=user.is_active
+        is_active=user.is_active,
+        is_app_user=bool(user.is_app_user),
+        can_read_all=bool(user.can_read_all),
+        can_write_all=bool(user.can_write_all),
     )
     db.add(new_user)
     db.commit()
