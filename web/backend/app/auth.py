@@ -122,7 +122,12 @@ async def get_current_app_user(
     if not ENABLE_APP_AUTH:
         if not token:
             logger.info(f"App auth disabled, using default user: {DEFAULT_APP_USER}")
-            return get_or_create_default_app_user(db)
+            user = get_or_create_default_app_user(db)
+            now = datetime.utcnow()
+            if not user.last_active or (now - user.last_active).total_seconds() > 60:
+                user.last_active = now
+                db.commit()
+            return user
     
     # Production mode: require valid token
     if not token:
@@ -160,6 +165,12 @@ async def get_current_app_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access app resources",
         )
+
+    # Update last_active timestamp (throttle to reduce DB writes)
+    now = datetime.utcnow()
+    if not user.last_active or (now - user.last_active).total_seconds() > 60:
+        user.last_active = now
+        db.commit()
     
     return user
 

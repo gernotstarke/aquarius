@@ -2,11 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { LogOut, Settings, Users } from 'lucide-react';
+import apiClient from '../api/client';
 
 const UserMenu: React.FC = () => {
   const navigate = useNavigate();
   const { user, logout, isAdmin } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [activeUserCount, setActiveUserCount] = useState<number | null>(null);
+  const [isActiveUserCountLoading, setIsActiveUserCountLoading] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu when clicking outside
@@ -21,6 +24,40 @@ const UserMenu: React.FC = () => {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let isCancelled = false;
+
+    const fetchActiveUserCount = async () => {
+      setIsActiveUserCountLoading(true);
+      try {
+        const response = await apiClient.get('/users/active-count', {
+          params: { minutes: 5 },
+        });
+        if (!isCancelled) {
+          setActiveUserCount(response.data?.active_users ?? null);
+        }
+      } catch {
+        if (!isCancelled) {
+          setActiveUserCount(null);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsActiveUserCountLoading(false);
+        }
+      }
+    };
+
+    fetchActiveUserCount();
+    const interval = window.setInterval(fetchActiveUserCount, 30000);
+
+    return () => {
+      isCancelled = true;
+      window.clearInterval(interval);
+    };
   }, [isOpen]);
 
   if (!user) return null;
@@ -74,7 +111,14 @@ const UserMenu: React.FC = () => {
               <Users size={16} />
               <div className="flex-1">
                 <span>Aktuelle User</span>
-                <span className="text-xs text-gray-400 ml-1">(coming soon)</span>
+              </div>
+              <div className="ml-2">
+                <span
+                  className="inline-flex items-center justify-center min-w-[1.5rem] h-6 px-2 text-xs font-semibold rounded-full bg-gray-100 text-gray-700"
+                  title="Aktiv in den letzten 5 Minuten"
+                >
+                  {isActiveUserCountLoading ? '…' : activeUserCount ?? '—'}
+                </span>
               </div>
             </button>
 

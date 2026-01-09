@@ -1,4 +1,5 @@
 from typing import List
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.database import get_db
@@ -8,6 +9,26 @@ router = APIRouter(
     prefix="/api/users",
     tags=["users"],
 )
+
+
+@router.get("/active-count")
+async def get_active_user_count(
+    minutes: int = 5,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_app_user),
+):
+    since = datetime.utcnow() - timedelta(minutes=minutes)
+
+    count = db.query(models.User).filter(
+        models.User.last_active >= since
+    ).count()
+
+    return {
+        "active_users": count,
+        "window_minutes": minutes,
+        "timestamp": datetime.utcnow(),
+    }
+
 
 @router.get("/", response_model=List[schemas.User])
 def read_users(
