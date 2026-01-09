@@ -19,6 +19,9 @@ class User(Base):
     backup_codes = Column(Text, nullable=True)  # JSON array of hashed backup codes
     totp_setup_at = Column(DateTime, nullable=True)  # When 2FA was enabled
 
+    # Activity tracking
+    last_active = Column(DateTime, nullable=True)
+
     # App user permissions (for non-admin users)
     is_app_user = Column(Boolean, default=False)  # Can access main app?
     can_read_all = Column(Boolean, default=True)  # Has read permission?

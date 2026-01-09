@@ -60,9 +60,20 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
         raise credentials_exception
     return user
 
-async def get_current_active_user(current_user: models.User = Depends(get_current_user)):
+async def get_current_active_user(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
+    
+    # Update last_active timestamp
+    now = datetime.utcnow()
+    # Only update if last_active is None or older than 60 seconds to reduce DB writes
+    if not current_user.last_active or (now - current_user.last_active).total_seconds() > 60:
+        current_user.last_active = now
+        db.commit()
+        
     return current_user
 
 async def get_current_admin_user(current_user: models.User = Depends(get_current_active_user)):
