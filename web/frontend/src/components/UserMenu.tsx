@@ -77,7 +77,13 @@ const UserMenu: React.FC = () => {
     <div className="relative" ref={menuRef}>
       {/* User Avatar Button with Glyph */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          const nextOpen = !isOpen;
+          setIsOpen(nextOpen);
+          if (nextOpen) {
+            setIsActiveUserCountLoading(true);
+          }
+        }}
         className="flex items-center space-x-3 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
         title={user.full_name || user.username}
       >
