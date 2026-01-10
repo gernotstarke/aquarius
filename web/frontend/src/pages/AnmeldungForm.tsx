@@ -8,6 +8,7 @@ import { AnmeldungCreate, Anmeldung } from '../types/anmeldung';
 import { Wettkampf, WettkampfWithDetails } from '../types/wettkampf';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import { useAuth } from '../context/AuthContext';
 
 const AnmeldungForm: React.FC = () => {
   const { id } = useParams();
@@ -15,6 +16,7 @@ const AnmeldungForm: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isEdit = Boolean(id);
+  const { canWrite } = useAuth();
 
   const preselectedWettkampfId = searchParams.get('wettkampf');
 
@@ -56,6 +58,13 @@ const AnmeldungForm: React.FC = () => {
     }
   }, [anmeldung]);
 
+  // Redirect read-only users who try to create new entries
+  useEffect(() => {
+    if (!isEdit && !canWrite) {
+      navigate('/anmeldung/liste');
+    }
+  }, [isEdit, canWrite, navigate]);
+
   const createMutation = useMutation({
     mutationFn: createAnmeldung,
     onSuccess: () => {
@@ -76,6 +85,12 @@ const AnmeldungForm: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check permissions before submitting
+    if (!canWrite) {
+      return;
+    }
+
     if (isEdit) {
       updateMutation.mutate({ figur_ids: selectedFigurIds });
     } else {
@@ -205,9 +220,11 @@ const AnmeldungForm: React.FC = () => {
           )}
 
           <div className="flex gap-4 pt-4">
-            <Button type="submit" size="lg">
-              {isEdit ? 'Speichern' : 'Anmelden'}
-            </Button>
+            {canWrite && (
+              <Button type="submit" size="lg">
+                {isEdit ? 'Speichern' : 'Anmelden'}
+              </Button>
+            )}
             <Button
               type="button"
               variant="secondary"

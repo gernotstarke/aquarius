@@ -5,9 +5,11 @@ import apiClient from '../api/client';
 import { Schwimmbad } from '../types';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import { useAuth } from '../context/AuthContext';
 
 const SchwimmbadList: React.FC = () => {
   const queryClient = useQueryClient();
+  const { canWrite } = useAuth();
 
   const { data: schwimmbäder, isLoading } = useQuery<Schwimmbad[]>({
     queryKey: ['schwimmbäder'],
@@ -32,9 +34,11 @@ const SchwimmbadList: React.FC = () => {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h2 className="text-h1 font-bold text-neutral-900">Schwimmbäder</h2>
-        <Link to="/schwimmbad/new">
-          <Button size="lg">Neues Schwimmbad</Button>
-        </Link>
+        {canWrite && (
+          <Link to="/schwimmbad/new">
+            <Button size="lg">Neues Schwimmbad</Button>
+          </Link>
+        )}
       </div>
 
       <div className="grid gap-6">
@@ -55,21 +59,23 @@ const SchwimmbadList: React.FC = () => {
                   )}
                 </div>
               </Link>
-              <div className="flex gap-4 ml-4">
-                <Link to={`/schwimmbad/${schwimmbad.id}`}>
-                  <Button variant="secondary">Bearbeiten</Button>
-                </Link>
-                <Button
-                  variant="danger"
-                  onClick={() => {
-                    if (confirm('Schwimmbad wirklich löschen?')) {
-                      deleteMutation.mutate(schwimmbad.id);
-                    }
-                  }}
-                >
-                  Löschen
-                </Button>
-              </div>
+              {canWrite && (
+                <div className="flex gap-4 ml-4">
+                  <Link to={`/schwimmbad/${schwimmbad.id}`}>
+                    <Button variant="secondary">Bearbeiten</Button>
+                  </Link>
+                  <Button
+                    variant="danger"
+                    onClick={() => {
+                      if (confirm('Schwimmbad wirklich löschen?')) {
+                        deleteMutation.mutate(schwimmbad.id);
+                      }
+                    }}
+                  >
+                    Löschen
+                  </Button>
+                </div>
+              )}
             </div>
           </Card>
         ))}

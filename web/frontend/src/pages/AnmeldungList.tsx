@@ -7,9 +7,11 @@ import { Anmeldung } from '../types/anmeldung';
 import { Wettkampf } from '../types/wettkampf';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import { useAuth } from '../context/AuthContext';
 
 const AnmeldungList: React.FC = () => {
   const queryClient = useQueryClient();
+  const { canWrite } = useAuth();
   const [selectedWettkampfId, setSelectedWettkampfId] = React.useState<number>(0);
 
   const { data: anmeldungen, isLoading } = useQuery<Anmeldung[], Error, Anmeldung[]>({
@@ -54,9 +56,11 @@ const AnmeldungList: React.FC = () => {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h2 className="text-h1 font-bold text-neutral-900">Anmeldungen</h2>
-        <Link to="/anmeldung/new">
-          <Button size="lg">Neue Anmeldung</Button>
-        </Link>
+        {canWrite && (
+          <Link to="/anmeldung/new">
+            <Button size="lg">Neue Anmeldung</Button>
+          </Link>
+        )}
       </div>
 
       {/* Wettkampf Filter */}
@@ -135,21 +139,23 @@ const AnmeldungList: React.FC = () => {
                   </div>
                 )}
               </Link>
-              <div className="flex gap-4 ml-4">
-                <Link to={`/anmeldung/${anmeldung.id}`}>
-                  <Button variant="secondary">Bearbeiten</Button>
-                </Link>
-                <Button
-                  variant="danger"
-                  onClick={() => {
-                    if (confirm('Anmeldung wirklich löschen?')) {
-                      deleteMutation.mutate(anmeldung.id);
-                    }
-                  }}
-                >
-                  Löschen
-                </Button>
-              </div>
+              {canWrite && (
+                <div className="flex gap-4 ml-4">
+                  <Link to={`/anmeldung/${anmeldung.id}`}>
+                    <Button variant="secondary">Bearbeiten</Button>
+                  </Link>
+                  <Button
+                    variant="danger"
+                    onClick={() => {
+                      if (confirm('Anmeldung wirklich löschen?')) {
+                        deleteMutation.mutate(anmeldung.id);
+                      }
+                    }}
+                  >
+                    Löschen
+                  </Button>
+                </div>
+              )}
             </div>
           </Card>
         ))}

@@ -6,12 +6,14 @@ import { Verein, VereinCreate } from '../types';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
+import { useAuth } from '../context/AuthContext';
 
 const VereinForm: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isEdit = Boolean(id);
+  const { canWrite } = useAuth();
 
   const [formData, setFormData] = useState<VereinCreate>({
     name: '',
@@ -40,6 +42,13 @@ const VereinForm: React.FC = () => {
     }
   }, [verein]);
 
+  // Redirect read-only users who try to create new entries
+  useEffect(() => {
+    if (!isEdit && !canWrite) {
+      navigate('/grunddaten/vereine');
+    }
+  }, [isEdit, canWrite, navigate]);
+
   const createMutation = useMutation({
     mutationFn: (data: VereinCreate) => apiClient.post('/verein', data),
     onSuccess: () => {
@@ -59,6 +68,12 @@ const VereinForm: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check permissions before submitting
+    if (!canWrite) {
+      return;
+    }
+
     if (isEdit) {
       updateMutation.mutate(formData);
     } else {
@@ -111,9 +126,11 @@ const VereinForm: React.FC = () => {
           />
 
           <div className="flex gap-4 pt-4">
-            <Button type="submit" size="lg">
-              {isEdit ? 'Speichern' : 'Erstellen'}
-            </Button>
+            {canWrite && (
+              <Button type="submit" size="lg">
+                {isEdit ? 'Speichern' : 'Erstellen'}
+              </Button>
+            )}
             <Button
               type="button"
               variant="secondary"

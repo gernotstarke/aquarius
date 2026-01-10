@@ -5,9 +5,11 @@ import apiClient from '../api/client';
 import { Verein } from '../types';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import { useAuth } from '../context/AuthContext';
 
 const VereinList: React.FC = () => {
   const queryClient = useQueryClient();
+  const { canWrite } = useAuth();
 
   const { data: vereine, isLoading } = useQuery<Verein[]>({
     queryKey: ['vereine'],
@@ -32,9 +34,11 @@ const VereinList: React.FC = () => {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h2 className="text-h1 font-bold text-neutral-900">Vereine</h2>
-        <Link to="/grunddaten/vereine/new">
-          <Button size="lg">Neuer Verein</Button>
-        </Link>
+        {canWrite && (
+          <Link to="/grunddaten/vereine/new">
+            <Button size="lg">Neuer Verein</Button>
+          </Link>
+        )}
       </div>
 
       <div className="grid gap-6">
@@ -51,21 +55,23 @@ const VereinList: React.FC = () => {
                   <p className="text-body text-neutral-500">Kontakt: {verein.contact}</p>
                 </div>
               </Link>
-              <div className="flex gap-4 ml-4">
-                <Link to={`/grunddaten/vereine/${verein.id}`}>
-                  <Button variant="secondary">Bearbeiten</Button>
-                </Link>
-                <Button
-                  variant="danger"
-                  onClick={() => {
-                    if (confirm('Verein wirklich löschen?')) {
-                      deleteMutation.mutate(verein.id);
-                    }
-                  }}
-                >
-                  Löschen
-                </Button>
-              </div>
+              {canWrite && (
+                <div className="flex gap-4 ml-4">
+                  <Link to={`/grunddaten/vereine/${verein.id}`}>
+                    <Button variant="secondary">Bearbeiten</Button>
+                  </Link>
+                  <Button
+                    variant="danger"
+                    onClick={() => {
+                      if (confirm('Verein wirklich löschen?')) {
+                        deleteMutation.mutate(verein.id);
+                      }
+                    }}
+                  >
+                    Löschen
+                  </Button>
+                </div>
+              )}
             </div>
           </Card>
         ))}

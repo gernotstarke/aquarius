@@ -5,9 +5,11 @@ import apiClient from '../api/client';
 import { Saison } from '../types';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import { useAuth } from '../context/AuthContext';
 
 const SaisonList: React.FC = () => {
   const queryClient = useQueryClient();
+  const { canWrite } = useAuth();
 
   const { data: saisons, isLoading } = useQuery<Saison[]>({
     queryKey: ['saisons'],
@@ -32,9 +34,11 @@ const SaisonList: React.FC = () => {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h2 className="text-h1 font-bold text-neutral-900">Saisons</h2>
-        <Link to="/saison/new">
-          <Button size="lg">Neue Saison</Button>
-        </Link>
+        {canWrite && (
+          <Link to="/saison/new">
+            <Button size="lg">Neue Saison</Button>
+          </Link>
+        )}
       </div>
 
       <div className="grid gap-6">
@@ -51,21 +55,23 @@ const SaisonList: React.FC = () => {
                   </p>
                 </div>
               </Link>
-              <div className="flex gap-4 ml-4">
-                <Link to={`/saison/${saison.id}`}>
-                  <Button variant="secondary">Bearbeiten</Button>
-                </Link>
-                <Button
-                  variant="danger"
-                  onClick={() => {
-                    if (confirm('Saison wirklich löschen?')) {
-                      deleteMutation.mutate(saison.id);
-                    }
-                  }}
-                >
-                  Löschen
-                </Button>
-              </div>
+              {canWrite && (
+                <div className="flex gap-4 ml-4">
+                  <Link to={`/saison/${saison.id}`}>
+                    <Button variant="secondary">Bearbeiten</Button>
+                  </Link>
+                  <Button
+                    variant="danger"
+                    onClick={() => {
+                      if (confirm('Saison wirklich löschen?')) {
+                        deleteMutation.mutate(saison.id);
+                      }
+                    }}
+                  >
+                    Löschen
+                  </Button>
+                </div>
+              )}
             </div>
           </Card>
         ))}

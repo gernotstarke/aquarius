@@ -5,9 +5,11 @@ import apiClient from '../api/client';
 import { Figur } from '../types';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import { useAuth } from '../context/AuthContext';
 
 const FigurenList: React.FC = () => {
   const queryClient = useQueryClient();
+  const { canWrite } = useAuth();
 
   const { data: figuren, isLoading } = useQuery<Figur[]>({
     queryKey: ['figuren'],
@@ -40,9 +42,11 @@ const FigurenList: React.FC = () => {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h2 className="text-h1 font-bold text-neutral-900">Figuren</h2>
-        <Link to="/stammdaten/figuren/new">
-          <Button size="lg">Neue Figur</Button>
-        </Link>
+        {canWrite && (
+          <Link to="/stammdaten/figuren/new">
+            <Button size="lg">Neue Figur</Button>
+          </Link>
+        )}
       </div>
 
       {groupedFiguren && Object.entries(groupedFiguren).map(([kategorie, figs]) => (
@@ -65,21 +69,23 @@ const FigurenList: React.FC = () => {
                       {figur.altersklasse && <span>{figur.altersklasse}</span>}
                     </div>
                   </Link>
-                  <div className="flex gap-4 ml-4">
-                    <Link to={`/stammdaten/figuren/${figur.id}`}>
-                      <Button variant="secondary">Bearbeiten</Button>
-                    </Link>
-                    <Button
-                      variant="danger"
-                      onClick={() => {
-                        if (confirm('Figur wirklich löschen?')) {
-                          deleteMutation.mutate(figur.id);
-                        }
-                      }}
-                    >
-                      Löschen
-                    </Button>
-                  </div>
+                  {canWrite && (
+                    <div className="flex gap-4 ml-4">
+                      <Link to={`/stammdaten/figuren/${figur.id}`}>
+                        <Button variant="secondary">Bearbeiten</Button>
+                      </Link>
+                      <Button
+                        variant="danger"
+                        onClick={() => {
+                          if (confirm('Figur wirklich löschen?')) {
+                            deleteMutation.mutate(figur.id);
+                          }
+                        }}
+                      >
+                        Löschen
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </Card>
             ))}

@@ -6,12 +6,14 @@ import { Saison, SaisonCreate } from '../types';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
+import { useAuth } from '../context/AuthContext';
 
 const SaisonForm: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isEdit = Boolean(id);
+  const { canWrite } = useAuth();
 
   const [formData, setFormData] = useState<SaisonCreate>({
     name: '',
@@ -38,6 +40,13 @@ const SaisonForm: React.FC = () => {
     }
   }, [saison]);
 
+  // Redirect read-only users who try to create new entries
+  useEffect(() => {
+    if (!isEdit && !canWrite) {
+      navigate('/saison');
+    }
+  }, [isEdit, canWrite, navigate]);
+
   const createMutation = useMutation({
     mutationFn: (data: SaisonCreate) => apiClient.post('/saison', data),
     onSuccess: () => {
@@ -57,6 +66,12 @@ const SaisonForm: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check permissions before submitting
+    if (!canWrite) {
+      return;
+    }
+
     if (isEdit) {
       updateMutation.mutate(formData);
     } else {
@@ -98,9 +113,11 @@ const SaisonForm: React.FC = () => {
           />
 
           <div className="flex gap-4 pt-4">
-            <Button type="submit" size="lg">
-              {isEdit ? 'Speichern' : 'Erstellen'}
-            </Button>
+            {canWrite && (
+              <Button type="submit" size="lg">
+                {isEdit ? 'Speichern' : 'Erstellen'}
+              </Button>
+            )}
             <Button
               type="button"
               variant="secondary"
