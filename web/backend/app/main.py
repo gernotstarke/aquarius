@@ -11,6 +11,7 @@ from sqlalchemy import text, or_, asc, desc, func, case
 from typing import List, Optional
 import os
 import logging
+from contextlib import asynccontextmanager
 
 from app.database import get_db, engine, Base
 from app import models, schemas
@@ -42,33 +43,35 @@ if not ENABLE_APP_AUTH:
 # Create tables
 Base.metadata.create_all(bind=engine)
 
+# Import SessionLocal for startup event
+from app.database import SessionLocal
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Initialize app user authentication on startup."""
+    # Startup logic
+    # Skip initialization if running tests (PYTEST_CURRENT_TEST env var is set)
+    if "PYTEST_CURRENT_TEST" not in os.environ:
+        if not ENABLE_APP_AUTH:
+            logger.info(f"📝 Development mode: Creating default app user '{DEFAULT_APP_USER}' if needed...")
+            from app import auth as auth_module
+            db = SessionLocal()
+            try:
+                auth_module.get_or_create_default_app_user(db)
+            except Exception as e:
+                logger.warning(f"⚠️  Error initializing default app user: {e}")
+            finally:
+                db.close()
+    
+    yield
+    # Shutdown logic (if any)
+
 app = FastAPI(
     title="Aquarius CRUD API",
     description="Simple CRUD API for testing the tech stack",
-    version=AQUARIUS_BACKEND_VERSION
+    version=AQUARIUS_BACKEND_VERSION,
+    lifespan=lifespan
 )
-
-# Startup event to initialize app user
-@app.on_event("startup")
-def startup_event():
-    """Initialize app user authentication on startup."""
-    # Skip initialization if running tests (PYTEST_CURRENT_TEST env var is set)
-    if "PYTEST_CURRENT_TEST" in os.environ:
-        return
-    
-    if not ENABLE_APP_AUTH:
-        logger.info(f"📝 Development mode: Creating default app user '{DEFAULT_APP_USER}' if needed...")
-        from app import auth as auth_module
-        db = SessionLocal()
-        try:
-            auth_module.get_or_create_default_app_user(db)
-        except Exception as e:
-            logger.warning(f"⚠️  Error initializing default app user: {e}")
-        finally:
-            db.close()
-
-# Import SessionLocal for startup event
-from app.database import SessionLocal
 
 # CORS middleware for frontend and documentation site
 app.add_middleware(
