@@ -5,9 +5,11 @@ import apiClient from '../api/client';
 import { Wettkampf } from '../types';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import { useAuth } from '../context/AuthContext';
 
 const WettkampfList: React.FC = () => {
   const queryClient = useQueryClient();
+  const { canWrite } = useAuth();
 
   const { data: wettkämpfe, isLoading } = useQuery<Wettkampf[]>({
     queryKey: ['wettkämpfe'],
@@ -32,9 +34,11 @@ const WettkampfList: React.FC = () => {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h2 className="text-h1 font-bold text-neutral-900">Wettkämpfe</h2>
-        <Link to="/wettkaempfe/new">
-          <Button size="lg">Neuer Wettkampf</Button>
-        </Link>
+        {canWrite && (
+          <Link to="/wettkaempfe/new">
+            <Button size="lg">Neuer Wettkampf</Button>
+          </Link>
+        )}
       </div>
 
       <div className="grid gap-6">
@@ -59,19 +63,23 @@ const WettkampfList: React.FC = () => {
                 <Link to={`/wettkaempfe/${wettkampf.id}/detail`}>
                   <Button>Details</Button>
                 </Link>
-                <Link to={`/wettkaempfe/${wettkampf.id}`}>
-                  <Button variant="secondary">Bearbeiten</Button>
-                </Link>
-                <Button
-                  variant="danger"
-                  onClick={() => {
-                    if (confirm('Wettkampf wirklich löschen?')) {
-                      deleteMutation.mutate(wettkampf.id);
-                    }
-                  }}
-                >
-                  Löschen
-                </Button>
+                {canWrite && (
+                  <>
+                    <Link to={`/wettkaempfe/${wettkampf.id}`}>
+                      <Button variant="secondary">Bearbeiten</Button>
+                    </Link>
+                    <Button
+                      variant="danger"
+                      onClick={() => {
+                        if (confirm('Wettkampf wirklich löschen?')) {
+                          deleteMutation.mutate(wettkampf.id);
+                        }
+                      }}
+                    >
+                      Löschen
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </Card>
