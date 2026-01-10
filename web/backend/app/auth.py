@@ -112,31 +112,28 @@ async def get_current_app_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_http_bearer),
 ) -> models.User:
     """
-    Get current app user.
-    In dev mode (ENABLE_APP_AUTH=false), returns default app user if no token provided.
-    In production (ENABLE_APP_AUTH=true), requires valid token.
+    Get current app user. Always requires a valid JWT token.
+
+    This ensures that permissions are properly checked based on the authenticated user,
+    not a default development user with full rights.
+
+    ENABLE_APP_AUTH environment variable no longer affects token requirement,
+    but can still be used for other auth-related features in the future.
     """
     token = credentials.credentials if credentials else None
     logger.info(f"[AUTH] ENABLE_APP_AUTH={ENABLE_APP_AUTH}, token={'present' if token else 'absent'}, credentials={'present' if credentials else 'absent'}")
 
-    # Development mode: allow access without token using default user
-    if not ENABLE_APP_AUTH:
-        if not token:
-            logger.info(f"[AUTH] App auth disabled, using default user: {DEFAULT_APP_USER}")
-            user = get_or_create_default_app_user(db)
-            now = datetime.utcnow()
-            if not user.last_active or (now - user.last_active).total_seconds() > 60:
-                user.last_active = now
-                db.commit()
-            return user
-        else:
-            logger.info(f"[AUTH] App auth disabled but token present, validating...")
-    
-    # Production mode: require valid token
+    # ALWAYS require token - no automatic fallback to default user
+    # This ensures proper permission checking even in development mode
     if not token:
+        logger.warning(f"[AUTH] No token provided - authentication required")
+        # Development mode: provide helpful error message
+        detail = "Authentication required"
+        if not ENABLE_APP_AUTH:
+            detail = "Authentication required. Please login at /app/login (Dev mode: ENABLE_APP_AUTH=false)"
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication required",
+            detail=detail,
             headers={"WWW-Authenticate": "Bearer"},
         )
     
