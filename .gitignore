@@ -56,3 +56,4 @@ logs/
 *.log
 web/frontend/test-results
 web/frontend/test-results*
+*test-results
