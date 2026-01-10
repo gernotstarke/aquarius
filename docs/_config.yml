@@ -24,7 +24,6 @@ markdown_ext: "markdown,mkdown,mkdn,mkd,md"
 include:
   - .htaccess
   - _pages
-  - 36ec5a16d550c71d780bc7e60b00dcce.txt
 exclude:
   - "*.sublime-project"
   - "*.sublime-workspace"
@@ -50,6 +49,7 @@ exclude:
   - README
   - tmp
 keep_files:
+  - 36ec5a16d550c71d780bc7e60b00dcce.txt
   - .git
 
 # Outputting
