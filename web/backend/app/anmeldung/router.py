@@ -5,7 +5,7 @@ from typing import List
 from datetime import date
 
 from app.database import get_db
-from app import models
+from app import models, auth
 from app.anmeldung import schemas as anmeldung_schemas
 from app.anmeldung.repository import AnmeldungRepository
 from app.anmeldung.services import AnmeldungService
@@ -28,7 +28,12 @@ def get_anmeldung_service(db: Session = Depends(get_db)) -> AnmeldungService:
 
 
 @router.get("/anmeldung", response_model=List[AnmeldungDTO])
-def list_anmeldung(skip: int = 0, limit: int = 100, service: AnmeldungService = Depends(get_anmeldung_service)):
+def list_anmeldung(
+    skip: int = 0,
+    limit: int = 100,
+    service: AnmeldungService = Depends(get_anmeldung_service),
+    current_user: models.User = Depends(auth.require_app_read_permission)
+):
     """Get list of all registrations."""
     anmeldungen = service.list_anmeldungen(skip=skip, limit=limit)
     # Map ORM models to DTOs
@@ -36,7 +41,11 @@ def list_anmeldung(skip: int = 0, limit: int = 100, service: AnmeldungService = 
 
 
 @router.get("/anmeldung/{anmeldung_id}", response_model=AnmeldungDTO)
-def get_anmeldung(anmeldung_id: int, service: AnmeldungService = Depends(get_anmeldung_service)):
+def get_anmeldung(
+    anmeldung_id: int,
+    service: AnmeldungService = Depends(get_anmeldung_service),
+    current_user: models.User = Depends(auth.require_app_read_permission)
+):
     """Get a specific registration by ID."""
     anmeldung = service.get_anmeldung(anmeldung_id)
     if not anmeldung:
@@ -46,7 +55,11 @@ def get_anmeldung(anmeldung_id: int, service: AnmeldungService = Depends(get_anm
 
 
 @router.post("/anmeldung", response_model=AnmeldungDTO, status_code=201)
-def create_anmeldung(anmeldung: anmeldung_schemas.AnmeldungCreate, service: AnmeldungService = Depends(get_anmeldung_service)):
+def create_anmeldung(
+    anmeldung: anmeldung_schemas.AnmeldungCreate,
+    service: AnmeldungService = Depends(get_anmeldung_service),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """
     Create a new registration with automatic startnummer assignment.
 
@@ -67,7 +80,12 @@ def create_anmeldung(anmeldung: anmeldung_schemas.AnmeldungCreate, service: Anme
 
 
 @router.put("/anmeldung/{anmeldung_id}", response_model=AnmeldungDTO)
-def update_anmeldung(anmeldung_id: int, anmeldung: anmeldung_schemas.AnmeldungUpdate, db: Session = Depends(get_db)):
+def update_anmeldung(
+    anmeldung_id: int,
+    anmeldung: anmeldung_schemas.AnmeldungUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """
     Update a registration.
 
@@ -128,7 +146,11 @@ def update_anmeldung(anmeldung_id: int, anmeldung: anmeldung_schemas.AnmeldungUp
 
 
 @router.delete("/anmeldung/{anmeldung_id}", status_code=204)
-def delete_anmeldung(anmeldung_id: int, service: AnmeldungService = Depends(get_anmeldung_service)):
+def delete_anmeldung(
+    anmeldung_id: int,
+    service: AnmeldungService = Depends(get_anmeldung_service),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Delete a registration."""
     deleted = service.delete_anmeldung(anmeldung_id)
     if not deleted:

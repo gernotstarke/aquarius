@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session, joinedload
 from typing import List
 
 from app.database import get_db
-from app import models, schemas
+from app import models, schemas, auth
 from app.wettkampf import schemas as wettkampf_schemas
 from app.shared.utils import anmeldung_with_insurance_ok
 
@@ -16,13 +16,22 @@ router = APIRouter(prefix="/api", tags=["wettkampf"])
 # ============================================================================
 
 @router.get("/wettkampf", response_model=List[wettkampf_schemas.Wettkampf])
-def list_wettkampf(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def list_wettkampf(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_read_permission)
+):
     """Get list of all competitions."""
     return db.query(models.Wettkampf).offset(skip).limit(limit).all()
 
 
 @router.get("/wettkampf/{wettkampf_id}", response_model=wettkampf_schemas.Wettkampf)
-def get_wettkampf(wettkampf_id: int, db: Session = Depends(get_db)):
+def get_wettkampf(
+    wettkampf_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_read_permission)
+):
     """Get a specific competition by ID."""
     wettkampf = db.query(models.Wettkampf).filter(models.Wettkampf.id == wettkampf_id).first()
     if not wettkampf:
@@ -31,7 +40,11 @@ def get_wettkampf(wettkampf_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/wettkampf", response_model=wettkampf_schemas.Wettkampf, status_code=201)
-def create_wettkampf(wettkampf: wettkampf_schemas.WettkampfCreate, db: Session = Depends(get_db)):
+def create_wettkampf(
+    wettkampf: wettkampf_schemas.WettkampfCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Create a new competition."""
     db_wettkampf = models.Wettkampf(**wettkampf.model_dump())
     db.add(db_wettkampf)
@@ -41,7 +54,12 @@ def create_wettkampf(wettkampf: wettkampf_schemas.WettkampfCreate, db: Session =
 
 
 @router.put("/wettkampf/{wettkampf_id}", response_model=wettkampf_schemas.Wettkampf)
-def update_wettkampf(wettkampf_id: int, wettkampf: wettkampf_schemas.WettkampfUpdate, db: Session = Depends(get_db)):
+def update_wettkampf(
+    wettkampf_id: int,
+    wettkampf: wettkampf_schemas.WettkampfUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Update a competition."""
     db_wettkampf = db.query(models.Wettkampf).filter(models.Wettkampf.id == wettkampf_id).first()
     if not db_wettkampf:
@@ -56,7 +74,11 @@ def update_wettkampf(wettkampf_id: int, wettkampf: wettkampf_schemas.WettkampfUp
 
 
 @router.delete("/wettkampf/{wettkampf_id}", status_code=204)
-def delete_wettkampf(wettkampf_id: int, db: Session = Depends(get_db)):
+def delete_wettkampf(
+    wettkampf_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Delete a competition."""
     db_wettkampf = db.query(models.Wettkampf).filter(models.Wettkampf.id == wettkampf_id).first()
     if not db_wettkampf:
@@ -72,7 +94,11 @@ def delete_wettkampf(wettkampf_id: int, db: Session = Depends(get_db)):
 # ============================================================================
 
 @router.get("/wettkampf/{wettkampf_id}/details", response_model=wettkampf_schemas.WettkampfWithDetails)
-def get_wettkampf_with_details(wettkampf_id: int, db: Session = Depends(get_db)):
+def get_wettkampf_with_details(
+    wettkampf_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_read_permission)
+):
     """Get competition with all figures and registrations."""
     wettkampf = db.query(models.Wettkampf).options(
         joinedload(models.Wettkampf.anmeldungen).joinedload(models.Anmeldung.kind)
@@ -94,7 +120,12 @@ def get_wettkampf_with_details(wettkampf_id: int, db: Session = Depends(get_db))
 
 
 @router.post("/wettkampf/{wettkampf_id}/figuren/{figur_id}", status_code=201)
-def add_figur_to_wettkampf(wettkampf_id: int, figur_id: int, db: Session = Depends(get_db)):
+def add_figur_to_wettkampf(
+    wettkampf_id: int,
+    figur_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Add a figure to the competition's allowed figures."""
     wettkampf = db.query(models.Wettkampf).filter(models.Wettkampf.id == wettkampf_id).first()
     if not wettkampf:
@@ -112,7 +143,12 @@ def add_figur_to_wettkampf(wettkampf_id: int, figur_id: int, db: Session = Depen
 
 
 @router.delete("/wettkampf/{wettkampf_id}/figuren/{figur_id}", status_code=204)
-def remove_figur_from_wettkampf(wettkampf_id: int, figur_id: int, db: Session = Depends(get_db)):
+def remove_figur_from_wettkampf(
+    wettkampf_id: int,
+    figur_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Remove a figure from the competition's allowed figures."""
     wettkampf = db.query(models.Wettkampf).filter(models.Wettkampf.id == wettkampf_id).first()
     if not wettkampf:
@@ -130,7 +166,12 @@ def remove_figur_from_wettkampf(wettkampf_id: int, figur_id: int, db: Session = 
 
 
 @router.put("/wettkampf/{wettkampf_id}/figuren", status_code=200)
-def set_wettkampf_figuren(wettkampf_id: int, figur_ids: List[int], db: Session = Depends(get_db)):
+def set_wettkampf_figuren(
+    wettkampf_id: int,
+    figur_ids: List[int],
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Set all allowed figures for a competition at once."""
     wettkampf = db.query(models.Wettkampf).filter(models.Wettkampf.id == wettkampf_id).first()
     if not wettkampf:

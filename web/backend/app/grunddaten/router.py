@@ -14,7 +14,7 @@ from sqlalchemy import func, asc, desc
 from typing import List
 
 from app.database import get_db
-from app import models
+from app import models, auth
 from app.grunddaten import schemas as grunddaten_schemas
 
 router = APIRouter(prefix="/api", tags=["grunddaten"])
@@ -25,13 +25,22 @@ router = APIRouter(prefix="/api", tags=["grunddaten"])
 # ============================================================================
 
 @router.get("/saison", response_model=List[grunddaten_schemas.Saison])
-def list_saison(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def list_saison(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_read_permission)
+):
     """Get list of all seasons."""
     return db.query(models.Saison).offset(skip).limit(limit).all()
 
 
 @router.get("/saison/{saison_id}", response_model=grunddaten_schemas.Saison)
-def get_saison(saison_id: int, db: Session = Depends(get_db)):
+def get_saison(
+    saison_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_read_permission)
+):
     """Get a specific season by ID."""
     saison = db.query(models.Saison).filter(models.Saison.id == saison_id).first()
     if not saison:
@@ -40,7 +49,11 @@ def get_saison(saison_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/saison", response_model=grunddaten_schemas.Saison, status_code=201)
-def create_saison(saison: grunddaten_schemas.SaisonCreate, db: Session = Depends(get_db)):
+def create_saison(
+    saison: grunddaten_schemas.SaisonCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Create a new season."""
     db_saison = models.Saison(**saison.model_dump())
     db.add(db_saison)
@@ -50,7 +63,12 @@ def create_saison(saison: grunddaten_schemas.SaisonCreate, db: Session = Depends
 
 
 @router.put("/saison/{saison_id}", response_model=grunddaten_schemas.Saison)
-def update_saison(saison_id: int, saison: grunddaten_schemas.SaisonUpdate, db: Session = Depends(get_db)):
+def update_saison(
+    saison_id: int,
+    saison: grunddaten_schemas.SaisonUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Update a season."""
     db_saison = db.query(models.Saison).filter(models.Saison.id == saison_id).first()
     if not db_saison:
@@ -65,7 +83,11 @@ def update_saison(saison_id: int, saison: grunddaten_schemas.SaisonUpdate, db: S
 
 
 @router.delete("/saison/{saison_id}", status_code=204)
-def delete_saison(saison_id: int, db: Session = Depends(get_db)):
+def delete_saison(
+    saison_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Delete a season."""
     db_saison = db.query(models.Saison).filter(models.Saison.id == saison_id).first()
     if not db_saison:
@@ -81,13 +103,22 @@ def delete_saison(saison_id: int, db: Session = Depends(get_db)):
 # ============================================================================
 
 @router.get("/schwimmbad", response_model=List[grunddaten_schemas.Schwimmbad])
-def list_schwimmbad(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def list_schwimmbad(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_read_permission)
+):
     """Get list of all pools."""
     return db.query(models.Schwimmbad).offset(skip).limit(limit).all()
 
 
 @router.get("/schwimmbad/{schwimmbad_id}", response_model=grunddaten_schemas.Schwimmbad)
-def get_schwimmbad(schwimmbad_id: int, db: Session = Depends(get_db)):
+def get_schwimmbad(
+    schwimmbad_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_read_permission)
+):
     """Get a specific pool by ID."""
     schwimmbad = db.query(models.Schwimmbad).filter(models.Schwimmbad.id == schwimmbad_id).first()
     if not schwimmbad:
@@ -96,7 +127,11 @@ def get_schwimmbad(schwimmbad_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/schwimmbad", response_model=grunddaten_schemas.Schwimmbad, status_code=201)
-def create_schwimmbad(schwimmbad: grunddaten_schemas.SchwimmbadCreate, db: Session = Depends(get_db)):
+def create_schwimmbad(
+    schwimmbad: grunddaten_schemas.SchwimmbadCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Create a new pool."""
     db_schwimmbad = models.Schwimmbad(**schwimmbad.model_dump())
     db.add(db_schwimmbad)
@@ -106,7 +141,12 @@ def create_schwimmbad(schwimmbad: grunddaten_schemas.SchwimmbadCreate, db: Sessi
 
 
 @router.put("/schwimmbad/{schwimmbad_id}", response_model=grunddaten_schemas.Schwimmbad)
-def update_schwimmbad(schwimmbad_id: int, schwimmbad: grunddaten_schemas.SchwimmbadUpdate, db: Session = Depends(get_db)):
+def update_schwimmbad(
+    schwimmbad_id: int,
+    schwimmbad: grunddaten_schemas.SchwimmbadUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Update a pool."""
     db_schwimmbad = db.query(models.Schwimmbad).filter(models.Schwimmbad.id == schwimmbad_id).first()
     if not db_schwimmbad:
@@ -121,7 +161,11 @@ def update_schwimmbad(schwimmbad_id: int, schwimmbad: grunddaten_schemas.Schwimm
 
 
 @router.delete("/schwimmbad/{schwimmbad_id}", status_code=204)
-def delete_schwimmbad(schwimmbad_id: int, db: Session = Depends(get_db)):
+def delete_schwimmbad(
+    schwimmbad_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Delete a pool."""
     db_schwimmbad = db.query(models.Schwimmbad).filter(models.Schwimmbad.id == schwimmbad_id).first()
     if not db_schwimmbad:
@@ -137,13 +181,22 @@ def delete_schwimmbad(schwimmbad_id: int, db: Session = Depends(get_db)):
 # ============================================================================
 
 @router.get("/verein", response_model=List[grunddaten_schemas.Verein])
-def list_verein(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def list_verein(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_read_permission)
+):
     """Get list of all clubs."""
     return db.query(models.Verein).offset(skip).limit(limit).all()
 
 
 @router.get("/verein/{verein_id}", response_model=grunddaten_schemas.Verein)
-def get_verein(verein_id: int, db: Session = Depends(get_db)):
+def get_verein(
+    verein_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_read_permission)
+):
     """Get a specific club by ID."""
     verein = db.query(models.Verein).filter(models.Verein.id == verein_id).first()
     if not verein:
@@ -152,7 +205,11 @@ def get_verein(verein_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/verein", response_model=grunddaten_schemas.Verein, status_code=201)
-def create_verein(verein: grunddaten_schemas.VereinCreate, db: Session = Depends(get_db)):
+def create_verein(
+    verein: grunddaten_schemas.VereinCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Create a new club."""
     db_verein = models.Verein(**verein.model_dump())
     db.add(db_verein)
@@ -162,7 +219,12 @@ def create_verein(verein: grunddaten_schemas.VereinCreate, db: Session = Depends
 
 
 @router.put("/verein/{verein_id}", response_model=grunddaten_schemas.Verein)
-def update_verein(verein_id: int, verein: grunddaten_schemas.VereinUpdate, db: Session = Depends(get_db)):
+def update_verein(
+    verein_id: int,
+    verein: grunddaten_schemas.VereinUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Update a club."""
     db_verein = db.query(models.Verein).filter(models.Verein.id == verein_id).first()
     if not db_verein:
@@ -177,7 +239,11 @@ def update_verein(verein_id: int, verein: grunddaten_schemas.VereinUpdate, db: S
 
 
 @router.delete("/verein/{verein_id}", status_code=204)
-def delete_verein(verein_id: int, db: Session = Depends(get_db)):
+def delete_verein(
+    verein_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Delete a club."""
     db_verein = db.query(models.Verein).filter(models.Verein.id == verein_id).first()
     if not db_verein:
@@ -199,6 +265,7 @@ def list_verbaende(
     sort_by: str = "name",
     sort_order: str = "asc",
     db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_read_permission)
 ):
     """Get list of all associations (read-only) with nomination counts."""
     sort_fields = {
@@ -239,7 +306,12 @@ def list_verbaende(
 # ============================================================================
 
 @router.get("/versicherung", response_model=List[grunddaten_schemas.Versicherung])
-def list_versicherungen(skip: int = 0, limit: int = 200, db: Session = Depends(get_db)):
+def list_versicherungen(
+    skip: int = 0,
+    limit: int = 200,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_read_permission)
+):
     """Get list of all insurance companies (read-only)."""
     return (
         db.query(models.Versicherung)
@@ -255,13 +327,22 @@ def list_versicherungen(skip: int = 0, limit: int = 200, db: Session = Depends(g
 # ============================================================================
 
 @router.get("/figur", response_model=List[grunddaten_schemas.Figur])
-def list_figur(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def list_figur(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_read_permission)
+):
     """Get list of all figures."""
     return db.query(models.Figur).offset(skip).limit(limit).all()
 
 
 @router.get("/figur/{figur_id}", response_model=grunddaten_schemas.Figur)
-def get_figur(figur_id: int, db: Session = Depends(get_db)):
+def get_figur(
+    figur_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_read_permission)
+):
     """Get a specific figure by ID."""
     figur = db.query(models.Figur).filter(models.Figur.id == figur_id).first()
     if not figur:
@@ -270,7 +351,11 @@ def get_figur(figur_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/figur", response_model=grunddaten_schemas.Figur, status_code=201)
-def create_figur(figur: grunddaten_schemas.FigurCreate, db: Session = Depends(get_db)):
+def create_figur(
+    figur: grunddaten_schemas.FigurCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Create a new figure."""
     db_figur = models.Figur(**figur.model_dump())
     db.add(db_figur)
@@ -280,7 +365,12 @@ def create_figur(figur: grunddaten_schemas.FigurCreate, db: Session = Depends(ge
 
 
 @router.put("/figur/{figur_id}", response_model=grunddaten_schemas.Figur)
-def update_figur(figur_id: int, figur: grunddaten_schemas.FigurUpdate, db: Session = Depends(get_db)):
+def update_figur(
+    figur_id: int,
+    figur: grunddaten_schemas.FigurUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Update a figure."""
     db_figur = db.query(models.Figur).filter(models.Figur.id == figur_id).first()
     if not db_figur:
@@ -295,7 +385,11 @@ def update_figur(figur_id: int, figur: grunddaten_schemas.FigurUpdate, db: Sessi
 
 
 @router.delete("/figur/{figur_id}", status_code=204)
-def delete_figur(figur_id: int, db: Session = Depends(get_db)):
+def delete_figur(
+    figur_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.require_app_write_permission)
+):
     """Delete a figure."""
     db_figur = db.query(models.Figur).filter(models.Figur.id == figur_id).first()
     if not db_figur:
