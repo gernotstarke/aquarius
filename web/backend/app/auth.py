@@ -112,22 +112,25 @@ async def get_current_app_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_http_bearer),
 ) -> models.User:
     """
-    Get current app user. 
+    Get current app user.
     In dev mode (ENABLE_APP_AUTH=false), returns default app user if no token provided.
     In production (ENABLE_APP_AUTH=true), requires valid token.
     """
     token = credentials.credentials if credentials else None
-    
+    logger.info(f"[AUTH] ENABLE_APP_AUTH={ENABLE_APP_AUTH}, token={'present' if token else 'absent'}, credentials={'present' if credentials else 'absent'}")
+
     # Development mode: allow access without token using default user
     if not ENABLE_APP_AUTH:
         if not token:
-            logger.info(f"App auth disabled, using default user: {DEFAULT_APP_USER}")
+            logger.info(f"[AUTH] App auth disabled, using default user: {DEFAULT_APP_USER}")
             user = get_or_create_default_app_user(db)
             now = datetime.utcnow()
             if not user.last_active or (now - user.last_active).total_seconds() > 60:
                 user.last_active = now
                 db.commit()
             return user
+        else:
+            logger.info(f"[AUTH] App auth disabled but token present, validating...")
     
     # Production mode: require valid token
     if not token:
@@ -154,11 +157,13 @@ async def get_current_app_user(
     user = db.query(models.User).filter(models.User.username == username).first()
     if user is None:
         raise credentials_exception
-    
+
+    logger.info(f"[AUTH] Token validated for user: {user.username}, role: {user.role}, can_read: {user.can_read_all}, can_write: {user.can_write_all}")
+
     # Check if user is active
     if not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
-    
+
     # Check if user has app access (admin users always have access)
     if user.role != "ROOT" and not user.is_app_user:
         raise HTTPException(
@@ -171,7 +176,7 @@ async def get_current_app_user(
     if not user.last_active or (now - user.last_active).total_seconds() > 60:
         user.last_active = now
         db.commit()
-    
+
     return user
 
 
@@ -199,13 +204,16 @@ async def require_app_write_permission(
     """Require write permission for app operations (create, update, delete)."""
     # Admin (ROOT) always has write access
     if current_user.role == "ROOT":
+        logger.info(f"[AUTH] Write access granted to ROOT user: {current_user.username}")
         return current_user
-    
+
     # App users must have write permission
     if not current_user.can_write_all:
+        logger.warning(f"[AUTH] Write permission DENIED for user: {current_user.username} (can_write_all={current_user.can_write_all})")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No write permission",
         )
-    
+
+    logger.info(f"[AUTH] Write access granted to user: {current_user.username}")
     return current_user
