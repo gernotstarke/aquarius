@@ -24,6 +24,7 @@ markdown_ext: "markdown,mkdown,mkdn,mkd,md"
 include:
   - .htaccess
   - _pages
+  - 36ec5a16d550c71d780bc7e60b00dcce.txt
 exclude:
   - "*.sublime-project"
   - "*.sublime-workspace"
