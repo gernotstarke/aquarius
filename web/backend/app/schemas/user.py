@@ -4,8 +4,9 @@ from datetime import datetime
 
 class UserBase(BaseModel):
     username: str
+    email: Optional[str] = None
     full_name: Optional[str] = None
-    role: str = "OFFIZIELLER"
+    role: str = "OFFIZIELLE"  # ADMIN, CLEO, VERWALTUNG, OFFIZIELLE, TEILNEHMENDE
     is_active: bool = True
     totp_enabled: bool = False
     is_app_user: Optional[bool] = False
@@ -16,6 +17,7 @@ class UserCreate(UserBase):
     password: str
 
 class UserUpdate(BaseModel):
+    email: Optional[str] = None
     full_name: Optional[str] = None
     password: Optional[str] = None
     role: Optional[str] = None

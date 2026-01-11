@@ -77,9 +77,10 @@ async def get_current_active_user(
     return current_user
 
 async def get_current_admin_user(current_user: models.User = Depends(get_current_active_user)):
-    if current_user.role != "ROOT":
+    # ADMIN and CLEO have full admin access
+    if current_user.role not in ["ADMIN", "CLEO"]:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, 
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access admin resources"
         )
     return current_user
@@ -94,7 +95,7 @@ def get_or_create_default_app_user(db: Session) -> models.User:
             username=DEFAULT_APP_USER,
             full_name="Default App User (Dev Mode)",
             hashed_password=get_password_hash("dev-password"),
-            role="OFFIZIELLER",
+            role="VERWALTUNG",
             is_app_user=True,
             can_read_all=True,
             can_write_all=True,
@@ -162,7 +163,7 @@ async def get_current_app_user(
         raise HTTPException(status_code=400, detail="Inactive user")
 
     # Check if user has app access (admin users always have access)
-    if user.role != "ROOT" and not user.is_app_user:
+    if user.role not in ["ADMIN", "CLEO"] and not user.is_app_user:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access app resources",
@@ -181,17 +182,17 @@ async def require_app_read_permission(
     current_user: models.User = Depends(get_current_app_user),
 ) -> models.User:
     """Require read permission for app operations."""
-    # Admin (ROOT) always has read access
-    if current_user.role == "ROOT":
+    # Admin and CLEO always have read access
+    if current_user.role in ["ADMIN", "CLEO"]:
         return current_user
-    
+
     # App users must have read permission
     if not current_user.can_read_all:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No read permission",
         )
-    
+
     return current_user
 
 
@@ -199,9 +200,9 @@ async def require_app_write_permission(
     current_user: models.User = Depends(get_current_app_user),
 ) -> models.User:
     """Require write permission for app operations (create, update, delete)."""
-    # Admin (ROOT) always has write access
-    if current_user.role == "ROOT":
-        logger.info(f"[AUTH] Write access granted to ROOT user: {current_user.username}")
+    # Admin and CLEO always have write access
+    if current_user.role in ["ADMIN", "CLEO"]:
+        logger.info(f"[AUTH] Write access granted to {current_user.role} user: {current_user.username}")
         return current_user
 
     # App users must have write permission

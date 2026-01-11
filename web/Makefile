@@ -59,6 +59,11 @@ clean: ## Clean build artifacts and caches
 
 ##@ Database
 
+db-migrate: ## Run database migrations (add new columns to existing tables)
+	@echo "🔄 Running database migrations..."
+	@docker compose exec backend python migrate_db.py
+	@echo "✅ Migration complete!"
+
 db-reset: ## Reset database (drop all tables and recreate)
 	@echo "⚠️  This will DELETE all data!"
 	@read -p "Continue? [y/N] " -n 1 -r; \

@@ -59,10 +59,10 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Check if ROOT user requires 2FA setup or verification
-    if user.role == "ROOT":
+    # Check if ADMIN/CLEO user requires 2FA setup or verification
+    if user.role in ["ADMIN", "CLEO"]:
         if not user.totp_enabled:
-            # ROOT user without 2FA - allow login but flag for setup
+            # ADMIN/CLEO user without 2FA - allow login but flag for setup
             access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
             access_token = auth.create_access_token(
                 data={"sub": user.username, "totp_verified": False},
@@ -229,7 +229,7 @@ async def get_totp_status(
     return {
         "totp_enabled": current_user.totp_enabled,
         "totp_setup_at": current_user.totp_setup_at,
-        "requires_setup": current_user.role == "ROOT" and not current_user.totp_enabled
+        "requires_setup": current_user.role in ["ADMIN", "CLEO"] and not current_user.totp_enabled
     }
 
 

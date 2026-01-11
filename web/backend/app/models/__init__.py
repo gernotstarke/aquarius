@@ -117,6 +117,8 @@ class Kind(Base):
     id = Column(Integer, primary_key=True, index=True)
     vorname = Column(String, nullable=False)
     nachname = Column(String, nullable=False, index=True)
+    email = Column(String, unique=True, index=True, nullable=True)
+    hashed_password = Column(String, nullable=True)
     geburtsdatum = Column(Date, nullable=False)
     geschlecht = Column(String(1))  # M, W, D
     verein_id = Column(Integer, ForeignKey("verein.id"), nullable=True)
@@ -141,6 +143,7 @@ class Figur(Base):
     beschreibung = Column(String)
     schwierigkeitsgrad = Column(Integer) # scaled by 10 or float? Usually float, but let's see usage
     altersklasse = Column(String)
+    min_alter = Column(Integer, nullable=True)  # Minimum age for this figure
     bild = Column(String) # Path to image
 
 

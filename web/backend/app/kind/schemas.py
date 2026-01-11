@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 class KindBase(BaseModel):
     vorname: str
     nachname: str
+    email: str | None = None
     geburtsdatum: date
     geschlecht: str | None = None
     verein_id: int | None = None
@@ -20,13 +21,15 @@ class KindBase(BaseModel):
 
 
 class KindCreate(KindBase):
-    pass
+    password: str | None = None  # Optional for self-registration
 
 
 class KindUpdate(BaseModel):
     """Schema for partial Kind updates - all fields optional."""
     vorname: str | None = None
     nachname: str | None = None
+    email: str | None = None
+    password: str | None = None  # If provided, will be hashed
     geburtsdatum: date | None = None
     geschlecht: str | None = None
     verein_id: int | None = None

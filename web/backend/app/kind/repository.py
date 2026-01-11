@@ -5,6 +5,7 @@ from typing import List, Optional
 
 from app import models
 from app.kind import schemas as kind_schemas
+from app.auth import get_password_hash
 
 
 class KindRepository:
@@ -23,7 +24,14 @@ class KindRepository:
         Returns:
             Created Kind model instance with eagerly loaded relationships
         """
-        db_kind = models.Kind(**kind_data.model_dump())
+        kind_dict = kind_data.model_dump()
+
+        # Hash password if provided
+        if kind_dict.get('password'):
+            kind_dict['hashed_password'] = get_password_hash(kind_dict['password'])
+            del kind_dict['password']  # Remove plain password
+
+        db_kind = models.Kind(**kind_dict)
         self.db.add(db_kind)
         self.db.commit()
         self.db.refresh(db_kind)
@@ -148,7 +156,14 @@ class KindRepository:
             return None
 
         # Only update fields that were explicitly set (partial updates)
-        for key, value in kind_data.model_dump(exclude_unset=True).items():
+        update_data = kind_data.model_dump(exclude_unset=True)
+
+        # Hash password if provided
+        if 'password' in update_data and update_data['password']:
+            update_data['hashed_password'] = get_password_hash(update_data['password'])
+            del update_data['password']  # Remove plain password
+
+        for key, value in update_data.items():
             setattr(db_kind, key, value)
 
         self.db.commit()
