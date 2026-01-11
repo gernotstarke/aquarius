@@ -1,12 +1,12 @@
 @startuml
 !include <C4/C4_Context>
 
+skinparam backgroundColor transparent
 
 
-Person(praesident, "Präsident", "Plant Saison und Wettkämpfe", $tags="lead")
-AddElementTag("lead", $bgColor="#FDE68A", $fontColor="#92400E")
+Person(praesident, "Präsident", "Plant Saison und Wettkämpfe", $tags="CLEO")
+AddElementTag("CLEO", $bgColor="#FDE68A", $fontColor="#92400E")
 
-Person(verein, "Verein", "organisiert und \nversichert Kinder")
 Person(punktrichter, "Punktrichter", "Verwaltet Wettkampf \nvor Ort")
 Person(kampfrichter, "Kampfrichter", "Bewertet Starts")
 Person(kind, "Kind", "Nimmt am Wettkampf teil")
@@ -18,7 +18,7 @@ System(aquarius, "Aquarius", "Bewertungssystem für Kunds- und Figurenschwimmen"
 System_Ext(schwimmverband, "Schwimmverband", "Figuren und Regeln")
 
 Rel(praesident, aquarius, "Plant Saison, verwaltet Stammdaten")
-Rel_U(verein, aquarius, "organisiert Teams" )
+
 Rel_U(eltern, aquarius, "Melden Kinder an")
 Rel(punktrichter, aquarius, "Führt Wettkampf durch", "offline")
 Rel(kampfrichter, aquarius, "Erfasst Punkte", "offline")
