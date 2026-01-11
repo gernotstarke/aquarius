@@ -44,6 +44,7 @@ const AdminLayout: React.FC = () => {
             )}
             <nav className="flex space-x-4 text-sm font-medium">
               <Link to="/admin/users" className="hover:text-red-200 transition-colors">Users</Link>
+              <Link to="/admin/kinder" className="hover:text-red-200 transition-colors">Kinder</Link>
               <Link to="/" className="hover:text-red-200 transition-colors opacity-75">Exit to App</Link>
             </nav>
             <button

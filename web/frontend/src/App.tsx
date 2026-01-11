@@ -32,6 +32,7 @@ import AdminLogin from './pages/admin/Login';
 import TOTPSetup from './pages/admin/TOTPSetup';
 import AdminDashboard from './pages/admin/Dashboard';
 import UserList from './pages/admin/UserList';
+import KinderList from './pages/admin/KinderList';
 import SystemHealth from './pages/admin/SystemHealth';
 import DatabaseStats from './pages/admin/Database';
 
@@ -145,6 +146,7 @@ const App: React.FC = () => {
               <Route element={<AdminLayout />}>
                 <Route index element={<AdminDashboard />} />
                 <Route path="users" element={<UserList />} />
+                <Route path="kinder" element={<KinderList />} />
                 <Route path="health" element={<SystemHealth />} />
                 <Route path="database" element={<DatabaseStats />} />
               </Route>

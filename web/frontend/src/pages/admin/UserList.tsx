@@ -6,8 +6,9 @@ import { UserPlus, Trash2, User as UserIcon, Edit2, Shield } from 'lucide-react'
 interface User {
   id: number;
   username: string;
+  email?: string;
   full_name: string;
-  role: 'ROOT' | 'PLANER' | 'OFFIZIELLER';
+  role: 'ADMIN' | 'CLEO' | 'VERWALTUNG' | 'OFFIZIELLE' | 'TEILNEHMENDE';
   is_active: boolean;
   is_app_user?: boolean;
   can_read_all?: boolean;
@@ -17,9 +18,11 @@ interface User {
 }
 
 const ROLE_LABELS: Record<string, string> = {
-  'ROOT': 'Admin',
-  'PLANER': 'Datenpflege',
-  'OFFIZIELLER': 'Bewertung'
+  'ADMIN': 'Admin',
+  'CLEO': 'Liga-Präsident',
+  'VERWALTUNG': 'Verwaltung',
+  'OFFIZIELLE': 'Offizielle',
+  'TEILNEHMENDE': 'Teilnehmende'
 };
 
 const UserList: React.FC = () => {
@@ -31,9 +34,10 @@ const UserList: React.FC = () => {
   // Form State
   const [formData, setFormData] = useState({
     username: '',
+    email: '',
     password: '',
     full_name: '',
-    role: 'OFFIZIELLER',
+    role: 'OFFIZIELLE',
     is_active: true,
     is_app_user: false,
     can_read_all: true,
@@ -55,7 +59,7 @@ const UserList: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       setIsCreateModalOpen(false);
-      setFormData({ username: '', password: '', full_name: '', role: 'OFFIZIELLER', is_active: true, is_app_user: false, can_read_all: true, can_write_all: false });
+      setFormData({ username: '', email: '', password: '', full_name: '', role: 'OFFIZIELLE', is_active: true, is_app_user: false, can_read_all: true, can_write_all: false });
     }
   });
 
@@ -67,7 +71,7 @@ const UserList: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       setIsEditModalOpen(false);
       setEditingUser(null);
-      setFormData({ username: '', password: '', full_name: '', role: 'OFFIZIELLER', is_active: true, is_app_user: false, can_read_all: true, can_write_all: false });
+      setFormData({ username: '', email: '', password: '', full_name: '', role: 'OFFIZIELLE', is_active: true, is_app_user: false, can_read_all: true, can_write_all: false });
     }
   });
 
@@ -90,6 +94,7 @@ const UserList: React.FC = () => {
     if (!editingUser) return;
 
     const updateData: any = {
+      email: formData.email,
       full_name: formData.full_name,
       role: formData.role,
       is_active: formData.is_active,
@@ -110,6 +115,7 @@ const UserList: React.FC = () => {
     setEditingUser(user);
     setFormData({
       username: user.username,
+      email: user.email || '',
       password: '',
       full_name: user.full_name || '',
       role: user.role,
@@ -169,9 +175,11 @@ const UserList: React.FC = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                    ${user.role === 'ROOT' ? 'bg-red-100 text-red-800' :
-                      user.role === 'PLANER' ? 'bg-blue-100 text-blue-800' :
-                      'bg-green-100 text-green-800'}`}>
+                    ${user.role === 'ADMIN' ? 'bg-red-100 text-red-800' :
+                      user.role === 'CLEO' ? 'bg-purple-100 text-purple-800' :
+                      user.role === 'VERWALTUNG' ? 'bg-blue-100 text-blue-800' :
+                      user.role === 'OFFIZIELLE' ? 'bg-green-100 text-green-800' :
+                      'bg-gray-100 text-gray-800'}`}>
                     {ROLE_LABELS[user.role]}
                   </span>
                 </td>
@@ -239,6 +247,15 @@ const UserList: React.FC = () => {
                 />
               </div>
               <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                <input
+                  type="email"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-red-500"
+                  value={formData.email}
+                  onChange={e => setFormData({...formData, email: e.target.value})}
+                />
+              </div>
+              <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2">Password</label>
                 <input
                   type="password"
@@ -264,9 +281,11 @@ const UserList: React.FC = () => {
                   value={formData.role}
                   onChange={e => setFormData({...formData, role: e.target.value})}
                 >
-                  <option value="OFFIZIELLER">Bewertung (Offizielle)</option>
-                  <option value="PLANER">Datenpflege (Backoffice)</option>
-                  <option value="ROOT">Admin (ROOT)</option>
+                  <option value="OFFIZIELLE">Offizielle (Bewertung)</option>
+                  <option value="VERWALTUNG">Verwaltung</option>
+                  <option value="TEILNEHMENDE">Teilnehmende</option>
+                  <option value="CLEO">CLEO (Liga-Präsident)</option>
+                  <option value="ADMIN">Admin</option>
                 </select>
               </div>
               <div className="mb-6">
@@ -351,6 +370,15 @@ const UserList: React.FC = () => {
                 <p className="text-xs text-gray-500 mt-1">Username cannot be changed</p>
               </div>
               <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                <input
+                  type="email"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
+                  value={formData.email}
+                  onChange={e => setFormData({...formData, email: e.target.value})}
+                />
+              </div>
+              <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2">
                   Password
                   <span className="font-normal text-gray-500 ml-2">(leave empty to keep current)</span>
@@ -379,9 +407,11 @@ const UserList: React.FC = () => {
                   value={formData.role}
                   onChange={e => setFormData({...formData, role: e.target.value})}
                 >
-                  <option value="OFFIZIELLER">Bewertung (Offizielle)</option>
-                  <option value="PLANER">Datenpflege (Backoffice)</option>
-                  <option value="ROOT">Admin (ROOT)</option>
+                  <option value="OFFIZIELLE">Offizielle (Bewertung)</option>
+                  <option value="VERWALTUNG">Verwaltung</option>
+                  <option value="TEILNEHMENDE">Teilnehmende</option>
+                  <option value="CLEO">CLEO (Liga-Präsident)</option>
+                  <option value="ADMIN">Admin</option>
                 </select>
               </div>
               <div className="mb-6">

@@ -1,4 +1,4 @@
-.PHONY: help dev dev-with-turso dev-down test test-ui db-reset db-seed db-import-figures deploy deploy-status deploy-logs deploy-ssh deploy-rollback deploy-setup clean
+.PHONY: help dev dev-with-turso dev-down test test-ui db-reset db-seed db-import-figures user-reset deploy deploy-status deploy-logs deploy-ssh deploy-rollback deploy-setup clean
 
 ##@ Web App Development
 
@@ -95,6 +95,20 @@ db-import-figures: ## Import figures from JSON catalog (usage: make db-import-fi
 		exit 1; \
 	fi
 	@docker compose exec backend python import_figures.py "$(FILE)"
+
+user-reset: ## Reset user password to username (usage: make user-reset username=admin)
+	@if [ -z "$(username)" ]; then \
+		echo "❌ Error: username parameter is required"; \
+		echo "Usage:"; \
+		echo "  make user-reset username=admin"; \
+		echo "  make user-reset username=fritz"; \
+		echo ""; \
+		echo "Available users:"; \
+		docker compose exec backend python -c "from app.database import SessionLocal; from app.models.user import User; db = SessionLocal(); users = db.query(User).all(); [print(f'  - {u.username} ({u.role})') for u in users]; db.close()"; \
+		exit 1; \
+	fi
+	@echo "🔐 Resetting password for user: $(username)"
+	@docker compose exec backend python reset_user_password.py "$(username)"
 
 db-export-local: ## Export local SQLite database from Docker to backend/exports/
 	@echo "📥 Exporting local SQLite database..."

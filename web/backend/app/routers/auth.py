@@ -51,6 +51,10 @@ class TOTPStatusResponse(BaseModel):
 
 @router.post("/token", response_model=schemas.Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """
+    App login endpoint - authenticates users for the main application.
+    2FA is optional for app access (required only for admin panel).
+    """
     user = db.query(models.User).filter(models.User.username == form_data.username).first()
     if not user or not auth.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
@@ -59,29 +63,8 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Check if ADMIN/CLEO user requires 2FA setup or verification
-    if user.role in ["ADMIN", "CLEO"]:
-        if not user.totp_enabled:
-            # ADMIN/CLEO user without 2FA - allow login but flag for setup
-            access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
-            access_token = auth.create_access_token(
-                data={"sub": user.username, "totp_verified": False},
-                expires_delta=access_token_expires
-            )
-            return {
-                "access_token": access_token,
-                "token_type": "bearer",
-                "requires_2fa_setup": True
-            }
-        else:
-            # ROOT user with 2FA enabled - require TOTP code
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="TOTP code required",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-
-    # Non-ROOT users - normal login
+    # All users can login to the app with username/password
+    # 2FA is only required for admin panel access (handled in /admin/auth/token)
     access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = auth.create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
