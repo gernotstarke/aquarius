@@ -87,21 +87,78 @@ def seed_data(minimal=False):
     try:
         print("\n📋 Seeding database with sample data...")
 
-        # Create Admin User
-        print("\n🔑 Creating admin user...")
+        # Create Admin Users
+        print("\n🔑 Creating admin users...")
+
+        # System Administrator
         admin_password = os.getenv("INITIAL_ADMIN_PASSWORD", "admin")
         admin_user = User(
             username="admin",
+            email="admin@aquarius.org",
             full_name="System Administrator",
             hashed_password=get_password_hash(admin_password),
-            role="ROOT",
+            role="ADMIN",
             is_active=True
         )
         db.add(admin_user)
-        db.commit()
-        print(f"   ✓ Created user: admin (Role: ROOT)")
+        print(f"   ✓ Created user: admin (Role: ADMIN)")
         if admin_password == "admin":
              print("   ⚠️  Using default password 'admin'. Change this in production!")
+
+        # CLEO - Chief League & Executive Officer (Fritz Flosse)
+        cleo_user = User(
+            username="fritz",
+            email="fritz.flosse@aquarius.org",
+            full_name="Fritz Flosse (Liga-Präsident)",
+            hashed_password=get_password_hash("flosse"),
+            role="CLEO",
+            is_active=True
+        )
+        db.add(cleo_user)
+        print(f"   ✓ Created user: fritz (Role: CLEO - Liga-Präsident)")
+
+        # Test users with different roles
+        test_users = [
+            User(
+                username="gernot",
+                email="gernot@aquarius.org",
+                full_name="Gernot Starke (Planer)",
+                hashed_password=get_password_hash("test123"),
+                role="VERWALTUNG",
+                is_app_user=True,
+                can_read_all=True,
+                can_write_all=False,  # Read-only for testing
+                is_active=True
+            ),
+            User(
+                username="maria",
+                email="maria@aquarius.org",
+                full_name="Maria Müller (Verwaltung)",
+                hashed_password=get_password_hash("test123"),
+                role="VERWALTUNG",
+                is_app_user=True,
+                can_read_all=True,
+                can_write_all=True,
+                is_active=True
+            ),
+            User(
+                username="peter",
+                email="peter@aquarius.org",
+                full_name="Peter Schmidt (Offizieller)",
+                hashed_password=get_password_hash("test123"),
+                role="OFFIZIELLE",
+                is_app_user=True,
+                can_read_all=True,
+                can_write_all=False,
+                is_active=True
+            ),
+        ]
+
+        for user in test_users:
+            db.add(user)
+            print(f"   ✓ Created user: {user.username} (Role: {user.role}, Write: {user.can_write_all})")
+
+        db.commit()
 
         # Create Verbände (constant data)
         print("\n🏢 Creating verbände...")
