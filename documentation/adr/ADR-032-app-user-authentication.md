@@ -1,14 +1,18 @@
 # ADR-032: App User Authentication & Authorization
 
 **Status:** Accepted  
-**Datum:** 2026-01-08  
+**Datum:** 2026-01-11  
 **Entscheider:** Gernot Starke
 
 ## Kontext
 
-Aquarius benötigt zwei unterschiedliche Benutzerklassen:
-1. **Admin-Benutzer**: Verwaltung von Benutzern, Systemkonfiguration, Monitoring (existiert bereits)
-2. **App-Benutzer**: Zugriff auf die Wettkampf-Verwaltungsanwendung mit Lese-/Schreibrechten
+Aquarius benötigt mehrere unterschiedliche User-Rollen:
+
+1. **Admin**: Verwaltung von Benutzern, Systemkonfiguration, Monitoring 
+2. **CLEO**: Chief League & Executive Officer, die Sonder-Rolle für Fritz Flosse, den Liga-Präsidenten.
+3. **Verwaltung**: Zugriff auf die Wettkampf-Verwaltungsanwendung mit Lese-/Schreibrechten
+4. **Offizielle**: Können Figuren/Durchführungen/Starts bei Wettkämpfen bewerten, und Anmeldungen für den jeweiligen Wettkampf löschen.
+5. **Teilnehmende**: Können sich selbst anmelden, ihre eigenen Stammdaten ändern, Ergebnislisten sehen. 
 
 **Anforderungen:**
 - Vereinfachte Lokalentwicklung ohne obligatorische Authentifizierung
@@ -76,45 +80,8 @@ Wir implementieren ein **umgebungsgestütztes App-Authentifizierungssystem**:
 **Produktion** (`ENABLE_APP_AUTH=true`):
 - Beim initialen Deployment: Kein Standard-Benutzer
 - Admin erstellt erste App-Benutzer über das Admin-Panel
-- Benutzer loggen sich dann über `/app/login` ein
+- User loggen sich dann über `/app/login` ein
 
-## Konsequenzen
-
-### Positiv ✅
-- **Entwickler-freundlich**: Automatische Authentifizierung in Lokalentwicklung
-- **Produktionsreife**: Vollständige Authentifizierung in Production
-- **Granulare Kontrolle**: Separate Lese-/Schreibberechtigungen
-- **Skalierbar**: Einfach verschiedene Rollen/Berechtigungen hinzufügen
-- **Admin-Kompatibilität**: Bestehende Admin-Authentifizierung nicht betroffen
-- **Typsicher**: TypeScript & Pydantic Validierung
-
-### Negativ ⚠️
-- **Komplexitäts-Overhead**: Zusätzliche Auth-Layer und Dependency-Injection
-- **Token-Management**: Frontend muss localStorage für Token verwalten
-- **Testanzpassungen**: Test-Fixture müssen User-Permissions setzen
-
-## Implementierungsreihenfolge
-
-1. **Phase 1 (✅ DONE)**: Backend-Infrastruktur
-   - User-Modell erweitern
-   - Auth-Dependencies implementieren
-   - Kind-Router als Beispiel schützen
-   - Alle Tests grün
-
-2. **Phase 2 (IN PROGRESS)**: Frontend-Foundation
-   - AuthContext implementieren
-   - AppLoginGuard erstellen
-   - AppLogin-Seite (analog Admin-Login)
-   - UserMenu (Option 1) hinzufügen
-
-3. **Phase 3 (PLANNED)**: UI Permission Gates
-   - Forms auf Read-Only prüfen
-   - Buttons basierend auf Berechtigungen ausblenden
-   - Visuelle Indikatoren für eingeschränkten Zugriff
-
-4. **Phase 4 (PLANNED)**: Alle Router schützen
-   - Restliche Domain-Router (Wettkampf, Anmeldung, Grunddaten, etc.)
-   - Identisches Muster wie Kind-Router
 
 ## Referenzen
 
