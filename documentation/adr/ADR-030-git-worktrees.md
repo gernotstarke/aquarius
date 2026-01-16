@@ -2,7 +2,7 @@
 
 **Status:** Accepted
 **Datum:** 2025-12-18
-**Entscheider:** Team
+**Entscheider:** Gernot
 
 ## Kontext
 
