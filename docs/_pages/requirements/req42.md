@@ -65,17 +65,17 @@ Das gesamte System ist als Fallstudie für Schulungen in Softwarearchitektur und
 
 ### Scope
 **In Scope:**
-- ✅ Figurenschwimmen-Bewertung
-- ✅ Saisonplanung und Wettkampforganisation
-- ✅ Anmeldungsverwaltung
-- ✅ Live-Bewertung mit Punkteerfassung
-- ✅ Einzel- und Teamwertung (nur Figuren)
-- ✅ Stammdatenverwaltung
+- Figurenschwimmen-Bewertung
+- Saisonplanung und Wettkampforganisation
+- Anmeldungsverwaltung
+- Live-Bewertung mit Punkteerfassung
+- Einzel- und Teamwertung (nur Figuren)
+- Stammdatenverwaltung
+- technische Anforderungen bezüglich Datensicherheit und Benutzungsfreundlichkeit
 
 **Out of Scope:**
-- ❌ Synchronschwimmen-Bewertung (erwähnt für Teamwertung, aber nicht im Detail)
-- ❌ Finanzielle Abwicklung
-- ❌ Externe Schnittstellen zu anderen Systemen
+- Synchronschwimmen-Bewertung (erwähnt für Teamwertung, aber nicht im Detail)
+- Finanzielle Abwicklung
 
 ---
 

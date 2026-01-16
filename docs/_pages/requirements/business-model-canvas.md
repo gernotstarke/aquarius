@@ -50,8 +50,15 @@ header:
   });
 </script>
 
-## Details
+## Mehr Informationen zum _Business Model Canvas_
 
-*(Content to be added)*
+
+* [Kompakte Einführung mit kleinen Beispielen](https://www.thepowermba.com/en/blog/business-model-canvas)
+
+* [Beschreibung vom "Erfinder" selbst](https://www.strategyzer.com/business-models-the-toolkit-to-design-a-disruptive-company)
+* [kurze Video-Einführung, auch von den Erfindern des BMC](https://youtu.be/QoAOzMTLP5s?si=Jva1Xf9iD40OGg24)
+
+
+
 
 [← Zurück zu Requirements](/requirements/)

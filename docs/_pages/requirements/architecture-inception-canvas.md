@@ -8,6 +8,6 @@ header:
   overlay_filter: "0.3"
 ---
 
-# Architecture Inception Canvas
+
 
 *Hier entsteht das Architecture Inception Canvas.*

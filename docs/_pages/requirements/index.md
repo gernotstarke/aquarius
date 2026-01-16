@@ -6,7 +6,7 @@ header:
   overlay_image: /assets/images/splash/aquarius-requirements-header-1500.webp
   overlay_color: "#000"
   overlay_filter: "0.3"
-  caption: "Der Einstieg in die Anforderungen"
+  caption: "(want - like - need)"
 ---
 
 <div class="req-tile-grid">
