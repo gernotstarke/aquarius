@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './auth.fixture';
 
 /**
  * Wettkampf & Anmeldung E2E Tests - Complex Nested Data
