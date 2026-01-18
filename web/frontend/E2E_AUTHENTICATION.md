@@ -152,9 +152,23 @@ Error: Auth file not found at .../frontend/.auth/token.json
 - Verify token format is valid JWT
 - Ensure frontend is loading from correct URL
 
+## Test Results
+
+### Working Tests ✅
+- All 6 smoke tests pass (page loading and navigation)
+- Tests are properly authenticated with JWT tokens
+- Token injection and API header authorization working correctly
+
+### Known Issues ⚠️
+Some domain logic tests are failing due to pre-existing backend validation errors unrelated to authentication:
+- Tests failing with "Invalid keyword argument" for domain models
+- These are test data/schema issues, not authentication issues
+- They existed before this auth implementation
+
 ## Notes
 
 - Test users are ephemeral - they don't persist between test runs
 - Using a single test user for all tests keeps setup simple and fast
 - Token expires after 24 hours (configured in backend)
 - No 2FA required for E2E test users
+- Authentication is now working end-to-end: user creation → token generation → localStorage injection → API authorization
