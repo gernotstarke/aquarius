@@ -15,8 +15,9 @@ This document describes the authentication setup for Playwright E2E tests. Tests
 
 2. **Each Test** (using `auth.fixture.ts`)
    - Loads token from `.auth/token.json`
-   - Injects token into `localStorage` before navigation
-   - Tests run fully authenticated
+   - Injects token into `localStorage` before navigation (for frontend fetch/axios calls)
+   - Wraps `request` fixture to automatically add `Authorization: Bearer <token>` header
+   - Tests run fully authenticated with both page-based and direct API calls
 
 3. **globalTeardown** (runs once after all tests)
    - Deletes ephemeral test user
@@ -29,6 +30,31 @@ This document describes the authentication setup for Playwright E2E tests. Tests
 - **Role**: `APP_USER` (full app permissions)
 - **Permissions**: `can_read_all=true`, `can_write_all=true`
 - **Scope**: Ephemeral (created/destroyed per test run)
+
+## How Auth Injection Works
+
+### Token Injection Points
+
+The auth fixture handles authentication through two mechanisms:
+
+**1. localStorage Injection (for frontend fetch/axios)**
+```typescript
+// Token is injected into localStorage before page navigation
+localStorage.setItem('token', '<jwt-token>');
+// Frontend app reads this and includes it in fetch/axios requests
+```
+
+**2. Authorization Header Injection (for direct API calls)**
+```typescript
+// The request fixture automatically wraps all HTTP methods
+const response = await request.post('/api/kind', { data: {...} });
+// Internally adds: headers: { 'Authorization': 'Bearer <jwt-token>' }
+```
+
+This dual approach ensures:
+- Page-based navigation and fetch calls work (if frontend reads token from localStorage)
+- Direct API calls via `request` fixture are always authenticated
+- No manual header management needed in tests
 
 ## Implementation Files
 
