@@ -34,15 +34,15 @@ function loadToken(): string {
 async function injectAuthToken(page: Page): Promise<void> {
   const token = loadToken();
 
-  // Navigate to a page first to establish context
-  await page.goto('/');
+  // Inject token into localStorage BEFORE any page navigation
+  // This ensures AuthContext finds the token when it initializes
+  await page.addInitScript((tokenData: { app_token: string; token: string }) => {
+    localStorage.setItem('app_token', tokenData.app_token);
+    localStorage.setItem('token', tokenData.token);
+  }, { app_token: token, token });
 
-  // Inject token into localStorage with the key the frontend expects ('app_token')
-  // Also set 'token' for backward compatibility with any components that might use it
-  await page.evaluate((token) => {
-    localStorage.setItem('app_token', token);
-    localStorage.setItem('token', token);
-  }, token);
+  // Now navigate to a page - localStorage will already be set
+  await page.goto('/');
 }
 
 export const test = base.extend({
