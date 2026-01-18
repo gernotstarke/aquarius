@@ -7,6 +7,13 @@ header:
   overlay_color: "#000"
   overlay_filter: "0.3"
   caption: "Der Einstieg in die Architektur"
+  actions:
+    - label: "Zu den Anforderungen"
+      url: "/requirements/"
+      btn_class: "btn btn--blue"
+    - label: "Zur Anwendung"
+      url: "/app/"
+      btn_class: "btn btn--violet"
 ---
 
 <div class="arch-search-container">
