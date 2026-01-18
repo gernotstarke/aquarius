@@ -1,5 +1,4 @@
 import { defineConfig } from '@playwright/test';
-import * as path from 'path';
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173';
 
@@ -9,8 +8,8 @@ export default defineConfig({
   expect: {
     timeout: 10000,
   },
-  globalSetup: path.join(__dirname, './playwright-globalSetup.ts'),
-  globalTeardown: path.join(__dirname, './playwright-globalTeardown.ts'),
+  globalSetup: './playwright-globalSetup.ts',
+  globalTeardown: './playwright-globalTeardown.ts',
   use: {
     baseURL,
     headless: true,
