@@ -37,8 +37,10 @@ async function injectAuthToken(page: Page): Promise<void> {
   // Navigate to a page first to establish context
   await page.goto('/');
 
-  // Inject token into localStorage (for frontend fetch/axios calls)
+  // Inject token into localStorage with the key the frontend expects ('app_token')
+  // Also set 'token' for backward compatibility with any components that might use it
   await page.evaluate((token) => {
+    localStorage.setItem('app_token', token);
     localStorage.setItem('token', token);
   }, token);
 }
@@ -53,6 +55,7 @@ export const test = base.extend({
 
     // Cleanup after test
     await page.evaluate(() => {
+      localStorage.removeItem('app_token');
       localStorage.removeItem('token');
     });
   },
