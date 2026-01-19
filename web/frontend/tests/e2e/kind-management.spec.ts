@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './auth.fixture';
 
 /**
  * Kind Management E2E Tests - Tests DDD Frontend Slicing

@@ -8,6 +8,8 @@ export default defineConfig({
   expect: {
     timeout: 10000,
   },
+  globalSetup: './playwright-globalSetup.ts',
+  globalTeardown: './playwright-globalTeardown.ts',
   use: {
     baseURL,
     headless: true,

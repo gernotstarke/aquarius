@@ -8,7 +8,7 @@ header:
   overlay_filter: "0.3"
 ---
 
-Aquarius ist ein computerunterstütztes Bewertungssystem für eine regionale Kinderliga im Kunstschwimmen. 
+**Aquarius unterstützt Planung und Durchführungen von Wettkämpfen im Kinder-Figurenschwimmen.**
 
 Verschiedene Teams treffen sich zu Wettkämpfen, bei denen Kinder in zwei Disziplinen konkurrieren, Figuren- und Synchronschwimmen. 
    
@@ -35,6 +35,8 @@ Bei einem **Wettkampf** werden mehrere **Durchgänge** für unterschiedliche Fig
 
 Die Stationen werden um ein Schwimmbecken herum eingerichtet, meistens eine an jeder Ecke. 
 
+![Stationen am Schwimmbecken](/assets/images/requirements/becken-schematisch.webp)
+
 Es gibt freiwillige Kampf- und Punkterichter (_Offizielle_). 
 Punkterichter ermüden schnell und müssen deshalb oft ausgewechselt werden. 
 Bei einem Wettkampf werden an jeder Station mehrere Kampf- und Punkterichter eingesetzt. 
@@ -45,11 +47,14 @@ An einer Station können im Verlauf eines Wettkampfs mehrere Durchgänge stattfi
 Die Wettkampfteilnehmer werden in Gruppen aufgeteilt. Jede Gruppe beginnt an einer anderen Station. 
 Wenn ein Kind an einer Station fertig ist, macht es an einer anderen Station mit einem anderen Durchgang weiter.
 
+![so funktionieren Start und Bewertung](/assets/images/requirements/so-funktioniert-start+wertung-300.webp){: .align-left}
+
 Wenn an einer Station jedes Kind einen bestimmten Durchgang absolviert hat, wird an dieser Station mit dem nächsten für die Station vorgesehenen Durchgang begonnen.
   
 Jedes teilnehmende Kind hat bei jedem Durchgang einen Versuch, d. h. einen **Start**. 
 Vor einem Start wird die Nummer des Kindes aufgerufen. 
 Manchmal passt ein Kind nicht auf oder die Punktrichter kommen durcheinander, so dass an der betreffenden Station eine Pause eintritt, bis die Ordnung wiederhergestellt ist. 
+
 
 Jeder **Kampfrichter** zeigt die vorläufige Punktezahl für jeden beobachteten Start an, indem er Zahlenkarten hochhält. 
 Die vorläufigen Punktezahlen werden von den Punktrichtern vorgelesen, die sie erfassen und die Endpunkte für den Start berechnen. 
@@ -59,9 +64,26 @@ Es gibt verschiedene Altersgruppen und eigene Preise für jede Altersgruppe.
 Einzelpreise werden nur auf der Basis des Figurenschwimmens vergeben. 
 Für Teampreise zählen sowohl das Figuren- als auch das Synchronschwimmen.
 
-Das Aquarius-System dient dazu, alle Informationen zur Saisonplanung, Wettkämpfen, Kindern, Anmeldungen, Bewertung usw. zu speichern. 
 
-Am Anfang einer **Saison** werden alle Schwimmer in das System eingegeben und ein Saisonplan wird erstellt, aus dem hervorgeht, welche Figuren bei welchem Wettkampf bewertet werden. 
+#### Das Aquarius-System
+
+Das Aquarius-System dient dazu, alle Informationen zur Saisonplanung, Wettkämpfen, Kindern, Anmeldungen, Bewertung usw. digital zu verwalten. 
+
+Eigentlich gibt es drei _Apps_: 
+
+Aquarius Control
+Aquarius Score
+
+* Das zentrale Programm, für Saison- und Wettkampfplanung sowie alle Grunddaten (Kinder, Schwimmbäder, Vereine, Verbände etc)
+* Eine App für Mobilgeräte, zur Unterstützung der Punkt- und Kampfrichter
+* Aquarius Splash, die App für Kinder und Eltern, zur Anmeldung sowie zur Anzeige von Ranglisten und Ergebnissen der Wettkämpfe: "Splash: Dein Wettkampf. Deine Platzierung."
+
+![Drei Apps](/assets/images/requirements/aquarius-die-apps-nobg.webp)
+
+Am Anfang einer **Saison** aktualisieren die Verantwortlichen (Präsident und Backoffice-Mitarbeitende) die Daten der Kinder und erstellen einen Saisonplan.
+Aus dem geht hervor, welche Figuren bei welchem Wettkampf bewertet werden.
+
 Vor einem Wettkampf wird das System zur Bearbeitung der Anmeldungen verwendet. 
-Während des Wettkampfs erfasst es die Punkte und ermittelt die Ranglisten.
+Während des Wettkampfs erfasst es die Punkte und ermittelt die Ranglisten, druckt Urkunden.
+
 

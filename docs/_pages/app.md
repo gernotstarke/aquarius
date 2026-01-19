@@ -7,6 +7,13 @@ header:
   overlay_image: /assets/images/splash/aquarius-app-header-1500x400.webp
   overlay_filter: "0.4"
   caption: "Planung und Durchführung von Wettkämpfen"
+  actions:
+    - label: "Zur Architektur"
+      url: "/architecture/"
+      btn_class: "btn btn--green"
+    - label: "Zu den Anforderungen"
+      url: "/requirements/"
+      btn_class: "btn btn--blue"
 ---
 
 

@@ -1,5 +1,5 @@
 
-import { test, expect } from '@playwright/test';
+import { test, expect } from './auth.fixture';
 
 test.describe('Wettkampf Deletion', () => {
   const createdIds: { wettkampf: number[], verein: number[], kind: number[], saison: number[], schwimmbad: number[] } = {
