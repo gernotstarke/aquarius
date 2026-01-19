@@ -25,6 +25,11 @@ header:
 </div>
 
 <div class="req-tile-grid">
+  <a href="/architecture/overview/" class="req-tile arch-tile--green-0">
+    <i class="fas fa-cubes"></i>
+    <h3>Lösungsüberblick</h3>
+  </a>
+
   <a href="/architecture/acc/" class="req-tile arch-tile--green-1">
     <i class="fas fa-comments"></i>
     <h3>Architecture Communication Canvas</h3>

@@ -1,11 +1,19 @@
 ---
 permalink: /requirements/story/
-title: "Schwimmliga: Die Story"
+title: "Aquarius"
 layout: splash
 header:
   overlay_image: /assets/images/splash/aquarius-requirements-header-1500.webp
   overlay_color: "#000"
   overlay_filter: "0.3"
+  caption: "Schwimmliga: Die Story"
+  actions:
+    - label: "Zur Startseite"
+      url: "/"
+    - label: "Zu den Anforderungen"
+      url: "/requirements/"
+    - label: "Zur Anwendung"
+      url: "/app/"  
 ---
 
 **Aquarius unterstützt Planung und Durchführungen von Wettkämpfen im Kinder-Figurenschwimmen.**
@@ -65,25 +73,12 @@ Einzelpreise werden nur auf der Basis des Figurenschwimmens vergeben.
 Für Teampreise zählen sowohl das Figuren- als auch das Synchronschwimmen.
 
 
-#### Das Aquarius-System
+### Die Aquarius-User
 
-Das Aquarius-System dient dazu, alle Informationen zur Saisonplanung, Wettkämpfen, Kindern, Anmeldungen, Bewertung usw. digital zu verwalten. 
+Das Aquarius-System soll dazu dienen, alle Informationen zur Saisonplanung, Wettkämpfen, Kindern, Anmeldungen, Bewertung usw. digital zu verwalten. 
 
-Eigentlich gibt es drei _Apps_: 
+Dafür haben wir drei verschiedene Kategorien von _Usern_: 
 
-Aquarius Control
-Aquarius Score
-
-* Das zentrale Programm, für Saison- und Wettkampfplanung sowie alle Grunddaten (Kinder, Schwimmbäder, Vereine, Verbände etc)
-* Eine App für Mobilgeräte, zur Unterstützung der Punkt- und Kampfrichter
-* Aquarius Splash, die App für Kinder und Eltern, zur Anmeldung sowie zur Anzeige von Ranglisten und Ergebnissen der Wettkämpfe: "Splash: Dein Wettkampf. Deine Platzierung."
-
-![Drei Apps](/assets/images/requirements/aquarius-die-apps-nobg.webp)
-
-Am Anfang einer **Saison** aktualisieren die Verantwortlichen (Präsident und Backoffice-Mitarbeitende) die Daten der Kinder und erstellen einen Saisonplan.
-Aus dem geht hervor, welche Figuren bei welchem Wettkampf bewertet werden.
-
-Vor einem Wettkampf wird das System zur Bearbeitung der Anmeldungen verwendet. 
-Während des Wettkampfs erfasst es die Punkte und ermittelt die Ranglisten, druckt Urkunden.
-
-
+* Unser _Backoffice_, im wesentlichen unseren Präsidenten Fritz Flosse. Deren Aufgabe ist die gesamte Planung, Verwaltung aller Grunddaten (Kinder, Vereine, Schwimmbäder u.s.w.). Während der Wettkämpfe können sie noch _last minute_ Aktualisierungen vornehmen, und Ranglisten und Urkunden drucken. Backoffice arbeitet meist im Büro, teilweise auch bei Wettkämpfen lokal vor-Ort.
+* Die _Offiziellen_, also Kampf- und Punktrichter. Sie sorgen für geregelten Ablauf an Stationen und bewerten die Starts der Kinder mit Noten.
+* Schließlich möchten wir den Kindern und ihren Eltern ermöglichen, Anmeldungen selbst vorzunehmen, und Rang-/Siegerlisten zeitnah (_in Echtzeit_) schon während der Wettkämpfe einzusehen (und natürlich auch danach noch).

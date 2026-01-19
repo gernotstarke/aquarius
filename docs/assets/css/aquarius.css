@@ -144,6 +144,15 @@
 
 /* --- Architecture Tiles (Green Variations) --- */
 
+/* Overview: Pale Green */
+.arch-tile--green-0 {
+  background-color: #f1f8e9;
+  border: 1px solid #33691e;
+}
+.arch-tile--green-0:hover {
+  background-color: #fff3e0;
+}
+
 /* ACC: Light Sage Green */
 .arch-tile--green-1 {
   background-color: #c8e6c9;
