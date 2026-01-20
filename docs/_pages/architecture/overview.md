@@ -1,7 +1,7 @@
 ---
 title: "Aquarius: Die Lösung"
 layout: protected
-permalink: /architecture/overview
+permalink: /architecture/overview/
 header:
   overlay_image: /assets/images/splash/aquarius-architecture-header-1500x400.webp
   overlay_color: "#000"
@@ -63,6 +63,11 @@ Ansonsten speichert es die Bewertung(en) lokal und synchronisiert mit Aquarius-C
 Hier gibt es eine besondere Herausforderung: Offizelle dürfen zu jedem Zeitpunkt auf höchstens EINEM Gerät angemeldet sein.
 Das ist insofern schwierig, als das Aquarius-Score ja auch offline funktionieren muss, ein Offizieller aber auf einem zweiten Gerät online sein kann. 
 
+Offizielle müssen einmalig im [Aquarius-Control](#aquacontrol) als User mit der Rolle "_offizielle_" eingerichtet werden.
+
+>Aktuell ist in Diskussion, ob der Zugang zu Aquarius-Score über eine 2-Faktor-Authentisierung abgesichert werden soll, oder ob alternative Mechanismen (Passwort, Token) zum Einsatz kommen werden.
+
+---
 
 <a id="aquasplash"></a>
 ## Aquarius Splash
@@ -72,16 +77,24 @@ Die App für Kinder und Eltern, zur Anmeldung sowie zur Anzeige von Ranglisten u
 
 > "Splash: Dein Wettkampf. Deine Platzierung."
 
-Kinder und Eltern können auf dieser schicken Mobile-App Anmeldungen für Wettkämpfe vornehmen und wichtige Grunddaten ändern und natürlich auch aktuelle Resultate und Ranglisten während de
+Kinder und Eltern können auf dieser schicken Mobile-App Anmeldungen für Wettkämpfe vornehmen und wichtige Grunddaten ändern.
+Dazu kommen Resultate und Ranglisten während der Wettkämpfe - zeitnah aktualisiert, stets am Puls des Geschehens.
+
+Diese App läuft auf den relevanten Betriebssystemen Android und iOS, sowohl auf Mobiltelefonen wie auch Tablets.
+
+Zur Nutzung ist einmalig die Registrierung im [Aquarius-Control](#aquacontrol) notwendig, um Mißbrauch durch unberechtigte Dritte zu verhindern.
+
+---
 
 <a id="aquapulse"></a>
 ## Aquarius Pulse
 
+
+![](/assets/images/architecture/aquarius-admin-scenario-400.webp){: .align-right}
+>User einrichten und Rechte vergeben gehört zu den kritischen und sensiblen Aufgaben beim Betrieb von IT-Systemen, insbesondere wenn diese schutz- und vertrauenswürdige Daten speichern - dafür gibt es die Rolle _Admin_.
+
+
 ![](/assets/images/architecture/app-logos/aquarius-pulse-logo-nobg-200.webp){: .align-left}
-
-
-User einrichten und Rechte vergeben gehört zu den kritischen und sensiblen Aufgaben beim Betrieb von IT-Systemen, insbesondere wenn diese schutz- und vertrauenswürdige Daten speichern - dafür gibt es die Rolle _Admin_.
-
 Im Umfeld Aquarius gehören dazu insbesondere die personenbezogenen Daten der Kinder.
 Die müssen einerseits vor unberechtigtem Zugriff geschützt werden, andererseits 
 
