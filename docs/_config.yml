@@ -2,7 +2,8 @@
 # Based on minimal-mistakes theme, styled like arc42.org
 
 # Theme Settings
-remote_theme: "mmistakes/minimal-mistakes@4.24.0"
+# remote_theme: "mmistakes/minimal-mistakes@4.24.0"
+theme: "minimal-mistakes-jekyll"
 minimal_mistakes_skin: "air" # clean, light theme like arc42.org
 
 # Site Settings

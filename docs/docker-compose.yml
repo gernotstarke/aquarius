@@ -3,8 +3,11 @@ services:
     image: bretfisher/jekyll-serve
     volumes:
       - .:/site
+      - bundle_cache:/usr/local/bundle
     ports:
       - '4000:4000'
+      - '35729:35729'
+    command: bundle exec jekyll serve --host 0.0.0.0 --livereload --force_polling
 
   obfuscate:
     image: node:20-alpine
@@ -28,3 +31,6 @@ services:
       - ./_pages/architecture:/output
       - ./scripts:/scripts:ro
     command: ["sh", "/scripts/compile-arc42.sh"]
+
+volumes:
+  bundle_cache:
