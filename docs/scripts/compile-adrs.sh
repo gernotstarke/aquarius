@@ -64,6 +64,24 @@ for adr_file in "$SOURCE_DIR"/ADR-*.md; do
     [ -z "$status" ] && status="unknown"
     [ -z "$adr_date" ] && adr_date="unknown"
 
+    # Determine header overlay filter based on status
+    # Use rgba gradient for colored overlays - this gives better color control
+    # Deprecated/Veraltet: Orange, Superseded/Ersetzt: Gray, Rejected/Abgelehnt: Red
+    case "$status" in
+        deprecated|veraltet)
+            overlay_filter="linear-gradient(rgba(139, 64, 0, 0.7), rgba(139, 64, 0, 0.7))"
+            ;;
+        superseded|ersetzt)
+            overlay_filter="linear-gradient(rgba(74, 74, 74, 0.7), rgba(74, 74, 74, 0.7))"
+            ;;
+        rejected|abgelehnt)
+            overlay_filter="linear-gradient(rgba(139, 0, 0, 0.7), rgba(139, 0, 0, 0.7))"
+            ;;
+        *)
+            overlay_filter="0.3"
+            ;;
+    esac
+
     # Create output file with front matter
     output_file="$OUTPUT_DIR/$filename"
 
@@ -74,12 +92,27 @@ adr_number: "$adr_number"
 adr_status: "$status"
 adr_date: "$adr_date"
 permalink: /architecture/adrs/ADR-$adr_number/
+header:
+  overlay_image: /assets/images/splash/aquarius-adr-header-1920x400.webp
+  overlay_filter: $overlay_filter
+  actions:
+    - label: "ADRs"
+      url: "/architecture/adrs/"
+    - label: "Architektur"
+      url: "/architecture/"
+    - label: "Home"
+      url: "/"
 ---
 
 EOF
 
     # Append original content (skip the title line to avoid duplication)
-    tail -n +2 "$adr_file" >> "$output_file"
+    # Add blank lines after Status, Datum/Date, and Entscheider for better readability
+    tail -n +2 "$adr_file" | sed -e '/^\*\*Status:\*\*/a\
+' -e '/^\*\*Datum:\*\*/a\
+' -e '/^\*\*Date:\*\*/a\
+' -e '/^\*\*Entscheider:\*\*/a\
+' >> "$output_file"
 
     count=$((count + 1))
     echo "   ✓ $filename (Status: $status)"
