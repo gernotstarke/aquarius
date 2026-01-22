@@ -19,22 +19,63 @@ header:
 
 
 <div class="req-tile-grid">
-  <a href="http://localhost:5173" target="_blank" rel="noopener noreferrer" class="req-tile app-tile--violet-1">
-    <span id="planungs-app-status" class="status-indicator" title="Checking status..."></span>
-    <img src="/assets/images/aquarius-wave-logo-highres-freigestellt.webp" alt="Aquarius Wave" style="height: 5rem; margin-bottom: 1rem;">
-    <h3>Planungs-App</h3>
+  <a id="tile-control" href="http://localhost:5173" target="_blank" rel="noopener noreferrer" class="req-tile app-tile--violet-1">
+    <span id="control-app-status" class="status-indicator" title="Checking status..."></span>
+    <img src="/assets/images/applications/aquarius-control-logo-nobg-200.webp" alt="Aquarius Control" style="height: 5rem; margin-bottom: 1rem;">
+    <h3>Aquarius Control</h3>
   </a>
 
-  <a href="/app/mobile/" class="req-tile app-tile--violet-2">
-    <i class="fas fa-mobile-alt"></i>
-    <h3>Mobile App</h3>
+  <a id="tile-splash" href="/app/mobile/" class="req-tile app-tile--violet-2">
+    <img src="/assets/images/applications/aquarius-splash-logo-nobg-200.webp" alt="Aquarius Splash" style="height: 5rem; margin-bottom: 1rem;">
+    <h3>Aquarius Splash</h3>
   </a>
 
-  <a href="http://localhost:5173/admin" target="_blank" rel="noopener noreferrer" class="req-tile app-tile--red-1">
-    <span id="admin-app-status" class="status-indicator" title="Checking status..."></span>
-    <i class="fas fa-skull-crossbones"></i>
-    <h3>Admin UI</h3>
+  <a id="tile-score" href="http://localhost:5173/score" target="_blank" rel="noopener noreferrer" class="req-tile app-tile--violet-1">
+    <span id="score-app-status" class="status-indicator" title="Checking status..."></span>
+    <img src="/assets/images/applications/aquarius-score-logo-nobg-200.webp" alt="Aquarius Score" style="height: 5rem; margin-bottom: 1rem;">
+    <h3>Aquarius Score</h3>
   </a>
+
+  <a id="tile-pulse" href="http://localhost:5173/admin" target="_blank" rel="noopener noreferrer" class="req-tile app-tile--red-1">
+    <span id="pulse-app-status" class="status-indicator" title="Checking status..."></span>
+    <img src="/assets/images/applications/aquarius-pulse-logo-nobg-200.webp" alt="Aquarius Pulse" style="height: 5rem; margin-bottom: 1rem;">
+    <h3>Aquarius Pulse</h3>
+  </a>
+
+  <a id="tile-dashboard" href="/app/dashboard/" class="req-tile app-tile--violet-2">
+    <i class="fas fa-tachometer-alt" style="font-size: 4rem; margin-bottom: 1rem;"></i>
+    <h3>Dashboard</h3>
+  </a>
+</div>
+
+<p class="status-legend" style="margin-top: 1.5rem; font-size: 0.85rem; color: #666;">
+  <strong>Status:</strong>
+  <span style="display: inline-flex; align-items: center; margin-left: 1rem;">
+    <span style="width: 10px; height: 10px; background: #28a745; border-radius: 50%; display: inline-block; margin-right: 0.3rem;"></span> Online
+  </span>
+  <span style="display: inline-flex; align-items: center; margin-left: 1rem;">
+    <span style="width: 10px; height: 10px; background: #dc3545; border-radius: 50%; display: inline-block; margin-right: 0.3rem;"></span> Offline
+  </span>
+</p>
+
+---
+
+## Die Aquarius Apps
+
+<div class="app-descriptions" style="margin: 2rem 0;">
+
+<h3><img src="/assets/images/applications/aquarius-control-logo-nobg-200.webp" alt="" style="height: 2rem; vertical-align: middle; margin-right: 0.5rem;"> Aquarius Control</h3>
+<p>Das zentrale Programm für Saison- und Wettkampfplanung sowie alle Grunddaten (Kinder, Schwimmbäder, Vereine, Verbände). Backoffice-Mitarbeitende planen hier die Saison, bearbeiten Anmeldungen und erfassen während des Wettkampfs die Bewertungen.</p>
+
+<h3><img src="/assets/images/applications/aquarius-splash-logo-nobg-200.webp" alt="" style="height: 2rem; vertical-align: middle; margin-right: 0.5rem;"> Aquarius Splash</h3>
+<p>Die App für Kinder und Eltern zur Anmeldung sowie zur Anzeige von Ranglisten und Ergebnissen. <em>"Splash: Dein Wettkampf. Deine Platzierung."</em> – Resultate zeitnah aktualisiert, stets am Puls des Geschehens.</p>
+
+<h3><img src="/assets/images/applications/aquarius-score-logo-nobg-200.webp" alt="" style="height: 2rem; vertical-align: middle; margin-right: 0.5rem;"> Aquarius Score</h3>
+<p>Eine App für Mobilgeräte zur Unterstützung der Punkt- und Kampfrichter. Offizielle bewerten hier Starts während der Wettkämpfe. Die Bewertung wird sofort übertragen oder bei fehlender Verbindung lokal gespeichert und später synchronisiert.</p>
+
+<h3><img src="/assets/images/applications/aquarius-pulse-logo-nobg-200.webp" alt="" style="height: 2rem; vertical-align: middle; margin-right: 0.5rem;"> Aquarius Pulse</h3>
+<p>Die Admin-App für User- und Rechteverwaltung, Monitoring, Datenbank-Pflege und Backup. Zugang nur mit 2-Faktor-Authentisierung für maximale Sicherheit der personenbezogenen Daten.</p>
+
 </div>
 
 ---
@@ -49,19 +90,6 @@ header:
     <li>Frontend Web-App auf Port 5173</li>
   </ul>
   <p>Die Mobile App erfordert einen separaten Start via Expo (siehe Mobile-Seite).</p>
-</div>
-
-<div id="app-dashboard">
-  <p id="dashboard-status">Lade System-Status...</p>
-  <ul>
-    <li><strong>App-Umgebung:</strong> <span id="dashboard-location">-</span></li>
-    <li><strong>Datenbank:</strong> <span id="dashboard-db-type">-</span></li>
-    <li><strong>Tabellen:</strong> <span id="dashboard-table-count">-</span></li>
-    <li><strong>Kind-Einträge:</strong> <span id="dashboard-kind-count">-</span></li>
-    <li><strong>Anmeldungen:</strong> <span id="dashboard-anmeldung-count">-</span></li>
-    <li><strong>Wettkämpfe:</strong> <span id="dashboard-wettkampf-count">-</span></li>
-    <li><strong>Backend-Version:</strong> <span id="dashboard-backend-version">-</span></li>
-  </ul>
 </div>
 
 <script>
@@ -80,17 +108,22 @@ header:
     }
 
     // Update link href if in production
-    const planungsTile = document.querySelector(".app-tile--violet-1");
-    if (planungsTile && !isLocalDocs) {
-        planungsTile.href = prodAppUrl;
+    const controlTile = document.getElementById("tile-control");
+    if (controlTile && !isLocalDocs) {
+        controlTile.href = prodAppUrl;
     }
-    const adminTile = document.querySelector(".app-tile--red-1");
-    if (adminTile && !isLocalDocs) {
-        adminTile.href = prodAppUrl + "/admin";
+    const scoreTile = document.getElementById("tile-score");
+    if (scoreTile && !isLocalDocs) {
+        scoreTile.href = prodAppUrl + "/score";
+    }
+    const pulseTile = document.getElementById("tile-pulse");
+    if (pulseTile && !isLocalDocs) {
+        pulseTile.href = prodAppUrl + "/admin";
     }
 
-    const indicatorPlanung = document.getElementById("planungs-app-status");
-    const indicatorAdmin = document.getElementById("admin-app-status");
+    const indicatorControl = document.getElementById("control-app-status");
+    const indicatorScore = document.getElementById("score-app-status");
+    const indicatorPulse = document.getElementById("pulse-app-status");
 
     // Check function using fetch to health endpoint
     function checkStatus() {
@@ -101,81 +134,30 @@ header:
       })
       .then(response => {
         if (response.ok) {
-          if (indicatorPlanung) {
-            indicatorPlanung.className = "status-indicator status-online";
-            indicatorPlanung.title = "App is running";
-          }
-          if (indicatorAdmin) {
-            indicatorAdmin.className = "status-indicator status-online";
-            indicatorAdmin.title = "App is running";
-          }
+          [indicatorControl, indicatorScore, indicatorPulse].forEach(indicator => {
+            if (indicator) {
+              indicator.className = "status-indicator status-online";
+              indicator.title = "App is running";
+            }
+          });
         } else {
           throw new Error('App returned error');
         }
       })
       .catch(error => {
-        if (indicatorPlanung) {
-          indicatorPlanung.className = "status-indicator status-offline";
-          indicatorPlanung.title = "App unreachable";
-        }
-        if (indicatorAdmin) {
-          indicatorAdmin.className = "status-indicator status-offline";
-          indicatorAdmin.title = "App unreachable";
-        }
+        [indicatorControl, indicatorScore, indicatorPulse].forEach(indicator => {
+          if (indicator) {
+            indicator.className = "status-indicator status-offline";
+            indicator.title = "App unreachable";
+          }
+        });
       });
     }
 
     // Initial check
     checkStatus();
-    
+
     // Check every 10 seconds
     setInterval(checkStatus, 10000);
-
-    const dashboardStatus = document.getElementById("dashboard-status");
-    const dashboardLocation = document.getElementById("dashboard-location");
-    const dashboardDbType = document.getElementById("dashboard-db-type");
-    const dashboardTableCount = document.getElementById("dashboard-table-count");
-    const dashboardKindCount = document.getElementById("dashboard-kind-count");
-    const dashboardAnmeldungCount = document.getElementById("dashboard-anmeldung-count");
-    const dashboardWettkampfCount = document.getElementById("dashboard-wettkampf-count");
-    const dashboardBackendVersion = document.getElementById("dashboard-backend-version");
-
-    function updateText(node, value) {
-      if (node) {
-        node.textContent = value;
-      }
-    }
-
-    fetch(targetUrl + "/api/status", {
-      method: 'GET',
-      mode: 'cors',
-      cache: 'no-cache'
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Status endpoint returned error');
-      }
-      return response.json();
-    })
-    .then(data => {
-      if (dashboardStatus) {
-        dashboardStatus.textContent = "System-Status verfügbar";
-      }
-      const environment = data?.app?.environment || "unbekannt";
-      const region = data?.app?.region || "";
-      const locationLabel = environment === "fly" ? `fly.io (${region || "unbekannt"})` : "lokal";
-      updateText(dashboardLocation, locationLabel);
-      updateText(dashboardDbType, data?.database?.type || "unbekannt");
-      updateText(dashboardTableCount, String(data?.database?.table_count ?? "-"));
-      updateText(dashboardKindCount, String(data?.counts?.kind ?? "-"));
-      updateText(dashboardAnmeldungCount, String(data?.counts?.anmeldung ?? "-"));
-      updateText(dashboardWettkampfCount, String(data?.counts?.wettkampf ?? "-"));
-      updateText(dashboardBackendVersion, data?.version || "-");
-    })
-    .catch(() => {
-      if (dashboardStatus) {
-        dashboardStatus.textContent = "System-Status nicht erreichbar";
-      }
-    });
   });
 </script>

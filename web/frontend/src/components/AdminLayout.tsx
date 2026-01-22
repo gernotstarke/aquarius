@@ -28,8 +28,8 @@ const AdminLayout: React.FC = () => {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-4">
              <Link to="/admin" className="text-xl font-bold tracking-wider flex items-center">
-               <img src="/logo.jpeg" alt="Aquarius Logo" className="h-10 w-auto mr-3 rounded-full border-2 border-red-200" />
-               SYSTEM ADMIN
+               <img src="/aquarius-pulse-logo-nobg-200.webp" alt="Aquarius Pulse" className="h-10 w-auto mr-3" />
+               Aquarius Pulse
              </Link>
              <span className="bg-red-700 text-red-100 text-xs px-2 py-1 rounded uppercase font-bold tracking-wide">
                Restricted Area
