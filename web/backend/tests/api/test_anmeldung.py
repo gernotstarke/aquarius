@@ -3,7 +3,7 @@ from fastapi import status
 from app import models
 
 
-def test_create_anmeldung_with_figuren(client, db):
+def test_create_anmeldung_with_figuren(client, db, app_token_headers):
     """Test creating anmeldung with figures."""
     # Create dependencies
     saison = models.Saison(
@@ -79,7 +79,8 @@ def test_create_anmeldung_with_figuren(client, db):
             "kind_id": kind_id,
             "wettkampf_id": wettkampf_id,
             "figur_ids": [figur1_id, figur2_id]
-        }
+        },
+        headers=app_token_headers
     )
     assert response.status_code == status.HTTP_201_CREATED
     data = response.json()
@@ -91,7 +92,7 @@ def test_create_anmeldung_with_figuren(client, db):
     assert data["startnummer"] is not None
 
 
-def test_create_anmeldung_without_figuren_is_vorlaeufig(client, db):
+def test_create_anmeldung_without_figuren_is_vorlaeufig(client, db, app_token_headers):
     """Test anmeldung without figures is marked as preliminary."""
     # Create dependencies
     saison = models.Saison(
@@ -143,14 +144,15 @@ def test_create_anmeldung_without_figuren_is_vorlaeufig(client, db):
             "kind_id": kind.id,
             "wettkampf_id": wettkampf.id,
             "figur_ids": []
-        }
+        },
+        headers=app_token_headers
     )
     assert response.status_code == status.HTTP_201_CREATED
     data = response.json()
     assert data["vorlaeufig"] == 1  # Should be preliminary (no figures)
 
 
-def test_create_anmeldung_uninsured_kind_is_vorlaeufig(client, db):
+def test_create_anmeldung_uninsured_kind_is_vorlaeufig(client, db, app_token_headers):
     """Test anmeldung for uninsured kind is marked as preliminary."""
     # Create dependencies
     saison = models.Saison(
@@ -204,7 +206,8 @@ def test_create_anmeldung_uninsured_kind_is_vorlaeufig(client, db):
             "kind_id": kind.id,
             "wettkampf_id": wettkampf.id,
             "figur_ids": [figur.id]
-        }
+        },
+        headers=app_token_headers
     )
     assert response.status_code == status.HTTP_201_CREATED
     data = response.json()
@@ -212,7 +215,7 @@ def test_create_anmeldung_uninsured_kind_is_vorlaeufig(client, db):
     assert data["insurance_ok"] == False
 
 
-def test_read_anmeldung_list(client, db):
+def test_read_anmeldung_list(client, db, app_token_headers):
     """Test reading list of anmeldungen."""
     # Create minimal dependencies
     saison = models.Saison(
@@ -260,16 +263,17 @@ def test_read_anmeldung_list(client, db):
             "kind_id": kind.id,
             "wettkampf_id": wettkampf.id,
             "figur_ids": []
-        }
+        },
+        headers=app_token_headers
     )
 
-    response = client.get("/api/anmeldung")
+    response = client.get("/api/anmeldung", headers=app_token_headers)
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert len(data) >= 1
 
 
-def test_read_anmeldung_by_id(client, db):
+def test_read_anmeldung_by_id(client, db, app_token_headers):
     """Test reading single anmeldung by ID."""
     # Create minimal dependencies
     saison = models.Saison(
@@ -317,19 +321,20 @@ def test_read_anmeldung_by_id(client, db):
             "kind_id": kind.id,
             "wettkampf_id": wettkampf.id,
             "figur_ids": []
-        }
+        },
+        headers=app_token_headers
     )
     anmeldung_id = res.json()["id"]
 
     # Read
-    response = client.get(f"/api/anmeldung/{anmeldung_id}")
+    response = client.get(f"/api/anmeldung/{anmeldung_id}", headers=app_token_headers)
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert data["id"] == anmeldung_id
     assert data["kind_id"] == kind.id
 
 
-def test_update_anmeldung_figuren(client, db):
+def test_update_anmeldung_figuren(client, db, app_token_headers):
     """Test updating anmeldung figures."""
     # Create dependencies
     saison = models.Saison(
@@ -392,7 +397,8 @@ def test_update_anmeldung_figuren(client, db):
             "kind_id": kind_id,
             "wettkampf_id": wettkampf_id,
             "figur_ids": []
-        }
+        },
+        headers=app_token_headers
     )
     anmeldung_id = res.json()["id"]
     assert res.json()["vorlaeufig"] == 1
@@ -402,7 +408,8 @@ def test_update_anmeldung_figuren(client, db):
         f"/api/anmeldung/{anmeldung_id}",
         json={
             "figur_ids": [figur_id]
-        }
+        },
+        headers=app_token_headers
     )
     assert response.status_code == status.HTTP_200_OK
     updated = response.json()
@@ -411,7 +418,7 @@ def test_update_anmeldung_figuren(client, db):
     assert updated["vorlaeufig"] == 0
 
 
-def test_delete_anmeldung(client, db):
+def test_delete_anmeldung(client, db, app_token_headers):
     """Test deleting anmeldung."""
     # Create minimal dependencies
     saison = models.Saison(
@@ -459,20 +466,21 @@ def test_delete_anmeldung(client, db):
             "kind_id": kind.id,
             "wettkampf_id": wettkampf.id,
             "figur_ids": []
-        }
+        },
+        headers=app_token_headers
     )
     anmeldung_id = res.json()["id"]
 
     # Delete
-    response = client.delete(f"/api/anmeldung/{anmeldung_id}")
+    response = client.delete(f"/api/anmeldung/{anmeldung_id}", headers=app_token_headers)
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
     # Verify gone
-    response = client.get(f"/api/anmeldung/{anmeldung_id}")
+    response = client.get(f"/api/anmeldung/{anmeldung_id}", headers=app_token_headers)
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_create_anmeldung_kind_not_found(client, db):
+def test_create_anmeldung_kind_not_found(client, db, app_token_headers):
     """Test creating anmeldung with non-existent kind returns 404."""
     saison = models.Saison(
         name="Test Saison",
@@ -504,13 +512,14 @@ def test_create_anmeldung_kind_not_found(client, db):
             "kind_id": 99999,  # Non-existent
             "wettkampf_id": wettkampf.id,
             "figur_ids": []
-        }
+        },
+        headers=app_token_headers
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert "Kind not found" in response.json()["detail"]
 
 
-def test_create_anmeldung_wettkampf_not_found(client):
+def test_create_anmeldung_wettkampf_not_found(client, app_token_headers):
     """Test creating anmeldung with non-existent wettkampf returns 404."""
     response = client.post(
         "/api/anmeldung",
@@ -518,7 +527,8 @@ def test_create_anmeldung_wettkampf_not_found(client):
             "kind_id": 1,
             "wettkampf_id": 99999,  # Non-existent
             "figur_ids": []
-        }
+        },
+        headers=app_token_headers
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert "Wettkampf not found" in response.json()["detail"]

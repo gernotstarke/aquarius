@@ -3,7 +3,7 @@ from datetime import date
 from app import models
 
 
-def test_create_wettkampf(client, db):
+def test_create_wettkampf(client, db, app_token_headers):
     """Test creating a new wettkampf."""
     # Create dependencies
     saison = models.Saison(
@@ -28,7 +28,8 @@ def test_create_wettkampf(client, db):
             "max_teilnehmer": 100,
             "saison_id": saison.id,
             "schwimmbad_id": schwimmbad.id
-        }
+        },
+        headers=app_token_headers
     )
     assert response.status_code == status.HTTP_201_CREATED
     data = response.json()
@@ -37,7 +38,7 @@ def test_create_wettkampf(client, db):
     assert "id" in data
 
 
-def test_read_wettkampf_list(client, db):
+def test_read_wettkampf_list(client, db, app_token_headers):
     """Test reading list of wettkämpfe."""
     # Create dependencies
     saison = models.Saison(
@@ -62,17 +63,18 @@ def test_read_wettkampf_list(client, db):
             "datum": "2024-12-08",
             "saison_id": saison.id,
             "schwimmbad_id": schwimmbad.id
-        }
+        },
+        headers=app_token_headers
     )
 
-    response = client.get("/api/wettkampf")
+    response = client.get("/api/wettkampf", headers=app_token_headers)
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert len(data) == 1
     assert data[0]["name"] == "Wintercup 2024"
 
 
-def test_read_wettkampf_by_id(client, db):
+def test_read_wettkampf_by_id(client, db, app_token_headers):
     """Test reading a single wettkampf by ID."""
     # Create dependencies
     saison = models.Saison(
@@ -98,19 +100,20 @@ def test_read_wettkampf_by_id(client, db):
             "max_teilnehmer": 80,
             "saison_id": saison.id,
             "schwimmbad_id": schwimmbad.id
-        }
+        },
+        headers=app_token_headers
     )
     wettkampf_id = res.json()["id"]
 
     # Read
-    response = client.get(f"/api/wettkampf/{wettkampf_id}")
+    response = client.get(f"/api/wettkampf/{wettkampf_id}", headers=app_token_headers)
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert data["name"] == "Sommerfest 2024"
     assert data["max_teilnehmer"] == 80
 
 
-def test_update_wettkampf(client, db):
+def test_update_wettkampf(client, db, app_token_headers):
     """Test updating a wettkampf."""
     # Create dependencies
     saison = models.Saison(
@@ -140,7 +143,8 @@ def test_update_wettkampf(client, db):
             "max_teilnehmer": 50,
             "saison_id": saison_id,
             "schwimmbad_id": schwimmbad_id
-        }
+        },
+        headers=app_token_headers
     )
     wettkampf_id = res.json()["id"]
 
@@ -153,7 +157,8 @@ def test_update_wettkampf(client, db):
             "max_teilnehmer": 120,
             "saison_id": saison_id,
             "schwimmbad_id": schwimmbad_id
-        }
+        },
+        headers=app_token_headers
     )
     assert response.status_code == status.HTTP_200_OK
     updated = response.json()
@@ -161,7 +166,7 @@ def test_update_wettkampf(client, db):
     assert updated["max_teilnehmer"] == 120
 
 
-def test_delete_wettkampf(client, db):
+def test_delete_wettkampf(client, db, app_token_headers):
     """Test deleting a wettkampf."""
     # Create dependencies
     saison = models.Saison(
@@ -186,20 +191,21 @@ def test_delete_wettkampf(client, db):
             "datum": "2024-06-01",
             "saison_id": saison.id,
             "schwimmbad_id": schwimmbad.id
-        }
+        },
+        headers=app_token_headers
     )
     wettkampf_id = res.json()["id"]
 
     # Delete
-    response = client.delete(f"/api/wettkampf/{wettkampf_id}")
+    response = client.delete(f"/api/wettkampf/{wettkampf_id}", headers=app_token_headers)
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
     # Verify gone
-    response = client.get(f"/api/wettkampf/{wettkampf_id}")
+    response = client.get(f"/api/wettkampf/{wettkampf_id}", headers=app_token_headers)
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_wettkampf_details_with_figuren_and_anmeldungen(client, db):
+def test_wettkampf_details_with_figuren_and_anmeldungen(client, db, app_token_headers):
     """Test wettkampf/details endpoint returns figuren and anmeldungen."""
     # Create dependencies
     saison = models.Saison(
@@ -224,12 +230,13 @@ def test_wettkampf_details_with_figuren_and_anmeldungen(client, db):
             "datum": "2024-08-01",
             "saison_id": saison.id,
             "schwimmbad_id": schwimmbad.id
-        }
+        },
+        headers=app_token_headers
     )
     wettkampf_id = res.json()["id"]
 
     # Get details
-    response = client.get(f"/api/wettkampf/{wettkampf_id}/details")
+    response = client.get(f"/api/wettkampf/{wettkampf_id}/details", headers=app_token_headers)
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert data["id"] == wettkampf_id

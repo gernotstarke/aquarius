@@ -60,11 +60,11 @@ def admin_token_headers(client, db):
     admin_user = models.User(
         username="admin_test",
         hashed_password=get_password_hash(password),
-        role="ROOT",
+        role="ADMIN",  # Changed from ROOT to ADMIN for admin endpoints
         is_active=True,
         is_app_user=False,
         can_read_all=True,
-        can_write_all=False,
+        can_write_all=True,
     )
     db.add(admin_user)
     db.commit()
@@ -76,5 +76,27 @@ def admin_token_headers(client, db):
     }
     response = client.post("/api/auth/token", data=login_data)
     token = response.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
+def app_token_headers(client, db):
+    """Create an app user with read/write permissions and return auth headers."""
+    from app.auth import get_password_hash, create_access_token
+
+    app_user = models.User(
+        username="app_test_user",
+        full_name="Test App User",
+        hashed_password=get_password_hash("app-test-password"),
+        role="VERWALTUNG",
+        is_active=True,
+        is_app_user=True,
+        can_read_all=True,
+        can_write_all=True,
+    )
+    db.add(app_user)
+    db.commit()
+
+    token = create_access_token({"sub": app_user.username})
     return {"Authorization": f"Bearer {token}"}
 

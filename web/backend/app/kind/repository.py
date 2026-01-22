@@ -27,9 +27,9 @@ class KindRepository:
         kind_dict = kind_data.model_dump()
 
         # Hash password if provided
-        if kind_dict.get('password'):
-            kind_dict['hashed_password'] = get_password_hash(kind_dict['password'])
-            del kind_dict['password']  # Remove plain password
+        password = kind_dict.pop('password', None)
+        if password:
+            kind_dict['hashed_password'] = get_password_hash(password)
 
         db_kind = models.Kind(**kind_dict)
         self.db.add(db_kind)
@@ -159,9 +159,10 @@ class KindRepository:
         update_data = kind_data.model_dump(exclude_unset=True)
 
         # Hash password if provided
-        if 'password' in update_data and update_data['password']:
-            update_data['hashed_password'] = get_password_hash(update_data['password'])
-            del update_data['password']  # Remove plain password
+        if 'password' in update_data:
+            password = update_data.pop('password')
+            if password:
+                update_data['hashed_password'] = get_password_hash(password)
 
         for key, value in update_data.items():
             setattr(db_kind, key, value)

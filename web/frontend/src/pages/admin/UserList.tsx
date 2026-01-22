@@ -209,7 +209,7 @@ const UserList: React.FC = () => {
                     >
                       <Edit2 size={18} />
                     </button>
-                    {user.role !== 'ROOT' && (
+                    {user.role !== 'ADMIN' && (
                       <button
                         onClick={() => {
                           if (confirm(`Are you sure you want to delete user ${user.username}?`)) {

@@ -7,11 +7,11 @@ IMPORTANT: Some tests are FAILING because business rules are NOT YET FULLY IMPLE
 This is expected and documents the gap between current and desired behavior.
 
 Status:
-- ✅ Vorläufig when no figuren: IMPLEMENTED
-- ❌ Vorläufig when no insurance: NOT IMPLEMENTED (test fails, documents expected behavior)
-- ✅ Vorläufig → Final transition: IMPLEMENTED
-- ❌ Wettkampf capacity limits: NOT IMPLEMENTED (test fails, documents expected behavior)
-- ✅ Eager loading: IMPLEMENTED
+- Vorläufig when no figuren: IMPLEMENTED
+- Vorläufig when no insurance: NOT IMPLEMENTED (test fails, documents expected behavior)
+- Vorläufig -> Final transition: IMPLEMENTED
+- Wettkampf capacity limits: NOT IMPLEMENTED (test fails, documents expected behavior)
+- Eager loading: IMPLEMENTED
 """
 
 from fastapi import status
@@ -21,7 +21,7 @@ import pytest
 
 
 @pytest.mark.skip(reason="Business rule not yet implemented - documents expected behavior for DDD")
-def test_anmeldung_without_insurance_should_be_vorlaeufig(client, db):
+def test_anmeldung_without_insurance_should_be_vorlaeufig(client, db, app_token_headers):
     """
     EXPECTED Business Rule: Anmeldung for Kind without insurance should be vorläufig.
 
@@ -34,11 +34,11 @@ def test_anmeldung_without_insurance_should_be_vorlaeufig(client, db):
     pass  # See comment above
 
 
-def test_anmeldung_without_figuren_is_vorlaeufig(client, db):
+def test_anmeldung_without_figuren_is_vorlaeufig(client, db, app_token_headers):
     """
     Business Rule: Anmeldung without figuren must be vorläufig.
 
-    STATUS: ✅ IMPLEMENTED and working correctly
+    STATUS: IMPLEMENTED and working correctly
     """
     # Setup
     saison = models.Saison(
@@ -83,7 +83,8 @@ def test_anmeldung_without_figuren_is_vorlaeufig(client, db):
             "geburtsdatum": "2015-05-15",
             "geschlecht": "M",
             "verein_id": verein_id
-        }
+        },
+        headers=app_token_headers
     )
     assert kind_response.status_code == status.HTTP_201_CREATED
     kind_id = kind_response.json()["id"]
@@ -95,23 +96,24 @@ def test_anmeldung_without_figuren_is_vorlaeufig(client, db):
             "kind_id": kind_id,
             "wettkampf_id": wettkampf_id,
             "figur_ids": []  # NO figuren - this is the key part
-        }
+        },
+        headers=app_token_headers
     )
 
     # Assert: Should be vorläufig
     assert response.status_code == status.HTTP_201_CREATED
     data = response.json()
 
-    # CRITICAL BUSINESS RULE: No figuren → vorläufig
+    # CRITICAL BUSINESS RULE: No figuren -> vorläufig
     assert data["vorlaeufig"] == 1
     assert data["status"] == "vorläufig"
 
 
-def test_anmeldung_with_figuren_becomes_final(client, db):
+def test_anmeldung_with_figuren_becomes_final(client, db, app_token_headers):
     """
     Business Rule: Anmeldung with figuren is not vorläufig.
 
-    STATUS: ✅ IMPLEMENTED (when Kind has insurance)
+    STATUS: IMPLEMENTED (when Kind has insurance)
 
     Note: Insurance check is NOT implemented, but figuren check IS working.
     """
@@ -162,7 +164,8 @@ def test_anmeldung_with_figuren_becomes_final(client, db):
             "geburtsdatum": "2015-05-15",
             "geschlecht": "M",
             "verein_id": verein_id
-        }
+        },
+        headers=app_token_headers
     )
     kind_id = kind_response.json()["id"]
 
@@ -173,23 +176,24 @@ def test_anmeldung_with_figuren_becomes_final(client, db):
             "kind_id": kind_id,
             "wettkampf_id": wettkampf_id,
             "figur_ids": [figur_id]  # HAS figuren
-        }
+        },
+        headers=app_token_headers
     )
 
     # Assert: Should be final (not vorläufig)
     assert response.status_code == status.HTTP_201_CREATED
     data = response.json()
 
-    # CRITICAL BUSINESS RULE: Figuren present → not vorläufig (final)
+    # CRITICAL BUSINESS RULE: Figuren present -> not vorläufig (final)
     assert data["vorlaeufig"] == 0
     assert data["status"] == "aktiv"
 
 
-def test_vorlaeufig_to_final_transition_when_figuren_added(client, db):
+def test_vorlaeufig_to_final_transition_when_figuren_added(client, db, app_token_headers):
     """
     Business Rule: Adding figuren to vorläufig anmeldung transitions it to final.
 
-    STATUS: ✅ IMPLEMENTED and working correctly
+    STATUS: IMPLEMENTED and working correctly
 
     Tests the state transition logic that will be in AnmeldungAggregate.
     """
@@ -240,7 +244,8 @@ def test_vorlaeufig_to_final_transition_when_figuren_added(client, db):
             "geburtsdatum": "2015-05-15",
             "geschlecht": "W",
             "verein_id": verein_id
-        }
+        },
+        headers=app_token_headers
     )
     kind_id = kind_response.json()["id"]
 
@@ -251,7 +256,8 @@ def test_vorlaeufig_to_final_transition_when_figuren_added(client, db):
             "kind_id": kind_id,
             "wettkampf_id": wettkampf_id,
             "figur_ids": []  # NO figuren initially
-        }
+        },
+        headers=app_token_headers
     )
     assert create_response.status_code == status.HTTP_201_CREATED
     anmeldung_id = create_response.json()["id"]
@@ -268,20 +274,21 @@ def test_vorlaeufig_to_final_transition_when_figuren_added(client, db):
             "wettkampf_id": wettkampf_id,
             "figur_ids": [figur_id],  # NOW adding figuren
             "vorlaeufig": 1  # Client sends current state
-        }
+        },
+        headers=app_token_headers
     )
 
     # Assert: Should transition to final
     assert update_response.status_code == status.HTTP_200_OK
     updated_data = update_response.json()
 
-    # CRITICAL BUSINESS RULE: Adding figuren transitions vorläufig → final
+    # CRITICAL BUSINESS RULE: Adding figuren transitions vorläufig -> final
     assert updated_data["vorlaeufig"] == 0
     assert updated_data["status"] == "aktiv"
 
 
 @pytest.mark.skip(reason="Business rule not yet implemented - documents expected behavior for DDD")
-def test_wettkampf_capacity_should_be_respected(client, db):
+def test_wettkampf_capacity_should_be_respected(client, db, app_token_headers):
     """
     EXPECTED Business Rule: Cannot exceed wettkampf max_teilnehmer with final anmeldungen.
 
@@ -296,11 +303,11 @@ def test_wettkampf_capacity_should_be_respected(client, db):
     pass  # See comment above
 
 
-def test_eager_loading_kind_in_anmeldung(client, db):
+def test_eager_loading_kind_in_anmeldung(client, db, app_token_headers):
     """
     Technical Test: Verify Kind data is eagerly loaded with Anmeldung.
 
-    STATUS: ✅ IMPLEMENTED and working correctly
+    STATUS: IMPLEMENTED and working correctly
 
     This prevents N+1 query problems and will be critical for DDD repository pattern.
     """
@@ -344,7 +351,8 @@ def test_eager_loading_kind_in_anmeldung(client, db):
             "nachname": "Test",
             "geburtsdatum": "2015-05-15",
             "verein_id": verein_id
-        }
+        },
+        headers=app_token_headers
     )
     kind_id = kind_response.json()["id"]
 
@@ -355,12 +363,13 @@ def test_eager_loading_kind_in_anmeldung(client, db):
             "kind_id": kind_id,
             "wettkampf_id": wettkampf_id,
             "figur_ids": []
-        }
+        },
+        headers=app_token_headers
     )
     anmeldung_id = anmeldung_response.json()["id"]
 
     # Act: Get Anmeldung list
-    list_response = client.get("/api/anmeldung")
+    list_response = client.get("/api/anmeldung", headers=app_token_headers)
 
     # Assert: Kind data should be present (eager loaded)
     assert list_response.status_code == status.HTTP_200_OK
@@ -380,11 +389,11 @@ def test_eager_loading_kind_in_anmeldung(client, db):
     assert our_anmeldung["kind"]["verein"]["name"] == "Eager Load Verein"
 
 
-def test_insurance_flag_calculated_correctly(client, db):
+def test_insurance_flag_calculated_correctly(client, db, app_token_headers):
     """
     Technical Test: Verify insurance_ok flag is calculated and returned.
 
-    STATUS: ⚠️  PARTIALLY IMPLEMENTED
+    STATUS: PARTIALLY IMPLEMENTED
 
     The insurance_ok field exists and is returned, but the calculation is INCORRECT.
     Currently returns True even when Kind has no insurance.
@@ -431,7 +440,8 @@ def test_insurance_flag_calculated_correctly(client, db):
             "nachname": "Test",
             "geburtsdatum": "2015-05-15",
             "verein_id": verein.id
-        }
+        },
+        headers=app_token_headers
     )
     kind_id = kind_response.json()["id"]
 
@@ -442,7 +452,8 @@ def test_insurance_flag_calculated_correctly(client, db):
             "kind_id": kind_id,
             "wettkampf_id": wettkampf_id,
             "figur_ids": []
-        }
+        },
+        headers=app_token_headers
     )
 
     # Assert: Check current behavior (documents bug)
@@ -454,4 +465,4 @@ def test_insurance_flag_calculated_correctly(client, db):
 
     # TODO for DDD migration: Fix insurance_ok calculation
     # EXPECTED: Should be False when Kind.versicherung_id is None
-    # assert data["insurance_ok"] is False  # No insurance → False
+    # assert data["insurance_ok"] is False  # No insurance -> False

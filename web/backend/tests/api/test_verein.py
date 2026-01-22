@@ -2,7 +2,7 @@
 from fastapi import status
 
 
-def test_create_verein(client):
+def test_create_verein(client, app_token_headers):
     """Test creating a new club."""
     response = client.post(
         "/api/verein",
@@ -11,7 +11,8 @@ def test_create_verein(client):
             "ort": "Berlin",
             "register_id": "VR-12345",
             "contact": "info@testschwimmverein.de"
-        }
+        },
+        headers=app_token_headers
     )
     assert response.status_code == status.HTTP_201_CREATED
     data = response.json()
@@ -22,7 +23,7 @@ def test_create_verein(client):
     assert "id" in data
 
 
-def test_read_verein_list(client):
+def test_read_verein_list(client, app_token_headers):
     """Test getting list of clubs."""
     # Create first
     client.post(
@@ -32,7 +33,8 @@ def test_read_verein_list(client):
             "ort": "Hamburg",
             "register_id": "VR-001",
             "contact": "verein1@test.de"
-        }
+        },
+        headers=app_token_headers
     )
     client.post(
         "/api/verein",
@@ -41,10 +43,11 @@ def test_read_verein_list(client):
             "ort": "Munich",
             "register_id": "VR-002",
             "contact": "verein2@test.de"
-        }
+        },
+        headers=app_token_headers
     )
-    
-    response = client.get("/api/verein")
+
+    response = client.get("/api/verein", headers=app_token_headers)
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert len(data) >= 2
@@ -53,7 +56,7 @@ def test_read_verein_list(client):
     assert "Verein 2" in names
 
 
-def test_read_verein_by_id(client):
+def test_read_verein_by_id(client, app_token_headers):
     """Test getting a specific club by ID."""
     # Create
     res = client.post(
@@ -63,12 +66,13 @@ def test_read_verein_by_id(client):
             "ort": "Frankfurt",
             "register_id": "VR-999",
             "contact": "specific@test.de"
-        }
+        },
+        headers=app_token_headers
     )
     verein_id = res.json()["id"]
 
     # Read
-    response = client.get(f"/api/verein/{verein_id}")
+    response = client.get(f"/api/verein/{verein_id}", headers=app_token_headers)
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert data["name"] == "Specific Verein"
@@ -76,13 +80,13 @@ def test_read_verein_by_id(client):
     assert data["id"] == verein_id
 
 
-def test_read_verein_not_found(client):
+def test_read_verein_not_found(client, app_token_headers):
     """Test getting non-existent club returns 404."""
-    response = client.get("/api/verein/99999")
+    response = client.get("/api/verein/99999", headers=app_token_headers)
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_update_verein(client):
+def test_update_verein(client, app_token_headers):
     """Test updating a club."""
     # Create
     res = client.post(
@@ -92,7 +96,8 @@ def test_update_verein(client):
             "ort": "Old City",
             "register_id": "VR-OLD",
             "contact": "old@test.de"
-        }
+        },
+        headers=app_token_headers
     )
     verein_id = res.json()["id"]
 
@@ -104,7 +109,8 @@ def test_update_verein(client):
             "ort": "New City",
             "register_id": "VR-NEW",
             "contact": "new@test.de"
-        }
+        },
+        headers=app_token_headers
     )
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -114,7 +120,7 @@ def test_update_verein(client):
     assert data["contact"] == "new@test.de"
 
 
-def test_delete_verein(client):
+def test_delete_verein(client, app_token_headers):
     """Test deleting a club."""
     # Create
     res = client.post(
@@ -124,20 +130,21 @@ def test_delete_verein(client):
             "ort": "Deletion City",
             "register_id": "VR-DEL",
             "contact": "delete@test.de"
-        }
+        },
+        headers=app_token_headers
     )
     verein_id = res.json()["id"]
 
     # Delete
-    response = client.delete(f"/api/verein/{verein_id}")
+    response = client.delete(f"/api/verein/{verein_id}", headers=app_token_headers)
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
     # Verify gone
-    response = client.get(f"/api/verein/{verein_id}")
+    response = client.get(f"/api/verein/{verein_id}", headers=app_token_headers)
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_delete_verein_not_found(client):
+def test_delete_verein_not_found(client, app_token_headers):
     """Test deleting non-existent club returns 404."""
-    response = client.delete("/api/verein/99999")
+    response = client.delete("/api/verein/99999", headers=app_token_headers)
     assert response.status_code == status.HTTP_404_NOT_FOUND

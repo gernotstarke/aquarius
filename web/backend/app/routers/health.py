@@ -60,6 +60,10 @@ async def health_check(
     process = psutil.Process(os.getpid())
     memory_usage = process.memory_info().rss / 1024 / 1024  # MB
     
+    # Detect database type from environment
+    database_url = os.getenv("DATABASE_URL", "sqlite:///./aquarius.db")
+    db_type = "turso" if database_url.startswith(("libsql://", "sqlite+libsql://")) else "sqlite"
+
     return {
         "status": "healthy" if db_status == "ok" else "degraded",
         "timestamp": datetime.utcnow().isoformat(),
@@ -73,7 +77,7 @@ async def health_check(
         "database": {
             "status": db_status,
             "latency_ms": round(db_latency, 2),
-            "type": "sqlite", # or turso/libsql in production
+            "type": db_type,
             "size_bytes": db_size_bytes,
             "table_count": table_count
         }

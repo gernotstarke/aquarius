@@ -2,14 +2,14 @@
 from fastapi import status
 
 
-def test_read_versicherung_list(client, db):
+def test_read_versicherung_list(client, db, app_token_headers):
     """Test getting list of insurance companies."""
     # Versicherung data comes from seed data, so we just test reading
-    response = client.get("/api/versicherung")
+    response = client.get("/api/versicherung", headers=app_token_headers)
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert isinstance(data, list)
-    
+
     # Check structure of first item if any exist
     if len(data) > 0:
         versicherung = data[0]
@@ -20,37 +20,37 @@ def test_read_versicherung_list(client, db):
         assert "hauptsitz" in versicherung
 
 
-def test_read_versicherung_sorted_by_name(client, db):
+def test_read_versicherung_sorted_by_name(client, db, app_token_headers):
     """Test that insurance companies are sorted by name."""
-    response = client.get("/api/versicherung")
+    response = client.get("/api/versicherung", headers=app_token_headers)
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
-    
+
     # Verify sorted if we have data (endpoint sorts by name)
     if len(data) > 1:
         names = [v["name"] for v in data]
         assert names == sorted(names)
 
 
-def test_read_versicherung_pagination(client, db):
+def test_read_versicherung_pagination(client, db, app_token_headers):
     """Test pagination for insurance companies."""
     # Get first 5
-    response = client.get("/api/versicherung?limit=5")
+    response = client.get("/api/versicherung?limit=5", headers=app_token_headers)
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert len(data) <= 5
-    
+
     # Skip and limit
-    response = client.get("/api/versicherung?skip=2&limit=3")
+    response = client.get("/api/versicherung?skip=2&limit=3", headers=app_token_headers)
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert len(data) <= 3
 
 
-def test_read_versicherung_default_limit(client, db):
+def test_read_versicherung_default_limit(client, db, app_token_headers):
     """Test default limit for insurance companies."""
     # Default limit is 200 according to the endpoint
-    response = client.get("/api/versicherung")
+    response = client.get("/api/versicherung", headers=app_token_headers)
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     # Should not exceed default limit

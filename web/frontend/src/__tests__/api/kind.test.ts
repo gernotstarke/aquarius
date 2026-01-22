@@ -106,7 +106,10 @@ describe('Kind API Service', () => {
 
       const createdKind: Kind = {
         id: 1,
-        ...newKind,
+        vorname: newKind.vorname,
+        nachname: newKind.nachname,
+        geburtsdatum: newKind.geburtsdatum,
+        verein_id: newKind.verein_id ?? undefined,
       };
 
       vi.mocked(apiClient.post).mockResolvedValue({ data: createdKind });

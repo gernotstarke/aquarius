@@ -44,7 +44,7 @@ const KindForm: React.FC = () => {
     queryFn: () => listVersicherungen(),
   });
 
-  const { data: kind, isLoading: isKindLoading } = useQuery<Kind>({
+  const { data: kind } = useQuery<Kind>({
     queryKey: ['kind', id],
     queryFn: () => getKind(Number(id)),
     enabled: isEdit,
@@ -155,7 +155,7 @@ const KindForm: React.FC = () => {
             <select
               name="geschlecht"
               className="w-full px-4 py-3 min-h-touch text-body bg-white border rounded-lg border-neutral-300 focus-ring"
-              value={formData.geschlecht}
+              value={formData.geschlecht ?? ''}
               onChange={(e) => setFormData({ ...formData, geschlecht: e.target.value })}
               disabled={!canWrite}
             >

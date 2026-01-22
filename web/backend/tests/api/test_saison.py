@@ -1,56 +1,61 @@
 from fastapi import status
 
-def test_create_saison(client):
+def test_create_saison(client, app_token_headers):
     response = client.post(
         "/api/saison",
-        json={"name": "Test Saison", "from_date": "2024-01-01", "to_date": "2024-12-31"}
+        json={"name": "Test Saison", "from_date": "2024-01-01", "to_date": "2024-12-31"},
+        headers=app_token_headers
     )
     assert response.status_code == status.HTTP_201_CREATED
     data = response.json()
     assert data["name"] == "Test Saison"
     assert "id" in data
 
-def test_read_saison(client):
+def test_read_saison(client, app_token_headers):
     # Create first
     client.post(
         "/api/saison",
-        json={"name": "Test Saison", "from_date": "2024-01-01", "to_date": "2024-12-31"}
+        json={"name": "Test Saison", "from_date": "2024-01-01", "to_date": "2024-12-31"},
+        headers=app_token_headers
     )
-    
-    response = client.get("/api/saison")
+
+    response = client.get("/api/saison", headers=app_token_headers)
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert len(data) == 1
     assert data[0]["name"] == "Test Saison"
 
-def test_update_saison(client):
+def test_update_saison(client, app_token_headers):
     # Create
     res = client.post(
         "/api/saison",
-        json={"name": "Old Name", "from_date": "2024-01-01", "to_date": "2024-12-31"}
+        json={"name": "Old Name", "from_date": "2024-01-01", "to_date": "2024-12-31"},
+        headers=app_token_headers
     )
     saison_id = res.json()["id"]
 
     # Update
     response = client.put(
         f"/api/saison/{saison_id}",
-        json={"name": "New Name", "from_date": "2024-01-01", "to_date": "2024-12-31"}
+        json={"name": "New Name", "from_date": "2024-01-01", "to_date": "2024-12-31"},
+        headers=app_token_headers
     )
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["name"] == "New Name"
 
-def test_delete_saison(client):
+def test_delete_saison(client, app_token_headers):
     # Create
     res = client.post(
         "/api/saison",
-        json={"name": "To Delete", "from_date": "2024-01-01", "to_date": "2024-12-31"}
+        json={"name": "To Delete", "from_date": "2024-01-01", "to_date": "2024-12-31"},
+        headers=app_token_headers
     )
     saison_id = res.json()["id"]
 
     # Delete
-    response = client.delete(f"/api/saison/{saison_id}")
+    response = client.delete(f"/api/saison/{saison_id}", headers=app_token_headers)
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
     # Verify gone
-    response = client.get(f"/api/saison/{saison_id}")
+    response = client.get(f"/api/saison/{saison_id}", headers=app_token_headers)
     assert response.status_code == status.HTTP_404_NOT_FOUND

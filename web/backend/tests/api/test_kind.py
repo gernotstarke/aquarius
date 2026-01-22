@@ -3,7 +3,7 @@ from fastapi import status
 from app import models
 
 
-def test_kind_crud(client, db):
+def test_kind_crud(client, db, app_token_headers):
     verband = models.Verband(
         name="Bezirk Nord",
         abkuerzung="BEN",
@@ -30,7 +30,7 @@ def test_kind_crud(client, db):
         "versicherung_id": versicherung.id,
         "vertrag": "SSW-2024-0001",
     }
-    create_response = client.post("/api/kind", json=create_payload)
+    create_response = client.post("/api/kind", json=create_payload, headers=app_token_headers)
     assert create_response.status_code == status.HTTP_201_CREATED
     created = create_response.json()
     kind_id = created["id"]
@@ -40,7 +40,7 @@ def test_kind_crud(client, db):
     assert created["versicherung_id"] == create_payload["versicherung_id"]
     assert created["vertrag"] == create_payload["vertrag"]
 
-    get_response = client.get(f"/api/kind/{kind_id}")
+    get_response = client.get(f"/api/kind/{kind_id}", headers=app_token_headers)
     assert get_response.status_code == status.HTTP_200_OK
     fetched = get_response.json()
     assert fetched["id"] == kind_id
@@ -55,17 +55,17 @@ def test_kind_crud(client, db):
         "versicherung_id": versicherung.id,
         "vertrag": "SSW-2024-0099",
     }
-    update_response = client.put(f"/api/kind/{kind_id}", json=update_payload)
+    update_response = client.put(f"/api/kind/{kind_id}", json=update_payload, headers=app_token_headers)
     assert update_response.status_code == status.HTTP_200_OK
     updated = update_response.json()
     assert updated["nachname"] == update_payload["nachname"]
     assert updated["versicherung_id"] == update_payload["versicherung_id"]
     assert updated["vertrag"] == update_payload["vertrag"]
 
-    delete_response = client.delete(f"/api/kind/{kind_id}")
+    delete_response = client.delete(f"/api/kind/{kind_id}", headers=app_token_headers)
     assert delete_response.status_code == status.HTTP_204_NO_CONTENT
 
-    get_response = client.get(f"/api/kind/{kind_id}")
+    get_response = client.get(f"/api/kind/{kind_id}", headers=app_token_headers)
     assert get_response.status_code == status.HTTP_404_NOT_FOUND
 
     print("testing CRUD for Kind: ok")
