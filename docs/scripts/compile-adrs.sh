@@ -92,6 +92,7 @@ adr_number: "$adr_number"
 adr_status: "$status"
 adr_date: "$adr_date"
 permalink: /architecture/adrs/ADR-$adr_number/
+classes: no-wave
 header:
   overlay_image: /assets/images/splash/aquarius-adr-header-1920x400.webp
   overlay_filter: $overlay_filter

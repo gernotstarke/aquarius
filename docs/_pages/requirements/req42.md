@@ -7,6 +7,15 @@ header:
   overlay_color: "#000"
   overlay_filter: "0.3"
   caption: "Basiert auf einer Idee von [Dr. Peter Hruschka](https://b-agile.de)"
+  actions:
+    - label: "Home"
+      url: "/"
+    - label: "Anforderungen"
+      url: "/requirements/"
+    - label: "Architektur"
+      url: "/architecture/"
+    - label: "Anwendung"
+      url: "/app/"
 
 ---
 

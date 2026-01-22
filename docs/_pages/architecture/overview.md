@@ -10,9 +10,9 @@ header:
   actions:
     - label: "Zur Startseite"
       url: "/"
-    - label: "Zu den Anforderungen"
+    - label: "Anforderungen"
       url: "/requirements/"
-    - label: "Zur Anwendung"
+    - label: "Anwendungen"
       url: "/app/"
 ---
 

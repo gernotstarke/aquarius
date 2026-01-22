@@ -8,12 +8,10 @@ header:
   overlay_filter: "0.4"
   caption: "Planung und Durchführung von Wettkämpfen"
   actions:
-    - label: "Zur Architektur"
+    - label: "Architektur"
       url: "/architecture/"
-      btn_class: "btn btn--green"
-    - label: "Zu den Anforderungen"
+    - label: "Anforderungen"
       url: "/requirements/"
-      btn_class: "btn btn--blue"
 ---
 
 

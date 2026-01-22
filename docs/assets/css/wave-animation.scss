@@ -200,3 +200,17 @@
   backface-visibility: hidden;
   perspective: 1000px;
 }
+
+/* ============================================
+   Disable Wave Effect for Specific Pages
+   Use classes: no-wave in frontmatter
+   ============================================ */
+
+.no-wave .page__hero--overlay::before,
+.no-wave .page__hero--overlay::after,
+.no-wave .page__hero-image-wrapper::before {
+  content: none;
+  animation: none;
+  filter: none;
+  display: none;
+}

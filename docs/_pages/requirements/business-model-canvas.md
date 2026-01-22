@@ -3,9 +3,15 @@ permalink: /requirements/business-model-canvas/
 title: "Business Model Canvas"
 layout: splash
 header:
-  overlay_image: /assets/images/splash/aquarius-architecture-header-1500x400.webp
-  overlay_color: "#000"
-  overlay_filter: "0.3"
+  overlay_image: /assets/images/splash/aquarius-requirements-header-1500.webp
+  overlay_filter: linear-gradient(rgba(0, 60, 120, 0.6), rgba(0, 60, 120, 0.6))
+  actions:
+    - label: "Anforderungen"
+      url: "/requirements/"
+    - label: "Architektur"
+      url: "/architecture/"
+    - label: "Anwendung"
+      url: "/app/"
 ---
 
 <div id="interactive-bmc-container"></div>

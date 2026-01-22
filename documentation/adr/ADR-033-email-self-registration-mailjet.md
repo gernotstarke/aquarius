@@ -1,6 +1,6 @@
 # ADR-033: Email-based Self-Registration and Mailjet Integration
 
-**Status:** in preparation  
+**Status:** rejected  
 **Datum:** 2026-01-10  
 **Entscheider:** Gernot Starke
 
@@ -18,7 +18,10 @@ Dieser soll E-Mail-Verifikation und Einladungsmechanismen unterstützen.
 
 ## Entscheidung
 
-Wir implementieren die E-Mail-Funktionalität unter Verwendung von **Mailjet**.
+>ALT: Wir implementieren die E-Mail-Funktionalität unter Verwendung von **Mailjet**.
+
+Neu: Wir verzichten aktuell auf MailJet, weil die Domain "arc42.org" nicht für den Versand von E-Mails konfiguriert ist.
+Wir evaluieren aktuell einen Mailversand über eine alternative Domain. 
 
 ### Begründung für Mailjet
 - **Kostenlose Nutzung**: Mailjet bietet ein großzügiges kostenloses Kontingent (bis zu 6.000 E-Mails/Monat, 200/Tag), was für die initialen Anforderungen von Aquarius ausreicht.

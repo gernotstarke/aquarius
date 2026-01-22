@@ -9,10 +9,8 @@ header:
   actions:
     - label: "Anwendungen"
       url: "/app/"
-      btn_class: "btn btn--violet"
     - label: "Architektur"
       url: "/architecture/"
-      btn_class: "btn btn--green"
 ---
 
 <div class="dashboard-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 2rem 0;">

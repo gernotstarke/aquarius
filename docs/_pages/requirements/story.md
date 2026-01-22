@@ -8,11 +8,13 @@ header:
   overlay_filter: "0.3"
   caption: "Schwimmliga: Die Story"
   actions:
-    - label: "Zur Startseite"
+    - label: "Startseite"
       url: "/"
-    - label: "Zu den Anforderungen"
+    - label: "Anforderungen"
       url: "/requirements/"
-    - label: "Zur Anwendung"
+    - label: "Architektkur"
+      url: "/architecture/"
+    - label: "Anwendungen"
       url: "/app/"  
 ---
 

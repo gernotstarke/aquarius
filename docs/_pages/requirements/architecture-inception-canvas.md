@@ -6,6 +6,13 @@ header:
   overlay_image: /assets/images/splash/aquarius-requirements-header-1500.webp
   overlay_color: "#000"
   overlay_filter: "0.3"
+  actions:
+    - label: "Anforderungen"
+      url: "/requirements/"
+    - label: "Architektkur"
+      url: "/architecture/"
+    - label: "Anwendungen"
+      url: "/app/"
 ---
 
 

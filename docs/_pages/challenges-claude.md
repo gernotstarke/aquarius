@@ -303,16 +303,6 @@ Must: Display on public screen (#3 - availability)
 Must: Work with historical figure catalog (#6)
 ```
 
-## Pedagogical Value
-
-Each challenge can be explored through:
-- **Architecture Katas**: Design solutions in small groups
-- **Trade-off Analysis**: No perfect solution exists
-- **Technology Evaluation**: Compare frameworks/databases
-- **Quality Attributes**: Performance, Security, Availability
-- **Real-world Constraints**: Budget, time, team skills
-- **Failure Scenarios**: What breaks and how to recover
-
 ---
 
 ## Further Reading
@@ -322,7 +312,3 @@ Each challenge can be explored through:
 - Pat Helland: "Life beyond Distributed Transactions"
 - GDPR Technical Guidelines
 - arc42 Architecture Documentation Template
-
----
-
-*This document evolves as new challenges emerge. Last updated: 2025-12-26*
