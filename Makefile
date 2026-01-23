@@ -51,6 +51,10 @@ web-backend-build: ## Build the backend Docker image
 
 ##@ Testing
 
+test: test-report-json ## Run all tests and compile reports for documentation
+	@echo "🔄 Recompiling website content after tests..."
+	@$(MAKE) website-compile
+
 test-report-json: test-backend-json test-frontend-json ## Generate JSON reports for frontend and backend tests
 	@echo "✅ All raw test reports generated in docs/build/test-results/"
 	@echo "⚙️  Compiling test results for Jekyll..."
