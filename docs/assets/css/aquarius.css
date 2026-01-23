@@ -180,6 +180,15 @@
   background-color: #fff3e0;
 }
 
+/* Test Report: Light Blue */
+.arch-tile--blue-1 {
+  background-color: #e0f2f7; /* Light blue */
+  border: 1px solid #0288d1; /* Darker blue border */
+}
+.arch-tile--blue-1:hover {
+  background-color: #b3e5fc; /* Lighter blue on hover */
+}
+
 /* arc42: Deep Green */
 .arch-tile--green-4 {
   background-color: #81c784;

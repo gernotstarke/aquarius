@@ -43,6 +43,11 @@ header:
     <h3>ADRs</h3>
   </a>
 
+  <a href="/architecture/test-reporting/" class="req-tile arch-tile--blue-1">
+    <i class="fas fa-check-double"></i>
+    <h3>Test Report</h3>
+  </a>
+
   <a href="/architecture/arc42/" class="req-tile arch-tile--green-4">
     <i class="fas fa-th"></i>
     <h3>arc42</h3>
