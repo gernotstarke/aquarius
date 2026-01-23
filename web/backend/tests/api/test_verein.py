@@ -3,7 +3,7 @@ from fastapi import status
 
 
 def test_create_verein(client, app_token_headers):
-    """Test creating a new club."""
+    """Ensures a new club can be created via the API."""
     response = client.post(
         "/api/verein",
         json={
@@ -24,7 +24,7 @@ def test_create_verein(client, app_token_headers):
 
 
 def test_read_verein_list(client, app_token_headers):
-    """Test getting list of clubs."""
+    """Ensures the API returns a list of all created clubs."""
     # Create first
     client.post(
         "/api/verein",

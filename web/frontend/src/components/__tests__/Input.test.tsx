@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import Input from '../Input';
 
-describe('Input Component', () => {
+describe('Input Component', () => { // Verifies the behavior of the standard input field.
   it('renders label and input', () => {
     render(<Input label="Test Label" placeholder="Enter text" />);
     expect(screen.getByText('Test Label')).toBeInTheDocument();
