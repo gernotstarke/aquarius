@@ -46,15 +46,20 @@ web-test: ## Run web app tests
 web-clean: ## Clean web app build artifacts
 	@cd web && make clean
 
+web-backend-build: ## Build the backend Docker image
+	@cd web && docker compose build backend
+
 ##@ Testing
 
 test-report-json: test-backend-json test-frontend-json ## Generate JSON reports for frontend and backend tests
-	@echo "✅ All test reports generated in docs/build/test-results/"
+	@echo "✅ All raw test reports generated in docs/build/test-results/"
+	@echo "⚙️  Compiling test results for Jekyll..."
+	@python3 scripts/compile-test-results.py
 
-test-backend-json:
+test-backend-json: web-backend-build
 	@echo "🧪 Running backend tests and generating JSON report..."
 	@mkdir -p docs/build/test-results
-	@cd web && docker compose run --rm backend pytest --json-report --json-report-file=../../docs/build/test-results/backend.json
+	@cd web && docker compose run --rm -v $(PWD)/docs/build/test-results:/app/test-results backend pytest --json-report --json-report-file=/app/test-results/backend.json
 
 test-frontend-json:
 	@echo "🧪 Running frontend tests and generating JSON report..."
