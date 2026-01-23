@@ -28,6 +28,7 @@ services:
     image: asciidoctor/docker-asciidoctor
     volumes:
       - ../documentation/architecture:/source:ro
+      - ../documentation/architecture/images:/source/images:ro
       - ./_pages/architecture:/output
       - ./scripts:/scripts:ro
     command: ["sh", "/scripts/compile-arc42.sh"]
