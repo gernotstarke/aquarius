@@ -67,6 +67,12 @@ jobs:
             --output assets/js/password-protect.min.js
           echo "✅ Obfuscated password-protect.js"
 
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Run Tests and Generate Report
+        run: make test
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
