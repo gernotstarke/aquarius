@@ -80,6 +80,7 @@ asciidoctor \
     -a icons=font \
     -a source-highlighter=rouge \
     -a imagesdir=/assets/images/arc42 \
+    --base-dir /source \
     -o "$TEMP_HTML" \
     "$TEMP_ADOC"
 
