@@ -37,26 +37,29 @@ help: ## Show all available targets
 
 ##@ Web App
 
-web-dev: ## Start web app development servers with local SQLite
-	@cd web && make dev
-
-web-dev-turso: ## Start web app development servers with Turso cloud database
-	@cd web && make dev-with-turso
+web-logs: ## Show web app logs
+	@cd web && make deploy-logs
 
 web-test: ## Run web app tests
 	@cd web && make test
 
-web-deploy: ## Deploy web app to fly.io
-	@cd web && make deploy
-
-web-deploy-status: ## Check web app deployment status
-	@cd web && make deploy-status
-
-web-logs: ## Show web app logs
-	@cd web && make deploy-logs
-
 web-clean: ## Clean web app build artifacts
 	@cd web && make clean
+
+##@ Testing
+
+test-report-json: test-backend-json test-frontend-json ## Generate JSON reports for frontend and backend tests
+	@echo "✅ All test reports generated in docs/build/test-results/"
+
+test-backend-json:
+	@echo "🧪 Running backend tests and generating JSON report..."
+	@mkdir -p docs/build/test-results
+	@cd web && docker compose run --rm backend pytest --json-report --json-report-file=../../docs/build/test-results/backend.json
+
+test-frontend-json:
+	@echo "🧪 Running frontend tests and generating JSON report..."
+	@mkdir -p docs/build/test-results
+	@cd web/frontend && npm install && npm run test -- --reporter=json > ../../docs/build/test-results/frontend.json
 
 ##@ Mobile App
 
