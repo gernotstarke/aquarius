@@ -1,182 +1,130 @@
 ---
+layout: splash
 permalink: /architecture/test-reporting/
 title: "Test Report"
-layout: protected
+excerpt: "Übersicht über alle automatisierten Testfälle"
 header:
-  overlay_image: /assets/images/splash/aquarius-architecture-header-1500x400.webp
-  overlay_color: "#000"
-  overlay_filter: "0.3"
-  caption: "Automatisierte Testberichte"
+  overlay_image: /assets/images/splash/aquarius-app-header-1500x400.webp
+  overlay_filter: "0.4"
+  caption: "Status der automatisierten Tests"
   actions:
-    - label: "Architektur"
+    - label: "Zurück zur Architekturübersicht"
       url: "/architecture/"
-    - label: "ADRs"
-      url: "/architecture/adrs/"
 ---
 
-Diese Seite zeigt die Ergebnisse der automatisierten Tests für Aquarius.
-
-{% if site.data.test_stats %}
-## Zusammenfassung
-
-<div class="test-summary-cards">
-  <div class="test-card test-card--passed">
-    <span class="test-card-number">{{ site.data.test_stats.passed }}</span>
-    <span class="test-card-label">Bestanden</span>
-  </div>
-  <div class="test-card test-card--failed">
-    <span class="test-card-number">{{ site.data.test_stats.failed }}</span>
-    <span class="test-card-label">Fehlgeschlagen</span>
-  </div>
-  <div class="test-card test-card--skipped">
-    <span class="test-card-number">{{ site.data.test_stats.skipped }}</span>
-    <span class="test-card-label">Übersprungen</span>
-  </div>
-  <div class="test-card test-card--total">
-    <span class="test-card-number">{{ site.data.test_stats.percentage }}%</span>
-    <span class="test-card-label">Erfolgsrate</span>
-  </div>
-</div>
-{% else %}
-<div class="notice--warning">
-  <p><strong>Keine Testdaten verfügbar.</strong></p>
-  <p>Führe <code>make test</code> aus, um Testberichte zu generieren.</p>
-</div>
-{% endif %}
-
-## Testdetails
-
-{% if site.data.test_results %}
-<table class="test-results-table">
-  <thead>
-    <tr>
-      <th>Status</th>
-      <th>Test</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for test in site.data.test_results %}
-    <tr class="test-row--{{ test.result }}">
-      <td class="test-status">
-        {% if test.result == 'passed' %}
-          <span class="test-icon test-icon--passed">✓</span>
-        {% elsif test.result == 'failed' %}
-          <span class="test-icon test-icon--failed">✗</span>
-        {% else %}
-          <span class="test-icon test-icon--skipped">⊘</span>
-        {% endif %}
-      </td>
-      <td>
-        <span class="test-description">{{ test.description }}</span>
-        <br><code class="test-technical-name">{{ test.technical_name }}</code>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<p><em>Keine detaillierten Testergebnisse verfügbar.</em></p>
-{% endif %}
-
 <style>
-.test-summary-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1rem;
-  margin: 2rem 0;
-}
-
-.test-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1.5rem 1rem;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.test-card-number {
-  font-size: 2.5rem;
-  font-weight: bold;
-  line-height: 1;
-}
-
-.test-card-label {
-  font-size: 0.85rem;
-  margin-top: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.test-card--passed {
-  background-color: #d4edda;
-  border: 1px solid #28a745;
-  color: #155724;
-}
-
-.test-card--failed {
-  background-color: #f8d7da;
-  border: 1px solid #dc3545;
-  color: #721c24;
-}
-
-.test-card--skipped {
-  background-color: #e2e3e5;
-  border: 1px solid #6c757d;
-  color: #383d41;
-}
-
-.test-card--total {
-  background-color: #cce5ff;
-  border: 1px solid #007bff;
-  color: #004085;
-}
-
-.test-results-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1.5rem;
-}
-
-.test-results-table th,
-.test-results-table td {
-  padding: 0.75rem;
-  text-align: left;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.test-results-table th {
-  background-color: #f8f9fa;
-}
-
-.test-status {
-  width: 50px;
-  text-align: center;
-}
-
-.test-icon {
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
-.test-icon--passed { color: #28a745; }
-.test-icon--failed { color: #dc3545; }
-.test-icon--skipped { color: #6c757d; }
-
-.test-description {
-  font-weight: 500;
-}
-
-.test-technical-name {
-  font-size: 0.75rem;
-  color: #6c757d;
-}
-
-.test-row--failed {
-  background-color: #fff5f5;
-}
-
-.test-row--skipped {
-  background-color: #fafafa;
-}
+  .test-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+    font-size: 0.9em;
+  }
+  .test-table th, .test-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  .test-table th {
+    background-color: #f2f2f2;
+  }
+  .status-passed {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    padding: .25em .4em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25rem;
+  }
+  .status-failed {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    padding: .25em .4em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25rem;
+  }
+  .status-skipped {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    padding: .25em .4em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25rem;
+  }
+  .status-unknown {
+    color: #004085;
+    background-color: #cce5ff;
+    border-color: #b8daff;
+    padding: .25em .4em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25rem;
+  }
 </style>
+
+{% assign grouped_results = site.data.test_results | group_by: "entity" %}
+<div class="test-report-container">
+  <p>Diese Seite zeigt den aktuellen Status aller automatisierten Backend- und Frontend-Tests.</p>
+  <div class="test-report-toc">
+    <h2>Inhalt</h2>
+    <ul>
+      {% for group in grouped_results %}
+        <li><a href="#{{ group.name | slugify }}">{{ group.name }}</a> ({{ group.items | size }})</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  {% for group in grouped_results %}
+    <h2 id="{{ group.name | slugify }}">{{ group.name }}</h2>
+    <table class="test-table">
+      <thead>
+        <tr>
+          <th>Business-Erklärung (Slug)</th>
+          <th>Technischer Name</th>
+          <th>Ergebnis</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for test in group.items %}
+          <tr>
+            <td>
+              <div class="business-explanation">{{ test.business_explanation }}</div>
+              <div class="business-slug"><code>{{ test.business_slug }}</code></div>
+            </td>
+            <td><code>{{ test.technical_name }}</code></td>
+            <td>
+              {% assign status_class = "status-unknown" %}
+              {% if test.result == "passed" %}
+                {% assign status_class = "status-passed" %}
+              {% elsif test.result == "failed" %}
+                {% assign status_class = "status-failed" %}
+              {% elsif test.result == "skipped" %}
+                {% assign status_class = "status-skipped" %}
+              {% endif %}
+              <span class="{{ status_class }}">{{ test.result | capitalize }}</span>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endfor %}
+</div>

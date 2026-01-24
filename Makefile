@@ -15,8 +15,7 @@ help: ## Show all available targets
 	@echo ""
 	@echo "Quick Start:"
 	@echo "  make web-dev        - Start web app development servers"
-	@echo "  make mobile-ios     - Run iOS simulator"
-	@echo "  make docs-build     - Generate documentation"
+	@echo "  make test           - Run all tests and generate reports"
 	@echo "  make website-dev    - Start Jekyll website (http://localhost:4000)"
 	@echo ""
 	@echo "Website (Jekyll + Docker):"
@@ -40,9 +39,6 @@ help: ## Show all available targets
 web-logs: ## Show web app logs
 	@cd web && make deploy-logs
 
-web-test: ## Run web app tests
-	@cd web && make test
-
 web-clean: ## Clean web app build artifacts
 	@cd web && make clean
 
@@ -51,9 +47,11 @@ web-backend-build: ## Build the backend Docker image
 
 ##@ Testing
 
-test: test-report-json ## Run all tests and compile reports for documentation
-	@echo "🔄 Recompiling website content after tests..."
+test: test-report-json ## Run all tests (backend + frontend) and generate reports
+	@echo "🔄 Recompiling website content with test results..."
 	@$(MAKE) website-compile
+	@echo ""
+	@echo "✅ Tests complete! Run 'make website-dev' to see results on the site."
 
 test-report-json: test-backend-json test-frontend-json ## Generate JSON reports for frontend and backend tests
 	@echo "✅ All raw test reports generated in docs/build/test-results/"
@@ -103,12 +101,20 @@ mobile-test: ## Run mobile app tests
 
 ##@ Project Website (Jekyll)
 
-website-compile: ## Compile content for Jekyll (ADRs, arc42)
+website-compile: ## Compile content for Jekyll (ADRs, arc42, test stats)
 	@echo "📄 Compiling ADRs for Jekyll..."
 	@mkdir -p docs/_adrs
 	@cd docs && docker compose run --rm compile-adrs
 	@echo "📄 Compiling arc42 documentation for Jekyll..."
 	@cd docs && docker compose run --rm compile-arc42
+	@echo "📊 Compiling test statistics..."
+	@mkdir -p docs/_data
+	@if [ -f docs/build/test-results/backend.json ] || [ -f docs/build/test-results/frontend.json ]; then \
+		python3 scripts/compile-test-results.py; \
+	else \
+		echo '{"passed": 0, "failed": 0, "skipped": 0, "total": 0, "percentage": 0}' > docs/_data/test_stats.json; \
+		echo "   ⚠️  No test results found. Run 'make test' to generate test reports."; \
+	fi
 
 website-dev: website-compile ## Start project website locally (http://localhost:4000)
 	@echo "🔐 Obfuscating protected JavaScript..."
