@@ -1,7 +1,18 @@
 ---
 permalink: /challenges/
-title: "Architectural Challenges"
-layout: single
+title: "Herausforderungen in der Architektur"
+layout: protected
+header:
+  overlay_image: /assets/images/splash/aquarius-architecture-header-1500x400.webp
+  overlay_color: "#000"
+  overlay_filter: "0.3"
+  actions:
+    - label: "Anforderungen"
+      url: "/requirements/"
+    - label: "Architektur"
+      url: "/architektur/"
+    - label: "Anwendungen"
+      url: "/app/"
 toc: true
 toc_label: "Challenges"
 toc_icon: "exclamation-triangle"
@@ -312,3 +323,6 @@ Must: Work with historical figure catalog (#6)
 - Pat Helland: "Life beyond Distributed Transactions"
 - GDPR Technical Guidelines
 - arc42 Architecture Documentation Template
+
+
+[← Zurück zur Architektur-Übersicht](/architecture/)

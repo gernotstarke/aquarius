@@ -198,6 +198,15 @@
   background-color: #fff3e0;
 }
 
+/* Challenges: Orange */
+.arch-tile--orange-1 {
+  background-color: #ffe0b2;
+  border: 1px solid #f57c00;
+}
+.arch-tile--orange-1:hover {
+  background-color: #fff3e0;
+}
+
 /* --- Application Tiles (Violet/Red Variations) --- */
 
 /* Planungs-App: Light Violet */
@@ -469,4 +478,25 @@
 .text-right.small a:hover {
   color: #28a745;
   background-color: #f0f7f0;
+}
+
+/* --- Tile Test Stats --- */
+.tile-test-stats {
+  display: flex;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  margin-top: 0.5rem;
+  font-family: monospace;
+}
+
+.tile-test-stats .test-passed {
+  color: #28a745;
+}
+
+.tile-test-stats .test-failed {
+  color: #dc3545;
+}
+
+.tile-test-stats .test-skipped {
+  color: #6c757d;
 }

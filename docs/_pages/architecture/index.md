@@ -46,11 +46,23 @@ header:
   <a href="/architecture/test-reporting/" class="req-tile arch-tile--blue-1">
     <i class="fas fa-check-double"></i>
     <h3>Test Report</h3>
+    {% if site.data.test_stats %}
+    <span class="tile-test-stats">
+      <span class="test-passed">✓{{ site.data.test_stats.passed }}</span>
+      {% if site.data.test_stats.failed > 0 %}<span class="test-failed">✗{{ site.data.test_stats.failed }}</span>{% endif %}
+      {% if site.data.test_stats.skipped > 0 %}<span class="test-skipped">⊘{{ site.data.test_stats.skipped }}</span>{% endif %}
+    </span>
+    {% endif %}
   </a>
 
   <a href="/architecture/arc42/" class="req-tile arch-tile--green-4">
     <i class="fas fa-th"></i>
     <h3>arc42</h3>
+  </a>
+
+  <a href="/challenges/" class="req-tile arch-tile--orange-1">
+    <i class="fas fa-mountain"></i>
+    <h3>Architektur-Herausforderungen</h3>
   </a>
 </div>
 
