@@ -19,9 +19,10 @@
       <a href="/architecture/adrs/" rel="noopener noreferrer">
         <img src="https://img.shields.io/badge/ADRs-{{ site.adrs.size }}-28a745?style=flat-square" alt="ADR count">
       </a>
-      {% if site.data.test_stats %}
+      {% include test-stats.html %}
+      {% if test_stats_total > 0 %}
       <a href="/architecture/test-reporting/" rel="noopener noreferrer">
-        {% assign pct = site.data.test_stats.percentage %}
+        {% assign pct = test_stats_percentage %}
         {% if pct >= 90 %}{% assign badge_color = "28a745" %}
         {% elsif pct >= 70 %}{% assign badge_color = "ffc107" %}
         {% else %}{% assign badge_color = "dc3545" %}{% endif %}

@@ -46,11 +46,12 @@ header:
   <a href="/architecture/test-reporting/" class="req-tile arch-tile--blue-1">
     <i class="fas fa-check-double"></i>
     <h3>Test Report</h3>
-    {% if site.data.test_stats %}
+    {% include test-stats.html %}
+    {% if test_stats_total > 0 %}
     <span class="tile-test-stats">
-      <span class="test-passed">✓{{ site.data.test_stats.passed }}</span>
-      {% if site.data.test_stats.failed > 0 %}<span class="test-failed">✗{{ site.data.test_stats.failed }}</span>{% endif %}
-      {% if site.data.test_stats.skipped > 0 %}<span class="test-skipped">⊘{{ site.data.test_stats.skipped }}</span>{% endif %}
+      <span class="test-passed">✓{{ test_stats_passed }}</span>
+      {% if test_stats_failed > 0 %}<span class="test-failed">✗{{ test_stats_failed }}</span>{% endif %}
+      {% if test_stats_skipped > 0 %}<span class="test-skipped">⊘{{ test_stats_skipped }}</span>{% endif %}
     </span>
     {% endif %}
   </a>

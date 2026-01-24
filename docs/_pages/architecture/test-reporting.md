@@ -2,17 +2,30 @@
 layout: splash
 permalink: /architecture/test-reporting/
 title: "Test Report"
-excerpt: "Übersicht über alle automatisierten Testfälle"
+excerpt: "Ergebnisse der automatisierten Tests"
 header:
-  overlay_image: /assets/images/splash/aquarius-app-header-1500x400.webp
-  overlay_filter: "0.4"
+  overlay_image: /assets/images/splash/test-results-header.webp
   caption: "Status der automatisierten Tests"
   actions:
-    - label: "Zurück zur Architekturübersicht"
+    - label: "Anforderungen"
+      url: "/requirements/"
+    - label: "Architektur"
       url: "/architecture/"
+    - label: "Anwendungen"
+      url: "/app/"      
+    - label: "Dashboard"
+      url: "/app/dashboard/"  
 ---
 
 <style>
+  /* Improve contrast for header text on light background */
+  .page__hero--overlay .page__title,
+  .page__hero--overlay .page__lead,
+  .page__hero--overlay .page__hero-caption {
+    color: #1b5e20 !important;
+    text-shadow: none !important;
+  }
+
   .test-table {
     width: 100%;
     border-collapse: collapse;
