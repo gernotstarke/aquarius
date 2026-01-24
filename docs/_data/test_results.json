@@ -1,0 +1,802 @@
+[
+  {
+    "business_explanation": "Api Test_access_rights: Read only user cannot modify kind",
+    "business_slug": "api-test-access-rights-read-only-user-cannot-modify-kind",
+    "description": "Api Test_access_rights: Read only user cannot modify kind",
+    "technical_name": "tests/api/test_access_rights.py::test_read_only_user_cannot_modify_kind",
+    "entity": "Zugriffsrechte",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Api Test_access_rights: Read only user cannot modify verein",
+    "business_slug": "api-test-access-rights-read-only-user-cannot-modify-verein",
+    "description": "Api Test_access_rights: Read only user cannot modify verein",
+    "technical_name": "tests/api/test_access_rights.py::test_read_only_user_cannot_modify_verein",
+    "entity": "Zugriffsrechte",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Api Test_access_rights: Read only user cannot modify saison",
+    "business_slug": "api-test-access-rights-read-only-user-cannot-modify-saison",
+    "description": "Api Test_access_rights: Read only user cannot modify saison",
+    "technical_name": "tests/api/test_access_rights.py::test_read_only_user_cannot_modify_saison",
+    "entity": "Zugriffsrechte",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Api Test_access_rights: Read only user cannot modify schwimmbad",
+    "business_slug": "api-test-access-rights-read-only-user-cannot-modify-schwimmbad",
+    "description": "Api Test_access_rights: Read only user cannot modify schwimmbad",
+    "technical_name": "tests/api/test_access_rights.py::test_read_only_user_cannot_modify_schwimmbad",
+    "entity": "Zugriffsrechte",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Api Test_access_rights: Read only user cannot modify wettkampf",
+    "business_slug": "api-test-access-rights-read-only-user-cannot-modify-wettkampf",
+    "description": "Api Test_access_rights: Read only user cannot modify wettkampf",
+    "technical_name": "tests/api/test_access_rights.py::test_read_only_user_cannot_modify_wettkampf",
+    "entity": "Zugriffsrechte",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Api Test_access_rights: Read only user cannot modify anmeldung",
+    "business_slug": "api-test-access-rights-read-only-user-cannot-modify-anmeldung",
+    "description": "Api Test_access_rights: Read only user cannot modify anmeldung",
+    "technical_name": "tests/api/test_access_rights.py::test_read_only_user_cannot_modify_anmeldung",
+    "entity": "Zugriffsrechte",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test creating anmeldung with figures.",
+    "business_slug": "test-creating-anmeldung-with-figures",
+    "description": "Api Test_anmeldung: Create anmeldung with figuren",
+    "technical_name": "tests/api/test_anmeldung.py::test_create_anmeldung_with_figuren",
+    "entity": "Anmeldung",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test anmeldung without figures is marked as preliminary.",
+    "business_slug": "test-anmeldung-without-figures-is-marked-as-preliminary",
+    "description": "Api Test_anmeldung: Create anmeldung without figuren is vorlaeufig",
+    "technical_name": "tests/api/test_anmeldung.py::test_create_anmeldung_without_figuren_is_vorlaeufig",
+    "entity": "Anmeldung",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test anmeldung for uninsured kind is marked as preliminary.",
+    "business_slug": "test-anmeldung-for-uninsured-kind-is-marked-as-preliminary",
+    "description": "Api Test_anmeldung: Create anmeldung uninsured kind is vorlaeufig",
+    "technical_name": "tests/api/test_anmeldung.py::test_create_anmeldung_uninsured_kind_is_vorlaeufig",
+    "entity": "Anmeldung",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test reading list of anmeldungen.",
+    "business_slug": "test-reading-list-of-anmeldungen",
+    "description": "Api Test_anmeldung: Read anmeldung list",
+    "technical_name": "tests/api/test_anmeldung.py::test_read_anmeldung_list",
+    "entity": "Anmeldung",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test reading single anmeldung by ID.",
+    "business_slug": "test-reading-single-anmeldung-by-id",
+    "description": "Api Test_anmeldung: Read anmeldung by id",
+    "technical_name": "tests/api/test_anmeldung.py::test_read_anmeldung_by_id",
+    "entity": "Anmeldung",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test updating anmeldung figures.",
+    "business_slug": "test-updating-anmeldung-figures",
+    "description": "Api Test_anmeldung: Update anmeldung figuren",
+    "technical_name": "tests/api/test_anmeldung.py::test_update_anmeldung_figuren",
+    "entity": "Anmeldung",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test deleting anmeldung.",
+    "business_slug": "test-deleting-anmeldung",
+    "description": "Api Test_anmeldung: Delete anmeldung",
+    "technical_name": "tests/api/test_anmeldung.py::test_delete_anmeldung",
+    "entity": "Anmeldung",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test creating anmeldung with non-existent kind returns 404.",
+    "business_slug": "test-creating-anmeldung-with-non-existent-kind-returns-404",
+    "description": "Api Test_anmeldung: Create anmeldung kind not found",
+    "technical_name": "tests/api/test_anmeldung.py::test_create_anmeldung_kind_not_found",
+    "entity": "Anmeldung",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test creating anmeldung with non-existent wettkampf returns 404.",
+    "business_slug": "test-creating-anmeldung-with-non-existent-wettkampf-returns-404",
+    "description": "Api Test_anmeldung: Create anmeldung wettkampf not found",
+    "technical_name": "tests/api/test_anmeldung.py::test_create_anmeldung_wettkampf_not_found",
+    "entity": "Anmeldung",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test creating a new figur.",
+    "business_slug": "test-creating-a-new-figur",
+    "description": "Api Test_figur: Create figur",
+    "technical_name": "tests/api/test_figur.py::test_create_figur",
+    "entity": "Figur",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test reading list of figuren.",
+    "business_slug": "test-reading-list-of-figuren",
+    "description": "Api Test_figur: Read figur list",
+    "technical_name": "tests/api/test_figur.py::test_read_figur_list",
+    "entity": "Figur",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test reading a single figur by ID.",
+    "business_slug": "test-reading-a-single-figur-by-id",
+    "description": "Api Test_figur: Read figur by id",
+    "technical_name": "tests/api/test_figur.py::test_read_figur_by_id",
+    "entity": "Figur",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test updating a figur.",
+    "business_slug": "test-updating-a-figur",
+    "description": "Api Test_figur: Update figur",
+    "technical_name": "tests/api/test_figur.py::test_update_figur",
+    "entity": "Figur",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test deleting a figur.",
+    "business_slug": "test-deleting-a-figur",
+    "description": "Api Test_figur: Delete figur",
+    "technical_name": "tests/api/test_figur.py::test_delete_figur",
+    "entity": "Figur",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test creating figur with only required fields.",
+    "business_slug": "test-creating-figur-with-only-required-fields",
+    "description": "Api Test_figur: Figur minimal fields",
+    "technical_name": "tests/api/test_figur.py::test_figur_minimal_fields",
+    "entity": "Figur",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Api Test_kind: Kind crud",
+    "business_slug": "api-test-kind-kind-crud",
+    "description": "Api Test_kind: Kind crud",
+    "technical_name": "tests/api/test_kind.py::test_kind_crud",
+    "entity": "Kind",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Api Test_saison: Create saison",
+    "business_slug": "api-test-saison-create-saison",
+    "description": "Api Test_saison: Create saison",
+    "technical_name": "tests/api/test_saison.py::test_create_saison",
+    "entity": "Saison",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Api Test_saison: Read saison",
+    "business_slug": "api-test-saison-read-saison",
+    "description": "Api Test_saison: Read saison",
+    "technical_name": "tests/api/test_saison.py::test_read_saison",
+    "entity": "Saison",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Api Test_saison: Update saison",
+    "business_slug": "api-test-saison-update-saison",
+    "description": "Api Test_saison: Update saison",
+    "technical_name": "tests/api/test_saison.py::test_update_saison",
+    "entity": "Saison",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Api Test_saison: Delete saison",
+    "business_slug": "api-test-saison-delete-saison",
+    "description": "Api Test_saison: Delete saison",
+    "technical_name": "tests/api/test_saison.py::test_delete_saison",
+    "entity": "Saison",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test creating a new swimming pool.",
+    "business_slug": "test-creating-a-new-swimming-pool",
+    "description": "Api Test_schwimmbad: Create schwimmbad",
+    "technical_name": "tests/api/test_schwimmbad.py::test_create_schwimmbad",
+    "entity": "Schwimmbad",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test creating a swimming pool with only required fields.",
+    "business_slug": "test-creating-a-swimming-pool-with-only-required-fields",
+    "description": "Api Test_schwimmbad: Create schwimmbad minimal",
+    "technical_name": "tests/api/test_schwimmbad.py::test_create_schwimmbad_minimal",
+    "entity": "Schwimmbad",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test getting list of swimming pools.",
+    "business_slug": "test-getting-list-of-swimming-pools",
+    "description": "Api Test_schwimmbad: Read schwimmbad list",
+    "technical_name": "tests/api/test_schwimmbad.py::test_read_schwimmbad_list",
+    "entity": "Schwimmbad",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test getting a specific swimming pool by ID.",
+    "business_slug": "test-getting-a-specific-swimming-pool-by-id",
+    "description": "Api Test_schwimmbad: Read schwimmbad by id",
+    "technical_name": "tests/api/test_schwimmbad.py::test_read_schwimmbad_by_id",
+    "entity": "Schwimmbad",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test getting non-existent swimming pool returns 404.",
+    "business_slug": "test-getting-non-existent-swimming-pool-returns-404",
+    "description": "Api Test_schwimmbad: Read schwimmbad not found",
+    "technical_name": "tests/api/test_schwimmbad.py::test_read_schwimmbad_not_found",
+    "entity": "Schwimmbad",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test updating a swimming pool.",
+    "business_slug": "test-updating-a-swimming-pool",
+    "description": "Api Test_schwimmbad: Update schwimmbad",
+    "technical_name": "tests/api/test_schwimmbad.py::test_update_schwimmbad",
+    "entity": "Schwimmbad",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test deleting a swimming pool.",
+    "business_slug": "test-deleting-a-swimming-pool",
+    "description": "Api Test_schwimmbad: Delete schwimmbad",
+    "technical_name": "tests/api/test_schwimmbad.py::test_delete_schwimmbad",
+    "entity": "Schwimmbad",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test deleting non-existent swimming pool returns 404.",
+    "business_slug": "test-deleting-non-existent-swimming-pool-returns-404",
+    "description": "Api Test_schwimmbad: Delete schwimmbad not found",
+    "technical_name": "tests/api/test_schwimmbad.py::test_delete_schwimmbad_not_found",
+    "entity": "Schwimmbad",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test getting list of associations.",
+    "business_slug": "test-getting-list-of-associations",
+    "description": "Api Test_verband: Read verband list",
+    "technical_name": "tests/api/test_verband.py::test_read_verband_list",
+    "entity": "Verband",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test sorting associations by name.",
+    "business_slug": "test-sorting-associations-by-name",
+    "description": "Api Test_verband: Read verband sorting by name",
+    "technical_name": "tests/api/test_verband.py::test_read_verband_sorting_by_name",
+    "entity": "Verband",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test sorting associations by nomination count.",
+    "business_slug": "test-sorting-associations-by-nomination-count",
+    "description": "Api Test_verband: Read verband sorting by nomination count",
+    "technical_name": "tests/api/test_verband.py::test_read_verband_sorting_by_nomination_count",
+    "entity": "Verband",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test pagination for associations.",
+    "business_slug": "test-pagination-for-associations",
+    "description": "Api Test_verband: Read verband pagination",
+    "technical_name": "tests/api/test_verband.py::test_read_verband_pagination",
+    "entity": "Verband",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Ensures a new club can be created via the API.",
+    "business_slug": "ensures-a-new-club-can-be-created-via-the-api",
+    "description": "Api Test_verein: Create verein",
+    "technical_name": "tests/api/test_verein.py::test_create_verein",
+    "entity": "Verein",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Ensures the API returns a list of all created clubs.",
+    "business_slug": "ensures-the-api-returns-a-list-of-all-created-clubs",
+    "description": "Api Test_verein: Read verein list",
+    "technical_name": "tests/api/test_verein.py::test_read_verein_list",
+    "entity": "Verein",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test getting a specific club by ID.",
+    "business_slug": "test-getting-a-specific-club-by-id",
+    "description": "Api Test_verein: Read verein by id",
+    "technical_name": "tests/api/test_verein.py::test_read_verein_by_id",
+    "entity": "Verein",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test getting non-existent club returns 404.",
+    "business_slug": "test-getting-non-existent-club-returns-404",
+    "description": "Api Test_verein: Read verein not found",
+    "technical_name": "tests/api/test_verein.py::test_read_verein_not_found",
+    "entity": "Verein",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test updating a club.",
+    "business_slug": "test-updating-a-club",
+    "description": "Api Test_verein: Update verein",
+    "technical_name": "tests/api/test_verein.py::test_update_verein",
+    "entity": "Verein",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test deleting a club.",
+    "business_slug": "test-deleting-a-club",
+    "description": "Api Test_verein: Delete verein",
+    "technical_name": "tests/api/test_verein.py::test_delete_verein",
+    "entity": "Verein",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test deleting non-existent club returns 404.",
+    "business_slug": "test-deleting-non-existent-club-returns-404",
+    "description": "Api Test_verein: Delete verein not found",
+    "technical_name": "tests/api/test_verein.py::test_delete_verein_not_found",
+    "entity": "Verein",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test getting list of insurance companies.",
+    "business_slug": "test-getting-list-of-insurance-companies",
+    "description": "Api Test_versicherung: Read versicherung list",
+    "technical_name": "tests/api/test_versicherung.py::test_read_versicherung_list",
+    "entity": "Versicherung",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test that insurance companies are sorted by name.",
+    "business_slug": "test-that-insurance-companies-are-sorted-by-name",
+    "description": "Api Test_versicherung: Read versicherung sorted by name",
+    "technical_name": "tests/api/test_versicherung.py::test_read_versicherung_sorted_by_name",
+    "entity": "Versicherung",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test pagination for insurance companies.",
+    "business_slug": "test-pagination-for-insurance-companies",
+    "description": "Api Test_versicherung: Read versicherung pagination",
+    "technical_name": "tests/api/test_versicherung.py::test_read_versicherung_pagination",
+    "entity": "Versicherung",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test default limit for insurance companies.",
+    "business_slug": "test-default-limit-for-insurance-companies",
+    "description": "Api Test_versicherung: Read versicherung default limit",
+    "technical_name": "tests/api/test_versicherung.py::test_read_versicherung_default_limit",
+    "entity": "Versicherung",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test creating a new wettkampf.",
+    "business_slug": "test-creating-a-new-wettkampf",
+    "description": "Api Test_wettkampf: Create wettkampf",
+    "technical_name": "tests/api/test_wettkampf.py::test_create_wettkampf",
+    "entity": "Wettkampf",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test reading list of wettk\u00e4mpfe.",
+    "business_slug": "test-reading-list-of-wettk-mpfe",
+    "description": "Api Test_wettkampf: Read wettkampf list",
+    "technical_name": "tests/api/test_wettkampf.py::test_read_wettkampf_list",
+    "entity": "Wettkampf",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test reading a single wettkampf by ID.",
+    "business_slug": "test-reading-a-single-wettkampf-by-id",
+    "description": "Api Test_wettkampf: Read wettkampf by id",
+    "technical_name": "tests/api/test_wettkampf.py::test_read_wettkampf_by_id",
+    "entity": "Wettkampf",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test updating a wettkampf.",
+    "business_slug": "test-updating-a-wettkampf",
+    "description": "Api Test_wettkampf: Update wettkampf",
+    "technical_name": "tests/api/test_wettkampf.py::test_update_wettkampf",
+    "entity": "Wettkampf",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test deleting a wettkampf.",
+    "business_slug": "test-deleting-a-wettkampf",
+    "description": "Api Test_wettkampf: Delete wettkampf",
+    "technical_name": "tests/api/test_wettkampf.py::test_delete_wettkampf",
+    "entity": "Wettkampf",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test wettkampf/details endpoint returns figuren and anmeldungen.",
+    "business_slug": "test-wettkampf-details-endpoint-returns-figuren-and-anmeldungen",
+    "description": "Api Test_wettkampf: Wettkampf details with figuren and anmeldungen",
+    "technical_name": "tests/api/test_wettkampf.py::test_wettkampf_details_with_figuren_and_anmeldungen",
+    "entity": "Wettkampf",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Business Rule: Anmeldung without figuren must be vorl\u00e4ufig.",
+    "business_slug": "business-rule-anmeldung-without-figuren-must-be-vorl-ufig",
+    "description": "Integration Test_business_rules: Anmeldung without figuren is vorlaeufig",
+    "technical_name": "tests/integration/test_business_rules.py::test_anmeldung_without_figuren_is_vorlaeufig",
+    "entity": "Gesch\u00e4ftsregeln",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Business Rule: Anmeldung with figuren is not vorl\u00e4ufig.",
+    "business_slug": "business-rule-anmeldung-with-figuren-is-not-vorl-ufig",
+    "description": "Integration Test_business_rules: Anmeldung with figuren becomes final",
+    "technical_name": "tests/integration/test_business_rules.py::test_anmeldung_with_figuren_becomes_final",
+    "entity": "Gesch\u00e4ftsregeln",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Business Rule: Adding figuren to vorl\u00e4ufig anmeldung transitions it to final.",
+    "business_slug": "business-rule-adding-figuren-to-vorl-ufig-anmeldung-transitions-it-to-final",
+    "description": "Integration Test_business_rules: Vorlaeufig to final transition when figuren added",
+    "technical_name": "tests/integration/test_business_rules.py::test_vorlaeufig_to_final_transition_when_figuren_added",
+    "entity": "Gesch\u00e4ftsregeln",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Technical Test: Verify Kind data is eagerly loaded with Anmeldung.",
+    "business_slug": "technical-test-verify-kind-data-is-eagerly-loaded-with-anmeldung",
+    "description": "Integration Test_business_rules: Eager loading kind in anmeldung",
+    "technical_name": "tests/integration/test_business_rules.py::test_eager_loading_kind_in_anmeldung",
+    "entity": "Gesch\u00e4ftsregeln",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Technical Test: Verify insurance_ok flag is calculated and returned.",
+    "business_slug": "technical-test-verify-insurance-ok-flag-is-calculated-and-returned",
+    "description": "Integration Test_business_rules: Insurance flag calculated correctly",
+    "technical_name": "tests/integration/test_business_rules.py::test_insurance_flag_calculated_correctly",
+    "entity": "Gesch\u00e4ftsregeln",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Integration test to verify that the standard SQLite configuration",
+    "business_slug": "integration-test-to-verify-that-the-standard-sqlite-configuration",
+    "description": "Integration Test_persistence: Sqlite file persistence",
+    "technical_name": "tests/integration/test_persistence.py::test_sqlite_file_persistence",
+    "entity": "Persistenz",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Verify that the app's get_db dependency yields a valid session",
+    "business_slug": "verify-that-the-app-s-get-db-dependency-yields-a-valid-session",
+    "description": "Integration Test_persistence: App dependency wiring",
+    "technical_name": "tests/integration/test_persistence.py::test_app_dependency_wiring",
+    "entity": "Persistenz",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Requirement for Step 6:",
+    "business_slug": "requirement-for-step-6",
+    "description": "Mappers Test_anmeldung_mapper: Anmeldung mapper computes insurance ok",
+    "technical_name": "tests/mappers/test_anmeldung_mapper.py::test_anmeldung_mapper_computes_insurance_ok",
+    "entity": "Anmeldung-Mapping",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Requirement for Step 6:",
+    "business_slug": "requirement-for-step-6",
+    "description": "Mappers Test_anmeldung_mapper: Anmeldung mapper handles uninsured kind",
+    "technical_name": "tests/mappers/test_anmeldung_mapper.py::test_anmeldung_mapper_handles_uninsured_kind",
+    "entity": "Anmeldung-Mapping",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Requirement for Step 6:",
+    "business_slug": "requirement-for-step-6",
+    "description": "Mappers Test_anmeldung_mapper: Anmeldung mapper includes figures",
+    "technical_name": "tests/mappers/test_anmeldung_mapper.py::test_anmeldung_mapper_includes_figures",
+    "entity": "Anmeldung-Mapping",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Requirement for Step 6:",
+    "business_slug": "requirement-for-step-6",
+    "description": "Mappers Test_kind_mapper: Kind entity to dto mapping",
+    "technical_name": "tests/mappers/test_kind_mapper.py::test_kind_entity_to_dto_mapping",
+    "entity": "Kind-Mapping",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Requirement for Step 6:",
+    "business_slug": "requirement-for-step-6",
+    "description": "Mappers Test_kind_mapper: Kind mapper handles relationships",
+    "technical_name": "tests/mappers/test_kind_mapper.py::test_kind_mapper_handles_relationships",
+    "entity": "Kind-Mapping",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Requirement for Step 4:",
+    "business_slug": "requirement-for-step-4",
+    "description": "Repositories Test_anmeldung_repository: Anmeldung repository get with details",
+    "technical_name": "tests/repositories/test_anmeldung_repository.py::test_anmeldung_repository_get_with_details",
+    "entity": "Anmeldung-Repository",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Requirement for Step 4:",
+    "business_slug": "requirement-for-step-4",
+    "description": "Repositories Test_anmeldung_repository: Anmeldung repository get next startnummer",
+    "technical_name": "tests/repositories/test_anmeldung_repository.py::test_anmeldung_repository_get_next_startnummer",
+    "entity": "Anmeldung-Repository",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test adding and setting figuren for an anmeldung.",
+    "business_slug": "test-adding-and-setting-figuren-for-an-anmeldung",
+    "description": "Repositories Test_anmeldung_repository: Anmeldung repository add and set figuren",
+    "technical_name": "tests/repositories/test_anmeldung_repository.py::test_anmeldung_repository_add_and_set_figuren",
+    "entity": "Anmeldung-Repository",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Requirement for Step 4:",
+    "business_slug": "requirement-for-step-4",
+    "description": "Repositories Test_kind_repository: Kind repository create and get",
+    "technical_name": "tests/repositories/test_kind_repository.py::test_kind_repository_create_and_get",
+    "entity": "Kind-Repository",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Requirement for Step 4:",
+    "business_slug": "requirement-for-step-4",
+    "description": "Repositories Test_kind_repository: Kind repository search",
+    "technical_name": "tests/repositories/test_kind_repository.py::test_kind_repository_search",
+    "entity": "Kind-Repository",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test that repository handles sorting correctly.",
+    "business_slug": "test-that-repository-handles-sorting-correctly",
+    "description": "Repositories Test_kind_repository: Kind repository search with sorting",
+    "technical_name": "tests/repositories/test_kind_repository.py::test_kind_repository_search_with_sorting",
+    "entity": "Kind-Repository",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Test update and delete operations.",
+    "business_slug": "test-update-and-delete-operations",
+    "description": "Repositories Test_kind_repository: Kind repository update and delete",
+    "technical_name": "tests/repositories/test_kind_repository.py::test_kind_repository_update_and_delete",
+    "entity": "Kind-Repository",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Requirement for Step 5:",
+    "business_slug": "requirement-for-step-5",
+    "description": "Services Test_anmeldung_service: Create anmeldung logic happy path",
+    "technical_name": "tests/services/test_anmeldung_service.py::test_create_anmeldung_logic_happy_path",
+    "entity": "Anmeldung-Service",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Requirement for Step 5:",
+    "business_slug": "requirement-for-step-5",
+    "description": "Services Test_anmeldung_service: Create anmeldung logic missing insurance",
+    "technical_name": "tests/services/test_anmeldung_service.py::test_create_anmeldung_logic_missing_insurance",
+    "entity": "Anmeldung-Service",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Requirement for Step 5:",
+    "business_slug": "requirement-for-step-5",
+    "description": "Services Test_kind_service: Check insurance status",
+    "technical_name": "tests/services/test_kind_service.py::test_check_insurance_status",
+    "entity": "Kind-Service",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Requirement for Step 5:",
+    "business_slug": "requirement-for-step-5",
+    "description": "Services Test_kind_service: Update kind triggers anmeldung update",
+    "technical_name": "tests/services/test_kind_service.py::test_update_kind_triggers_anmeldung_update",
+    "entity": "Kind-Service",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Verify standard SQLite configuration.",
+    "business_slug": "verify-standard-sqlite-configuration",
+    "description": "Unit Test_db_config: Sqlite configuration",
+    "technical_name": "tests/unit/test_db_config.py::test_sqlite_configuration",
+    "entity": "Datenbank-Konfiguration",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Verify Turso/libSQL configuration.",
+    "business_slug": "verify-turso-libsql-configuration",
+    "description": "Unit Test_db_config: Libsql configuration",
+    "technical_name": "tests/unit/test_db_config.py::test_libsql_configuration",
+    "entity": "Datenbank-Konfiguration",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Verify default fallback to local sqlite.",
+    "business_slug": "verify-default-fallback-to-local-sqlite",
+    "description": "Unit Test_db_config: Default configuration",
+    "technical_name": "tests/unit/test_db_config.py::test_default_configuration",
+    "entity": "Datenbank-Konfiguration",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Verify that the Turso/libSQL related dependencies are correctly installed",
+    "business_slug": "verify-that-the-turso-libsql-related-dependencies-are-correctly-installed",
+    "description": "Unit Test_libsql_availability: Libsql dependencies available",
+    "technical_name": "tests/unit/test_libsql_availability.py::test_libsql_dependencies_available",
+    "entity": "libSQL",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Unit Test_rules: Calculate age group stub",
+    "business_slug": "unit-test-rules-calculate-age-group-stub",
+    "description": "Unit Test_rules: Calculate age group stub",
+    "technical_name": "tests/unit/test_rules.py::test_calculate_age_group_stub",
+    "entity": "Regeln",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Business rules stubs should validate max participants",
+    "business_slug": "business-rules-stubs-should-validate-max-participants",
+    "description": "Business rules stubs should validate max participants",
+    "technical_name": " Business Rules Stubs should validate max participants",
+    "entity": "Business",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Kind api listkinder should fetch list of kinder with pagination",
+    "business_slug": "kind-api-listkinder-should-fetch-list-of-kinder-with-pagination",
+    "description": "Kind api listkinder should fetch list of kinder with pagination",
+    "technical_name": " Kind API Service listKinder should fetch list of kinder with pagination",
+    "entity": "Kind",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Kind api listkinder should handle search and sorting parameters",
+    "business_slug": "kind-api-listkinder-should-handle-search-and-sorting-parameters",
+    "description": "Kind api listkinder should handle search and sorting parameters",
+    "technical_name": " Kind API Service listKinder should handle search and sorting parameters",
+    "entity": "Kind",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Kind api getkind should fetch a single kind by id",
+    "business_slug": "kind-api-getkind-should-fetch-a-single-kind-by-id",
+    "description": "Kind api getkind should fetch a single kind by id",
+    "technical_name": " Kind API Service getKind should fetch a single kind by ID",
+    "entity": "Kind",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Kind api createkind should create a new kind",
+    "business_slug": "kind-api-createkind-should-create-a-new-kind",
+    "description": "Kind api createkind should create a new kind",
+    "technical_name": " Kind API Service createKind should create a new kind",
+    "entity": "Kind",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Kind api updatekind should update an existing kind",
+    "business_slug": "kind-api-updatekind-should-update-an-existing-kind",
+    "description": "Kind api updatekind should update an existing kind",
+    "technical_name": " Kind API Service updateKind should update an existing kind",
+    "entity": "Kind",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Kind api deletekind should delete a kind by id",
+    "business_slug": "kind-api-deletekind-should-delete-a-kind-by-id",
+    "description": "Kind api deletekind should delete a kind by id",
+    "technical_name": " Kind API Service deleteKind should delete a kind by ID",
+    "entity": "Kind",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Kind api iskindinsured should return true if kind has verein",
+    "business_slug": "kind-api-iskindinsured-should-return-true-if-kind-has-verein",
+    "description": "Kind api iskindinsured should return true if kind has verein",
+    "technical_name": " Kind API Service isKindInsured should return true if kind has verein",
+    "entity": "Kind",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Kind api iskindinsured should return true if kind has verband",
+    "business_slug": "kind-api-iskindinsured-should-return-true-if-kind-has-verband",
+    "description": "Kind api iskindinsured should return true if kind has verband",
+    "technical_name": " Kind API Service isKindInsured should return true if kind has verband",
+    "entity": "Kind",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Kind api iskindinsured should return true if kind has contract insurance",
+    "business_slug": "kind-api-iskindinsured-should-return-true-if-kind-has-contract-insurance",
+    "description": "Kind api iskindinsured should return true if kind has contract insurance",
+    "technical_name": " Kind API Service isKindInsured should return true if kind has contract insurance",
+    "entity": "Kind",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Kind api iskindinsured should return false if kind has no insurance",
+    "business_slug": "kind-api-iskindinsured-should-return-false-if-kind-has-no-insurance",
+    "description": "Kind api iskindinsured should return false if kind has no insurance",
+    "technical_name": " Kind API Service isKindInsured should return false if kind has no insurance",
+    "entity": "Kind",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Kind api iskindinsured should return false if kind has versicherung_id but no vertrag",
+    "business_slug": "kind-api-iskindinsured-should-return-false-if-kind-has-versicherung-id-but-no-vertrag",
+    "description": "Kind api iskindinsured should return false if kind has versicherung_id but no vertrag",
+    "technical_name": " Kind API Service isKindInsured should return false if kind has versicherung_id but no vertrag",
+    "entity": "Kind",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Input renders label and input",
+    "business_slug": "input-renders-label-and-input",
+    "description": "Input renders label and input",
+    "technical_name": " Input Component renders label and input",
+    "entity": "Input",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Input displays error message",
+    "business_slug": "input-displays-error-message",
+    "description": "Input displays error message",
+    "technical_name": " Input Component displays error message",
+    "entity": "Input",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Input calls onchange handler",
+    "business_slug": "input-calls-onchange-handler",
+    "description": "Input calls onchange handler",
+    "technical_name": " Input Component calls onChange handler",
+    "entity": "Input",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Wettkampfform business rules should show error and wobble when max_teilnehmer is <= 1",
+    "business_slug": "wettkampfform-business-rules-should-show-error-and-wobble-when-max-teilnehmer-is-1",
+    "description": "Wettkampfform business rules should show error and wobble when max_teilnehmer is <= 1",
+    "technical_name": " WettkampfForm Business Rules should show error and wobble when max_teilnehmer is <= 1",
+    "entity": "Wettkampfform",
+    "result": "skipped"
+  },
+  {
+    "business_explanation": "Wettkampfform business rules should not show error when max_teilnehmer is > 1",
+    "business_slug": "wettkampfform-business-rules-should-not-show-error-when-max-teilnehmer-is-1",
+    "description": "Wettkampfform business rules should not show error when max_teilnehmer is > 1",
+    "technical_name": " WettkampfForm Business Rules should not show error when max_teilnehmer is > 1",
+    "entity": "Wettkampfform",
+    "result": "skipped"
+  }
+]

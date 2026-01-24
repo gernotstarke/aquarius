@@ -1,5 +1,7 @@
 import json
 import os
+import ast
+import re
 
 def format_python_test_name_to_description(nodeid):
     """
@@ -24,9 +26,103 @@ def format_python_test_name_to_description(nodeid):
 
     return description
 
+def slugify(value):
+    slug = value.lower()
+    slug = re.sub(r'[^a-z0-9]+', '-', slug)
+    slug = re.sub(r'-+', '-', slug).strip('-')
+    return slug or 'n-a'
+
+def resolve_test_file_path(test_file_path):
+    candidates = [
+        test_file_path,
+        os.path.join('web', 'backend', test_file_path)
+    ]
+    for candidate in candidates:
+        if os.path.exists(candidate):
+            return candidate
+    return None
+
+def extract_entity_from_test_path(test_file_path):
+    base_name = os.path.basename(test_file_path)
+    if base_name.startswith('test_') and base_name.endswith('.py'):
+        key = base_name[len('test_'):-3]
+    else:
+        key = os.path.splitext(base_name)[0]
+
+    mapping = {
+        'access_rights': 'Zugriffsrechte',
+        'anmeldung': 'Anmeldung',
+        'anmeldung_mapper': 'Anmeldung-Mapping',
+        'anmeldung_repository': 'Anmeldung-Repository',
+        'anmeldung_service': 'Anmeldung-Service',
+        'business_rules': 'Geschäftsregeln',
+        'db_config': 'Datenbank-Konfiguration',
+        'figur': 'Figur',
+        'kind': 'Kind',
+        'kind_mapper': 'Kind-Mapping',
+        'kind_repository': 'Kind-Repository',
+        'kind_service': 'Kind-Service',
+        'libsql_availability': 'libSQL',
+        'persistence': 'Persistenz',
+        'rules': 'Regeln',
+        'saison': 'Saison',
+        'schwimmbad': 'Schwimmbad',
+        'verband': 'Verband',
+        'verein': 'Verein',
+        'versicherung': 'Versicherung',
+        'wettkampf': 'Wettkampf'
+    }
+
+    return mapping.get(key, key.replace('_', ' ').title()) if key else 'Allgemein'
+
+def extract_entity_from_frontend_test(technical_name, description):
+    text = (description or technical_name or '').strip()
+    if not text:
+        return 'Frontend'
+    return text.split()[0].capitalize()
+
+def get_python_docstring_first_line(nodeid, cache):
+    parts = nodeid.split('::')
+    if not parts:
+        return None
+
+    test_file_path = resolve_test_file_path(parts[0])
+    if not test_file_path:
+        return None
+
+    if test_file_path not in cache:
+        with open(test_file_path, 'r', encoding='utf-8') as f:
+            cache[test_file_path] = ast.parse(f.read())
+
+    tree = cache[test_file_path]
+    function_part = parts[-1]
+    class_part = parts[-2] if len(parts) > 2 else None
+    function_name = function_part.split('[')[0]
+
+    def find_docstring(nodes):
+        for node in nodes:
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == function_name:
+                return ast.get_docstring(node)
+        return None
+
+    docstring = None
+    if class_part:
+        for node in tree.body:
+            if isinstance(node, ast.ClassDef) and node.name == class_part:
+                docstring = find_docstring(node.body)
+                break
+    else:
+        docstring = find_docstring(tree.body)
+
+    if not docstring:
+        return None
+
+    return docstring.strip().splitlines()[0].strip()
+
 
 def compile_test_results(backend_report_path, frontend_report_path, output_path):
     all_test_results = []
+    docstring_cache = {}
 
     # Process backend (pytest) report
     if os.path.exists(backend_report_path):
@@ -44,10 +140,17 @@ def compile_test_results(backend_report_path, frontend_report_path, output_path)
             # For simplicity, derive description from nodeid for now.
             # Further enhancement would involve parsing Python source code for docstrings.
             description = format_python_test_name_to_description(test['nodeid'])
+            docstring_line = get_python_docstring_first_line(test['nodeid'], docstring_cache)
+            business_explanation = docstring_line or description
+            business_slug = slugify(business_explanation)
+            entity = extract_entity_from_test_path(test['nodeid'].split('::')[0])
 
             all_test_results.append({
+                'business_explanation': business_explanation,
+                'business_slug': business_slug,
                 'description': description,
                 'technical_name': test['nodeid'],
+                'entity': entity,
                 'result': test['outcome']
             })
     
@@ -93,9 +196,16 @@ def compile_test_results(backend_report_path, frontend_report_path, output_path)
                     short_description = short_description.replace('::', ': ').replace('/', ' ').replace(' _ ', ' ').strip()
                     short_description = short_description.capitalize()
 
+                business_explanation = short_description
+                business_slug = slugify(business_explanation)
+                entity = extract_entity_from_frontend_test(assertion.get('fullName'), short_description)
+
                 all_test_results.append({
+                    'business_explanation': business_explanation,
+                    'business_slug': business_slug,
                     'description': short_description,
                     'technical_name': assertion['fullName'],
+                    'entity': entity,
                     'result': assertion['status']
                 })
 
