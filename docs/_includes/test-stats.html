@@ -2,6 +2,7 @@
 {% assign test_stats_passed = 0 %}
 {% assign test_stats_failed = 0 %}
 {% assign test_stats_skipped = 0 %}
+{% assign test_stats_percentage = 0 %}
 
 {% for test in site.data.test_results %}
   {% assign test_stats_total = test_stats_total | plus: 1 %}
@@ -13,3 +14,7 @@
     {% assign test_stats_skipped = test_stats_skipped | plus: 1 %}
   {% endif %}
 {% endfor %}
+
+{% if test_stats_total > 0 %}
+  {% assign test_stats_percentage = test_stats_passed | times: 100 | divided_by: test_stats_total %}
+{% endif %}

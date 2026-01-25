@@ -16,7 +16,6 @@ help: ## Show all available targets
 	@echo "Quick Start:"
 	@echo "  make web-dev        - Start web app development servers"
 	@echo "  make test           - Run all tests and generate reports"
-	@echo "  make website-dev    - Start Jekyll website (http://localhost:4000)"
 	@echo ""
 	@echo "Website (Jekyll + Docker):"
 	@echo "  make website-compile - Compile ADRs and other content for Jekyll"
