@@ -10,8 +10,7 @@ header:
   actions:
     - label: "Startseite"
       url: "/"
-    - label: "Anforderungen"
-      url: "/requirements/"
+
     - label: "Architektur"
       url: "/architecture/"
     - label: "Anwendungen"
