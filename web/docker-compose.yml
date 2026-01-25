@@ -1,5 +1,6 @@
 services:
   backend:
+    container_name: aquarius-backend
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -24,6 +25,7 @@ services:
       start_period: 5s
 
   frontend:
+    container_name: aquarius-frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -39,24 +41,7 @@ services:
       - aquarius-network
     command: sh -c "chmod +x /app/node_modules/.bin/* && npm run dev"
 
-  # Playwright service - disabled due to ARM architecture issues (ADR-029)
-  # E2E tests run locally via 'make test-ui' instead
-  # playwright:
-  #   image: mcr.microsoft.com/playwright:v1.57.0-jammy
-  #   working_dir: /app
-  #   environment:
-  #     - PLAYWRIGHT_BASE_URL=http://frontend:5173
-  #   volumes:
-  #     - ./frontend:/app
-  #   depends_on:
-  #     frontend:
-  #       condition: service_started
-  #     backend:
-  #       condition: service_healthy
-  #   networks:
-  #     - aquarius-network
-  #   command: /bin/sh -c "npm ci && npm run test:e2e"
-
+  
 volumes:
   sqlite-data:
 

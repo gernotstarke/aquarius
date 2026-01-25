@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   docs:
+    container_name: aquarius-docs-base
     build:
       context: .
       dockerfile: Dockerfile.docs
@@ -13,6 +14,7 @@ services:
 
   # Service for generating diagrams
   docs-diagrams:
+    container_name: aquarius-docs-diagrams
     image: aquarius-docs:latest
     volumes:
       - ./docs:/docs
@@ -26,6 +28,7 @@ services:
 
   # Service for generating HTML
   docs-html:
+    container_name: aquarius-docs-html
     image: aquarius-docs:latest
     volumes:
       - ./docs:/docs
@@ -46,6 +49,7 @@ services:
 
   # Service for generating PDF
   docs-pdf:
+    container_name: aquarius-docs-pdf
     image: aquarius-docs:latest
     volumes:
       - ./docs:/docs
@@ -63,6 +67,7 @@ services:
 
   # Service for watching and rebuilding
   docs-watch:
+    container_name: aquarius-docs-watch
     image: aquarius-docs:latest
     volumes:
       - ./docs:/docs

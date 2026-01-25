@@ -1,5 +1,6 @@
 services:
   jekyll:
+    container_name: aquarius-website
     image: bretfisher/jekyll-serve
     volumes:
       - .:/site
@@ -10,6 +11,7 @@ services:
     command: bundle exec jekyll serve --host 0.0.0.0 --livereload --force_polling
 
   obfuscate:
+    container_name: aquarius-website-obfuscate
     image: node:20-alpine
     volumes:
       - .:/site
@@ -17,6 +19,7 @@ services:
     command: ["sh", "-c", "npm install -g terser && terser assets/js/password-protect.js --compress --mangle --mangle-props regex=/^_/ --output assets/js/password-protect.min.js && echo '✅ Obfuscated password-protect.js'"]
 
   compile-adrs:
+    container_name: aquarius-website-compile-adrs
     image: alpine:latest
     volumes:
       - ../documentation/adr:/source:ro
@@ -25,6 +28,7 @@ services:
     command: ["sh", "/scripts/compile-adrs.sh"]
 
   compile-arc42:
+    container_name: aquarius-website-compile-arc42
     image: asciidoctor/docker-asciidoctor
     volumes:
       - ../documentation/architecture:/source:ro

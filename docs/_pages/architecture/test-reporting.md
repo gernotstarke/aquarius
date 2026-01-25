@@ -1,7 +1,8 @@
 ---
+title: "Test Report"
 layout: splash
 permalink: /architecture/test-reporting/
-title: "Test Report"
+classes: no-wave
 header:
   overlay_image: /assets/images/splash/test-results-header.webp
   caption: "Status der automatisierten Tests"
@@ -23,6 +24,95 @@ header:
   .page__hero--overlay .page__hero-caption {
     color: #1b5e20 !important;
     text-shadow: none !important;
+  }
+
+  .test-report-stats {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #e9ecef;
+  }
+
+  .test-report-stats h3 {
+    margin-top: 0;
+    font-size: 1.2rem;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .stat-item {
+    padding: 0.5rem;
+    background: white;
+    border-radius: 0.25rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .test-report-toc {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .test-report-toc h2 {
+    margin-top: 0;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .test-report-toc ul {
+    columns: 2;
+    -webkit-columns: 2;
+    -moz-columns: 2;
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+  }
+
+  .test-report-toc li {
+    break-inside: avoid;
+    margin-bottom: 0.5rem;
+    padding-left: 1.2em;
+    position: relative;
+  }
+
+  .test-report-toc li::before {
+    content: "•";
+    color: #0056b3;
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+  }
+
+  .test-report-toc a {
+    text-decoration: none;
+    color: #0056b3;
+  }
+
+  .test-report-toc a:hover {
+    text-decoration: underline;
   }
 
   .test-table {
@@ -91,11 +181,52 @@ header:
     vertical-align: baseline;
     border-radius: .25rem;
   }
+  .top-link {
+    text-align: right;
+    font-size: 0.85em;
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
+  }
+  .top-link a {
+    color: #6c757d;
+    text-decoration: none;
+  }
+  .top-link a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+  }
 </style>
+
+{% include test-stats.html %}
 
 {% assign grouped_results = site.data.test_results | group_by: "entity" %}
 <div class="test-report-container">
-  <p>Diese Seite zeigt den aktuellen Status aller automatisierten Backend- und Frontend-Tests.</p>
+  <div class="test-report-stats">
+    <h3>Zusammenfassung</h3>
+    <div class="stat-grid">
+      <div class="stat-item">
+        <span class="stat-value" style="color: #2c3e50;">{{ test_stats_total }}</span>
+        <span class="stat-label">Gesamt</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" style="color: #28a745;">{{ test_stats_passed }}</span>
+        <span class="stat-label">Bestanden</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" style="color: #dc3545;">{{ test_stats_failed }}</span>
+        <span class="stat-label">Fehlgeschlagen</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value" style="color: #ffc107;">{{ test_stats_skipped }}</span>
+        <span class="stat-label">Übersprungen</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">{{ test_stats_percentage }}%</span>
+        <span class="stat-label">Erfolgsquote</span>
+      </div>
+    </div>
+  </div>
+
   <div class="test-report-toc">
     <h2>Inhalt</h2>
     <ul>
@@ -138,5 +269,6 @@ header:
         {% endfor %}
       </tbody>
     </table>
+    <p class="top-link"><a href="#">↑ Seitenanfang</a></p>
   {% endfor %}
 </div>

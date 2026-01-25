@@ -43,6 +43,9 @@ def resolve_test_file_path(test_file_path):
     return None
 
 def extract_entity_from_test_path(test_file_path):
+    if 'step_definitions' in test_file_path:
+        return 'Akzeptanztests (BDD)'
+
     base_name = os.path.basename(test_file_path)
     if base_name.startswith('test_') and base_name.endswith('.py'):
         key = base_name[len('test_'):-3]

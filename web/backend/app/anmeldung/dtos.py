@@ -5,7 +5,7 @@ They define the contract between the API and its clients.
 """
 from datetime import date
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class FigurDTO(BaseModel):
@@ -92,9 +92,8 @@ class AnmeldungDTO(BaseModel):
     figuren: List[FigurDTO] = Field(default_factory=list, description="Figures selected for this registration")
     kind: Optional[KindDTOSimple] = Field(None, description="Child data if eager-loaded")
 
-    class Config:
-        """Pydantic configuration."""
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "id": 1,
                 "kind_id": 5,
@@ -128,3 +127,4 @@ class AnmeldungDTO(BaseModel):
                 }
             }
         }
+    )

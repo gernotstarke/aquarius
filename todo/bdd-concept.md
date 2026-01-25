@@ -75,8 +75,6 @@ def check_status(response, status):
 
 ### 3. Ausführung & Reporting
 Die BDD-Tests werden automatisch mit dem bestehenden Test-Befehl ausgeführt:
-
-```bash
 make test
 ```
 

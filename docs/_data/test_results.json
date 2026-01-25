@@ -624,6 +624,22 @@
     "result": "passed"
   },
   {
+    "business_explanation": "Step_definitions Test_kind_steps: Kind erfolgreich anlegen",
+    "business_slug": "step-definitions-test-kind-steps-kind-erfolgreich-anlegen",
+    "description": "Step_definitions Test_kind_steps: Kind erfolgreich anlegen",
+    "technical_name": "tests/step_definitions/test_kind_steps.py::test_kind_erfolgreich_anlegen",
+    "entity": "Akzeptanztests (BDD)",
+    "result": "passed"
+  },
+  {
+    "business_explanation": "Step_definitions Test_kind_steps: Kind liste abrufen",
+    "business_slug": "step-definitions-test-kind-steps-kind-liste-abrufen",
+    "description": "Step_definitions Test_kind_steps: Kind liste abrufen",
+    "technical_name": "tests/step_definitions/test_kind_steps.py::test_kind_liste_abrufen",
+    "entity": "Akzeptanztests (BDD)",
+    "result": "passed"
+  },
+  {
     "business_explanation": "Verify standard SQLite configuration.",
     "business_slug": "verify-standard-sqlite-configuration",
     "description": "Unit Test_db_config: Sqlite configuration",

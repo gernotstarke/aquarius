@@ -1,7 +1,8 @@
 ---
-permalink: /app/dashboard/
 title: "Aquarius Dashboard"
+permalink: /app/dashboard/
 layout: splash
+classes: no-wave
 header:
   overlay_image: /assets/images/splash/aquarius-app-header-1500x400.webp
   overlay_filter: "0.4"
