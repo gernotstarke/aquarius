@@ -8,8 +8,11 @@ header:
   overlay_filter: "0.3"
   caption: "Der Einstieg in die Architektur"
   actions:
+    - label: "Startseite"
+      url: "/"
     - label: "Anforderungen"
       url: "/requirements/"
+
     - label: "Anwendungen"
       url: "/app/"
 ---

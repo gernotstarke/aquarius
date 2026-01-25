@@ -8,13 +8,13 @@ header:
   overlay_filter: "0.3"
   caption: "Basiert auf einer Idee von [Dr. Peter Hruschka](https://b-agile.de)"
   actions:
-    - label: "Home"
+    - label: "Startseite"
       url: "/"
     - label: "Anforderungen"
       url: "/requirements/"
     - label: "Architektur"
       url: "/architecture/"
-    - label: "Anwendung"
+    - label: "Anwendungen"
       url: "/app/"
 
 ---

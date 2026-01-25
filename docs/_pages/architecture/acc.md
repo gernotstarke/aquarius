@@ -7,13 +7,14 @@ header:
   overlay_color: "#000"
   overlay_filter: "0.3"
   actions:
+    - label: "Startseite"
+      url: "/"
     - label: "Anforderungen"
       url: "/requirements/"
     - label: "Architektur"
-      url: "/architektur/"
+      url: "/architecture/"
     - label: "Anwendungen"
       url: "/app/"
-
 ---
 
 

@@ -14,7 +14,7 @@ header:
 
 aquarius_sections:
   - title: "Anforderungen"
-    excerpt: "![requirements](/assets/images/aquarius-requirements-logo.jpeg)<br> 
+    excerpt: "[![requirements](/assets/images/aquarius-requirements-logo.jpeg)](/requirements/)<br> 
     User Stories, Use Cases und funktionale Anforderungen für Aquarius, das Wettkampf-Management-System für Kunstschwimmen.
     Umfassende und req42-basierte Dokumentation der Stakeholder-Bedürfnisse."
     url: "/requirements/"
@@ -22,7 +22,7 @@ aquarius_sections:
     btn_class: "btn btn--blue"
 
   - title: "Architektur"
-    excerpt: "![architecture](/assets/images/aquarius-architecture-logo.jpeg)<br>
+    excerpt: "[![architecture](/assets/images/aquarius-architecture-logo.jpeg)](/architecture/)<br>
     Technische Architektur, Designentscheidungen und Lösungsansatz nach dem arc42-Template.
     Bausteine, Laufzeitsichten und Deployment-Szenarien."
     url: "/architecture/"
@@ -30,7 +30,7 @@ aquarius_sections:
     btn_class: "btn btn--green"
 
   - title: "Anwendung"
-    excerpt: "![application](/assets/images/aquarius-application-logo.jpeg)<br>Deployment-Guide, API-Dokumentation und Benutzerhandbücher für die Aquarius-Anwendung.
+    excerpt: "[![application](/assets/images/aquarius-application-logo.jpeg)](/app/)<br>Deployment-Guide, API-Dokumentation und Benutzerhandbücher für die Aquarius-Anwendung.
     Alles, was Sie für den Betrieb und die Nutzung des Systems benötigen."
     url: "/app/"
     btn_label: "Mehr lesen..."

@@ -2,7 +2,6 @@
 layout: splash
 permalink: /architecture/test-reporting/
 title: "Test Report"
-excerpt: "Ergebnisse der automatisierten Tests"
 header:
   overlay_image: /assets/images/splash/test-results-header.webp
   caption: "Status der automatisierten Tests"

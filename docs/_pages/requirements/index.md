@@ -8,12 +8,13 @@ header:
   overlay_filter: "0.3"
   caption: "(want - like - need)"
   actions:
-    - label: "Zur Architektur"
+    - label: "Startseite"
+      url: "/"
+
+    - label: "Architektur"
       url: "/architecture/"
-      btn_class: "btn btn--green"
-    - label: "Zur Anwendung"
+    - label: "Anwendungen"
       url: "/app/"
-      btn_class: "btn btn--violet"
 ---
 
 <div class="req-tile-grid">
