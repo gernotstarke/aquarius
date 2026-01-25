@@ -23,7 +23,9 @@ header:
 >
 >Noli equi dentes inspicere donati.
 >
->
+>Don’t look a gift horse in the mouth.
+
+
 ## Verantwortlich für den Inhalt
 
 Dr. Gernot Starke  
