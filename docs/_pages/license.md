@@ -1,6 +1,6 @@
 ---
 permalink: /license/
-title: "License"
+title: "Lizenz"
 layout: splash
 classes: no-wave dark-title
 header:
