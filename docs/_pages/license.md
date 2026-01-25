@@ -2,10 +2,9 @@
 permalink: /license/
 title: "License"
 layout: splash
+classes: no-wave
 header:
-  overlay_image: /assets/images/splash/aquarius-splash-dark.png
-  overlay_color: "#000"
-  overlay_filter: "0.3"
+  overlay_image: /assets/images/splash/license-splash.png
   caption: "Open Source MIT License"
   actions:
     - label: "Startseite"
@@ -48,20 +47,20 @@ This project is **open source** under the [MIT License](https://opensource.org/l
 
 ### You Are Free To:
 
-- ✅ **Use** this software for any purpose, including commercial projects
-- ✅ **Modify** the source code to suit your needs
-- ✅ **Distribute** copies of the software
-- ✅ **Sublicense** the software as part of a larger project
+- **Use** this software for any purpose, including commercial projects
+- **Modify** the source code to suit your needs
+- **Distribute** copies of the software
+- **Sublicense** the software as part of a larger project
 
 ### Requirements:
 
 - 📋 You must include the copyright notice and license text in all copies or substantial portions of the software
 
-### Disclaimers:
+### Disclaimers ⚠️:
 
-- ⚠️ **No Warranty**: This software is provided "as is", without warranty of any kind
-- ⚠️ **No Support**: There is no official support or maintenance guarantee
-- ⚠️ **No Liability**: The authors are not liable for any damages arising from the use of this software
+- **No Warranty**: This software is provided "as is", without warranty of any kind
+- **No Support**: There is no official support or maintenance guarantee
+- **No Liability**: The authors are not liable for any damages arising from the use of this software
 
 ---
 
@@ -73,4 +72,4 @@ The complete source code for Aquarius is available on GitHub:
 
 ---
 
-*Made with 🏊 in Cologne*
+*Made with passion in Cologne*

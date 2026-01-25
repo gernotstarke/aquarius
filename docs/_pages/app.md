@@ -6,7 +6,7 @@ layout: splash
 header:
   overlay_image: /assets/images/splash/aquarius-app-header-1500x400.webp
   overlay_filter: "0.4"
-  caption: "Planung und Durchführung von Wettkämpfen"
+  caption: "Python, JS, SQLite & Co in Aktion"
   actions:
     - label: "Startseite"
       url: "/"

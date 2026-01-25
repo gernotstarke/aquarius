@@ -4,8 +4,6 @@ title: "Herausforderungen in der Architektur"
 layout: protected
 header:
   overlay_image: /assets/images/splash/aquarius-architecture-header-1500x400.webp
-  overlay_color: "#000"
-  overlay_filter: "0.3"
   actions:
     - label: "Startseite"
       url: "/"
