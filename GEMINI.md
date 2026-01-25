@@ -72,11 +72,20 @@ Located in `backend/`:
 - `uvicorn app.main:app --reload`: Start server (requires env setup)
 
 ## Directory Structure
-- `backend/`: API source code, database models, and schemas.
-- `frontend/`: React application source code, components, and pages.
-- `docs/src/`: Source files for architecture documentation (ADRs, diagrams, text).
-- `docs/build/`: Generated output for documentation (ignored by git).
+- `backend/`: API source code, database models, and schemas for the web application.
+- `frontend/`: React application source code, components, and pages for the web application.
+- `documentation/`: Source files for the arc42 architecture documentation and ADRs (AsciiDoc and Markdown).
+- `docs/`: Source for the Jekyll-based documentation website.
+  - `_data/`: Data files for Jekyll, such as compiled test results.
+  - `_includes/`: Reusable Jekyll components.
+  - `_layouts/`: Jekyll page layouts (e.g., `splash`, `protected`).
+  - `_pages/`: The main content pages for the Jekyll site.
+    - `architecture/`: Contains architecture-related pages like the overview, ACC, ADR list, tech stack, and test report.
+    - `requirements/`: Contains requirements-related pages like the story, BMC, and req42.
+    - `app/`: Contains pages related to the applications themselves.
+  - `assets/`: CSS, images, and JavaScript for the Jekyll site.
 - `.crush/`: System logs and artifacts.
+- `.github/`: Contains GitHub Actions workflows for CI/CD.
 
 ## Project Conventions
 - **Custom Stylesheet:** The main custom stylesheet for the project website is located at `docs/assets/css/aquarius.css`. Do NOT move or rename this file.
