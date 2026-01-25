@@ -2,7 +2,7 @@
 permalink: /impressum/
 title: "Impressum"
 layout: splash
-classes: no-wave
+classes: no-wave dark-title
 header:
   overlay_image: /assets/images/splash/impressum-splash-wave.png
   caption: "Rechtliche Hinweise"

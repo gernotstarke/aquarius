@@ -500,3 +500,11 @@
 .tile-test-stats .test-skipped {
   color: #6c757d;
 }
+
+/* --- Dark Title for Light Splash Images --- */
+.dark-title .page__hero--overlay .page__title,
+.dark-title .page__hero--overlay .page__lead,
+.dark-title .page__hero--overlay .page__hero-caption {
+  color: #1a1a1a !important;
+  text-shadow: 1px 1px 2px rgba(255,255,255,0.5) !important;
+}

@@ -2,7 +2,7 @@
 permalink: /license/
 title: "License"
 layout: splash
-classes: no-wave
+classes: no-wave dark-title
 header:
   overlay_image: /assets/images/splash/license-splash.png
   caption: "Open Source MIT License"
