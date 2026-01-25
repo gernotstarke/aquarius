@@ -10,7 +10,7 @@ header:
     - label: "Anforderungen"
       url: "/requirements/"
     - label: "Architektur"
-      url: "/architektur/"
+      url: "/architecture/"
     - label: "Anwendungen"
       url: "/app/"
 toc: true

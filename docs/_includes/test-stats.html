@@ -1,12 +1,15 @@
-{% assign test_results = site.data.test_results %}
-{% assign test_stats_total = test_results | size %}
-{% assign test_stats_passed = test_results | where: "result", "passed" | size %}
-{% assign test_stats_failed = test_results | where: "result", "failed" | size %}
-{% assign test_stats_skipped = test_results | where: "result", "skipped" | size %}
-{% assign test_stats_total_executed = test_stats_passed | plus: test_stats_failed %}
-{% assign test_stats_total = test_stats_total_executed | plus: test_stats_skipped %}
-{% if test_stats_total_executed > 0 %}
-  {% assign test_stats_percentage = test_stats_passed | times: 100 | divided_by: test_stats_total_executed %}
-{% else %}
-  {% assign test_stats_percentage = 0 %}
-{% endif %}
+{% assign test_stats_total = 0 %}
+{% assign test_stats_passed = 0 %}
+{% assign test_stats_failed = 0 %}
+{% assign test_stats_skipped = 0 %}
+
+{% for test in site.data.test_results %}
+  {% assign test_stats_total = test_stats_total | plus: 1 %}
+  {% if test.result == "passed" %}
+    {% assign test_stats_passed = test_stats_passed | plus: 1 %}
+  {% elsif test.result == "failed" %}
+    {% assign test_stats_failed = test_stats_failed | plus: 1 %}
+  {% elsif test.result == "skipped" %}
+    {% assign test_stats_skipped = test_stats_skipped | plus: 1 %}
+  {% endif %}
+{% endfor %}
