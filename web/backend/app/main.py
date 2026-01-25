@@ -11,6 +11,7 @@ from sqlalchemy import text, or_, asc, desc, func, case
 from typing import List, Optional
 import os
 import logging
+import time
 from contextlib import asynccontextmanager
 
 from app.database import get_db, engine, Base
@@ -167,6 +168,59 @@ def status_overview(db: Session = Depends(get_db)):
         text("SELECT count(*) FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
     ).scalar() or 0
 
+    page_count = db.execute(text("PRAGMA page_count")).scalar() or 0
+    page_size = db.execute(text("PRAGMA page_size")).scalar() or 0
+    db_size_bytes = page_count * page_size
+
+    health_start = time.perf_counter()
+    db.execute(text("SELECT 1"))
+    health_latency_ms = round((time.perf_counter() - health_start) * 1000, 2)
+
+    write_latency_ms = None
+    read_latency_ms = None
+    perf_rows = None
+
+    try:
+        db.execute(
+            text(
+                "CREATE TABLE IF NOT EXISTS performance_probe ("
+                "id INTEGER PRIMARY KEY, "
+                "created_at TEXT NOT NULL, "
+                "payload TEXT)"
+            )
+        )
+        db.commit()
+
+        insert_start = time.perf_counter()
+        db.execute(
+            text("INSERT INTO performance_probe (created_at, payload) VALUES (:created_at, :payload)"),
+            {
+                "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "payload": "probe",
+            },
+        )
+        db.commit()
+        write_latency_ms = round((time.perf_counter() - insert_start) * 1000, 2)
+
+        read_start = time.perf_counter()
+        perf_rows = db.execute(text("SELECT count(*) FROM performance_probe")).scalar() or 0
+        if perf_rows > 10000:
+            db.execute(
+                text(
+                    "DELETE FROM performance_probe "
+                    "WHERE id NOT IN ("
+                    "  SELECT id FROM performance_probe "
+                    "  ORDER BY id DESC "
+                    "  LIMIT 10000"
+                    ")"
+                )
+            )
+            db.commit()
+            perf_rows = db.execute(text("SELECT count(*) FROM performance_probe")).scalar() or 0
+        read_latency_ms = round((time.perf_counter() - read_start) * 1000, 2)
+    except Exception:
+        db.rollback()
+
     return {
         "version": AQUARIUS_BACKEND_VERSION,
         "app": {
@@ -176,8 +230,14 @@ def status_overview(db: Session = Depends(get_db)):
         "database": {
             "type": db_type,
             "table_count": table_count,
+            "size_bytes": db_size_bytes,
+            "health_latency_ms": health_latency_ms,
+            "write_latency_ms": write_latency_ms,
+            "read_latency_ms": read_latency_ms,
+            "performance_rows": perf_rows,
         },
         "counts": {
+            "users": db.query(models.User).count(),
             "kind": db.query(models.Kind).count(),
             "anmeldung": db.query(models.Anmeldung).count(),
             "wettkampf": db.query(models.Wettkampf).count(),

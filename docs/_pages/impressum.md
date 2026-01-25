@@ -1,12 +1,29 @@
 ---
 permalink: /impressum/
 title: "Impressum"
-layout: single
-toc: true
-toc_label: "Inhalt"
+layout: splash
+header:
+  overlay_image: /assets/images/splash/impressum-splash-wave.png
+  caption: "Rechtliche Hinweise"
+  actions:
+    - label: "Startseite"
+      url: "/"
+    - label: "Anforderungen"
+      url: "/requirements/"
+    - label: "Architektur"
+      url: "/architecture/"
+    - label: "Anwendungen"
+      url: "/app/"
 ---
 
-
+>禮物之馬，勿看牙口。(Lǐwù zhī mǎ, wù kàn yákǒu.)
+>
+>
+>मुफ़्त के घोड़े के दाँत नहीं देखते। (Muft ke ghoṛe ke dānt nahīṁ dekhte.)
+>
+>Noli equi dentes inspicere donati.
+>
+>
 ## Verantwortlich für den Inhalt
 
 Dr. Gernot Starke  
@@ -55,12 +72,16 @@ Sie haben gemäß DSGVO folgende Rechte:
 
 ### Keine Gewährleistung
 
-Der Autor übernimmt keinerlei Gewähr für die Aktualität, Korrektheit, Vollständigkeit oder Qualität der bereitgestellten Informationen. Haftungsansprüche gegen den Autor, welche sich auf Schäden materieller oder ideeller Art beziehen, die durch die Nutzung oder Nichtnutzung der dargebotenen Informationen bzw. durch die Nutzung fehlerhafter und unvollständiger Informationen verursacht wurden, sind grundsätzlich ausgeschlossen, sofern seitens des Autors kein nachweislich vorsätzliches oder grob fahrlässiges Verschulden vorliegt.
+Der Autor übernimmt keinerlei Gewähr für die Aktualität, Korrektheit, Vollständigkeit oder Qualität der bereitgestellten Informationen. 
+Haftungsansprüche gegen den Autor, welche sich auf Schäden materieller oder ideeller Art beziehen, die durch die Nutzung oder Nichtnutzung der dargebotenen Informationen bzw. durch die Nutzung fehlerhafter und unvollständiger Informationen verursacht wurden, sind grundsätzlich ausgeschlossen, sofern seitens des Autors kein nachweislich vorsätzliches oder grob fahrlässiges Verschulden vorliegt.
 
 ### Haftung für Links
 
-Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich.
+Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir keinen Einfluss haben. 
+Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. 
+Für die Inhalte der verlinkten Seiten sind stets die jeweiligen Anbieter oder Betreiber der Seiten verantwortlich.
 
 ## Urheberrecht
 
-Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.
+Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. 
+Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.

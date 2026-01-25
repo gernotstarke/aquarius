@@ -206,7 +206,14 @@ protect-hash: ## Generate SHA-256 hash for a password (usage: make protect-hash 
 		echo "  - Page front matter as 'password_hash'"; \
 	else \
 		echo "🔑 Generating SHA-256 hash for password..."; \
-		HASH=$$(echo -n "$(PASSWORD)" | sha256sum | cut -d' ' -f1); \
+		if command -v shasum >/dev/null 2>&1; then \
+			HASH=$$(printf %s "$(PASSWORD)" | shasum -a 256 | awk '{print $$1}'); \
+		elif command -v sha256sum >/dev/null 2>&1; then \
+			HASH=$$(printf %s "$(PASSWORD)" | sha256sum | awk '{print $$1}'); \
+		else \
+			echo "Error: no SHA-256 tool found (need shasum or sha256sum)."; \
+			exit 1; \
+		fi; \
 		echo ""; \
 		echo "Password: $(PASSWORD)"; \
 		echo "SHA-256:  $$HASH"; \

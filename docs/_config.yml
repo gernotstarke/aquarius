@@ -122,5 +122,5 @@ footer:
       url: "/impressum"
 
 # Password Protection
-protected_password_hash: "7020944000838d0f0cf5492c77178060fa85b6319897f99b262c89bfabdd4080"
+protected_password_hash: "affe9db8a607895ce0775639efa512a48a33ef043a6d1de231a0d62676a4732a"
     

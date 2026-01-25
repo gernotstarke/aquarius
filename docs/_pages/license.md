@@ -1,8 +1,21 @@
 ---
 permalink: /license/
 title: "License"
-layout: single
-toc: false
+layout: splash
+header:
+  overlay_image: /assets/images/splash/aquarius-splash-dark.png
+  overlay_color: "#000"
+  overlay_filter: "0.3"
+  caption: "Open Source MIT License"
+  actions:
+    - label: "Startseite"
+      url: "/"
+    - label: "Anforderungen"
+      url: "/requirements/"
+    - label: "Architektur"
+      url: "/architecture/"
+    - label: "Anwendungen"
+      url: "/app/"
 ---
 
 # MIT License

@@ -7,8 +7,9 @@ import os
 import sys
 import random
 import shutil
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from pathlib import Path
+from sqlalchemy import text
 from app.database import SessionLocal, engine, Base
 from app.models import Saison, Schwimmbad, Wettkampf, Kind, Figur, Anmeldung, User, Verein, Verband, Versicherung
 from app.auth import get_password_hash
@@ -172,6 +173,8 @@ def seed_data(minimal=False):
 
         if minimal:
             print("\n🛑 Minimal mode: Skipping sample data (Saisons, Kinder, etc.)")
+            print("\n⚙️  Seeding performance probe table...")
+            seed_performance_probe(db)
             return
 
         # Create Saisons
@@ -462,6 +465,9 @@ def seed_data(minimal=False):
         else:
             print(f"   ⚠️  Skipping sample registrations (need at least 23 figures and 10 kinder)")
 
+        print("\n⚙️  Seeding performance probe table...")
+        seed_performance_probe(db)
+
         print("\n✨ Database seeding complete!")
         print(f"\n📊 Summary:")
         print(f"   • {db.query(User).count()} Users")
@@ -476,12 +482,47 @@ def seed_data(minimal=False):
         print(f"   • {db.query(Kind).count()} Kinder")
         print(f"   • {db.query(Figur).count()} Figuren")
         print(f"   • {db.query(Anmeldung).count()} Anmeldungen")
+        print(f"   • {get_performance_probe_count(db)} Performance-Tests")
 
     except Exception as e:
         print(f"\n❌ Error seeding database: {e}")
         db.rollback()
     finally:
         db.close()
+
+def seed_performance_probe(db, rows=1000):
+    db.execute(
+        text(
+            "CREATE TABLE IF NOT EXISTS performance_probe ("
+            "id INTEGER PRIMARY KEY, "
+            "created_at TEXT NOT NULL, "
+            "payload TEXT)"
+        )
+    )
+    db.commit()
+
+    payloads = []
+    now = datetime.utcnow()
+    for i in range(rows):
+        payloads.append(
+            {
+                "created_at": (now - timedelta(seconds=i)).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "payload": "seed",
+            }
+        )
+
+    db.execute(
+        text("INSERT INTO performance_probe (created_at, payload) VALUES (:created_at, :payload)"),
+        payloads,
+    )
+    db.commit()
+    print(f"   ✓ Seeded performance_probe with {rows} rows")
+
+def get_performance_probe_count(db):
+    try:
+        return db.execute(text("SELECT count(*) FROM performance_probe")).scalar() or 0
+    except Exception:
+        return 0
 
 if __name__ == "__main__":
     print("=" * 60)

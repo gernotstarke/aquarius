@@ -25,6 +25,7 @@ header:
       <li><strong>Umgebung:</strong> <span id="dash-environment">-</span></li>
       <li><strong>Region:</strong> <span id="dash-region">-</span></li>
       <li><strong>Backend-Version:</strong> <span id="dash-version">-</span></li>
+      <li><strong>Benutzer:</strong> <span id="dash-user-count">-</span></li>
       <li><strong>Health:</strong> <span id="dash-health" style="color: #999;">prüfe...</span></li>
     </ul>
   </div>
@@ -34,6 +35,11 @@ header:
     <ul style="list-style: none; padding: 0; margin: 0;">
       <li><strong>Typ:</strong> <span id="dash-db-type">-</span></li>
       <li><strong>Tabellen:</strong> <span id="dash-table-count">-</span></li>
+      <li><strong>Größe:</strong> <span id="dash-db-size">-</span></li>
+      <li><strong>Ping:</strong> <span id="dash-db-health-latency">-</span></li>
+      <li><strong>Schreiben:</strong> <span id="dash-db-write-latency">-</span></li>
+      <li><strong>Lesen:</strong> <span id="dash-db-read-latency">-</span></li>
+      <li><strong>Perf-Tests:</strong> <span id="dash-db-perf-rows">-</span></li>
     </ul>
   </div>
 
@@ -68,6 +74,23 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function formatTime(date) {
     return date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  function formatBytes(bytes) {
+    if (!Number.isFinite(bytes) || bytes <= 0) return "-";
+    const units = ["B", "KB", "MB", "GB", "TB"];
+    let size = bytes;
+    let unitIndex = 0;
+    while (size >= 1024 && unitIndex < units.length - 1) {
+      size /= 1024;
+      unitIndex += 1;
+    }
+    return `${size.toFixed(1)} ${units[unitIndex]}`;
+  }
+
+  function formatMs(value) {
+    if (!Number.isFinite(value) || value < 0) return "-";
+    return `${value.toFixed(1)} ms`;
   }
 
   function fetchDashboardData() {
@@ -108,6 +131,12 @@ document.addEventListener("DOMContentLoaded", function() {
         updateText("dash-version", data?.version || "-");
         updateText("dash-db-type", data?.database?.type || "-");
         updateText("dash-table-count", String(data?.database?.table_count ?? "-"));
+        updateText("dash-db-size", formatBytes(Number(data?.database?.size_bytes)));
+        updateText("dash-db-health-latency", formatMs(Number(data?.database?.health_latency_ms)));
+        updateText("dash-db-write-latency", formatMs(Number(data?.database?.write_latency_ms)));
+        updateText("dash-db-read-latency", formatMs(Number(data?.database?.read_latency_ms)));
+        updateText("dash-db-perf-rows", String(data?.database?.performance_rows ?? "-"));
+        updateText("dash-user-count", String(data?.counts?.users ?? "-"));
         updateText("dash-kind-count", String(data?.counts?.kind ?? "-"));
         updateText("dash-anmeldung-count", String(data?.counts?.anmeldung ?? "-"));
         updateText("dash-wettkampf-count", String(data?.counts?.wettkampf ?? "-"));
