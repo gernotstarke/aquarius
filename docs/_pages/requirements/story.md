@@ -12,7 +12,7 @@ header:
       url: "/"
     - label: "Anforderungen"
       url: "/requirements/"
-    - label: "Architektkur"
+    - label: "Architektur"
       url: "/architecture/"
     - label: "Anwendungen"
       url: "/app/"  

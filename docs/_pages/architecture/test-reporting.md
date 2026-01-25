@@ -8,8 +8,14 @@ header:
   overlay_filter: "0.4"
   caption: "Status der automatisierten Tests"
   actions:
-    - label: "Zurück zur Architekturübersicht"
+    - label: "Startseite"
+      url: "/"
+    - label: "Anforderungen"
+      url: "/requirements/"
+    - label: "Architektur"
       url: "/architecture/"
+    - label: "Anwendungen"
+      url: "/app/"
 ---
 
 <style>

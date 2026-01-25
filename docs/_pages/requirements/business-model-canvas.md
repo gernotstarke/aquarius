@@ -6,11 +6,13 @@ header:
   overlay_image: /assets/images/splash/aquarius-requirements-header-1500.webp
   overlay_filter: linear-gradient(rgba(0, 60, 120, 0.6), rgba(0, 60, 120, 0.6))
   actions:
+    - label: "Startseite"
+      url: "/"
     - label: "Anforderungen"
       url: "/requirements/"
     - label: "Architektur"
       url: "/architecture/"
-    - label: "Anwendung"
+    - label: "Anwendungen"
       url: "/app/"
 ---
 

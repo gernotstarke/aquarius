@@ -7,10 +7,14 @@ header:
   overlay_filter: "0.4"
   caption: "System-Status und Statistiken"
   actions:
-    - label: "Anwendungen"
-      url: "/app/"
+    - label: "Startseite"
+      url: "/"
+    - label: "Anforderungen"
+      url: "/requirements/"
     - label: "Architektur"
       url: "/architecture/"
+    - label: "Anwendungen"
+      url: "/app/"
 ---
 
 <div class="dashboard-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 2rem 0;">

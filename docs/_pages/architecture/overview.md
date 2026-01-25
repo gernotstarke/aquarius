@@ -8,10 +8,12 @@ header:
   overlay_filter: "0.3"
   caption: "Überblick über Anwendungen"
   actions:
-    - label: "Zur Startseite"
+    - label: "Startseite"
       url: "/"
     - label: "Anforderungen"
       url: "/requirements/"
+    - label: "Architektur"
+      url: "/architecture/"
     - label: "Anwendungen"
       url: "/app/"
 ---

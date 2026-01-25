@@ -6,6 +6,15 @@ header:
   overlay_image: /assets/images/splash/aquarius-architecture-header-1500x400.webp
   overlay_color: "#000"
   overlay_filter: "0.3"
+  actions:
+    - label: "Startseite"
+      url: "/"
+    - label: "Anforderungen"
+      url: "/requirements/"
+    - label: "Architektur"
+      url: "/architecture/"
+    - label: "Anwendungen"
+      url: "/app/"
 ---
 
 
