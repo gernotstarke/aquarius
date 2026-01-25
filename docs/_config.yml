@@ -50,7 +50,6 @@ exclude:
   - README
   - tmp
 keep_files:
-  - 36ec5a16d550c71d780bc7e60b00dcce.txt
   - .git
 
 # Outputting
@@ -69,7 +68,6 @@ plugins:
   - jekyll-gist
   - jekyll-feed
   - jekyll-include-cache
-  - jekyll-remote-theme
 
 # Archives
 category_archive:
@@ -124,5 +122,5 @@ footer:
       url: "/impressum"
 
 # Password Protection
-protected_password_hash: "d87cda3b58fd57ac4eef2989dd55438c2a74a0ccc02a60de049549cc0a12cbc7"
+protected_password_hash: "7020944000838d0f0cf5492c77178060fa85b6319897f99b262c89bfabdd4080"
     
