@@ -204,7 +204,7 @@
   border: 1px solid #f57c00;
 }
 .arch-tile--orange-1:hover {
-  background-color: #fff3e0;
+  background-color: #FFC107; /* Vibrant amber on hover */
 }
 
 /* --- Application Tiles (Violet/Red Variations) --- */
