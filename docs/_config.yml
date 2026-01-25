@@ -122,4 +122,7 @@ footer:
     - label: "Impressum"
       icon: "fas fa-file-contract"  
       url: "/impressum"
+
+# Password Protection
+protected_password_hash: "d87cda3b58fd57ac4eef2989dd55438c2a74a0ccc02a60de049549cc0a12cbc7"
     

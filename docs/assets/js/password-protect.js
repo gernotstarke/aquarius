@@ -101,12 +101,18 @@
     var remainingAttempts = getRemainingAttempts();
 
     modal.innerHTML =
+      '<style>' +
+      '.password-wrapper { position: relative; margin-bottom: 1rem; }' +
+      '#password-input { width: 100%; padding: 0.75rem 2.5rem 0.75rem 1rem; font-size: 1rem; border: 2px solid #ddd; border-radius: 4px; box-sizing: border-box; }' +
+      '.password-toggle-icon { position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; color: #777; }' +
+      '</style>' +
       '<h2 style="margin:0 0 1rem;color:#333;font-size:1.5rem;">🔒 Geschützter Bereich</h2>' +
       '<p style="margin:0 0 1.5rem;color:#666;">Dieser Bereich ist nur für autorisierte Trainingsteilnehmer zugänglich.</p>' +
       '<form id="password-form">' +
-      '<input type="password" id="password-input" placeholder="Passwort eingeben" ' +
-      'style="width:100%;padding:0.75rem;font-size:1rem;border:2px solid #ddd;border-radius:4px;box-sizing:border-box;margin-bottom:1rem;" ' +
-      'autocomplete="current-password" />' +
+      '<div class="password-wrapper">' +
+      '<input type="password" id="password-input" placeholder="Passwort eingeben" autocomplete="current-password" />' +
+      '<span id="toggle-password" class="password-toggle-icon"><i class="fas fa-eye"></i></span>' +
+      '</div>' +
       '<div id="password-error" style="color:#dc3545;margin-bottom:1rem;display:none;"></div>' +
       '<button type="submit" style="width:100%;padding:0.75rem;font-size:1rem;background:#007bff;color:#fff;border:none;border-radius:4px;cursor:pointer;">Zugang anfordern</button>' +
       '</form>' +
@@ -119,6 +125,15 @@
     // Focus the input
     var input = document.getElementById('password-input');
     input.focus();
+
+    // Handle password visibility toggle
+    var togglePassword = document.getElementById('toggle-password');
+    togglePassword.addEventListener('click', function() {
+      var type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+      input.setAttribute('type', type);
+      this.querySelector('i').classList.toggle('fa-eye');
+      this.querySelector('i').classList.toggle('fa-eye-slash');
+    });
 
     // Handle form submission
     var form = document.getElementById('password-form');
