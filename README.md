@@ -109,6 +109,11 @@ make web-db-reset
 # Seed with sample data
 make web-db-seed
 
+# If you see "(trapped) error reading bcrypt version", rebuild the web backend
+# (bcrypt 4.x is incompatible with passlib 1.7.x).
+# Example:
+# docker compose build backend
+
 # Import figures from JSON catalog
 cd web && make db-import-figures FILE=backend/data/figuren/figuren-v1.0-saison-2024.json
 ```

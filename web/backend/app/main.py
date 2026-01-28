@@ -2,7 +2,7 @@
 FastAPI main application for Aquarius CRUD prototype.
 Simple CRUD operations for Kind, Wettkampf, Schwimmbad, and Saison.
 """
-from fastapi import FastAPI, Depends, HTTPException, Response
+from fastapi import FastAPI, Depends, HTTPException, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -12,6 +12,7 @@ from typing import List, Optional
 import os
 import logging
 import time
+from datetime import datetime, timedelta
 from contextlib import asynccontextmanager
 
 from app.database import get_db, engine, Base
@@ -33,6 +34,8 @@ logger = logging.getLogger(__name__)
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./aquarius.db")
 logger.info(f"🔧 DATABASE_URL: {DATABASE_URL}")
 logger.info(f"🔧 TURSO_AUTH_TOKEN present: {bool(os.getenv('TURSO_AUTH_TOKEN'))}")
+logger.info(f"🔧 Engine URL: {engine.url}")
+logger.info(f"🔧 Engine dialect: {engine.dialect.name}")
 
 # Log authentication configuration
 ENABLE_APP_AUTH = os.getenv("ENABLE_APP_AUTH", "false").lower() == "true"
@@ -137,6 +140,20 @@ def read_root():
         return {"message": "Aquarius CRUD API", "version": AQUARIUS_BACKEND_VERSION}
 
 
+@app.get("/{full_path:path}")
+def spa_fallback(full_path: str, request: Request):
+    """Serve SPA index.html for unknown routes (non-API/static)."""
+    if full_path.startswith(("api", "docs", "redoc", "openapi.json", "static", "assets")):
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    frontend_dist = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "frontend", "dist")
+    index_html = os.path.join(frontend_dist, "index.html")
+    if os.path.exists(index_html):
+        return FileResponse(index_html)
+
+    return {"message": "Aquarius CRUD API", "version": AQUARIUS_BACKEND_VERSION}
+
+
 @app.get("/api/health")
 def health_check(db: Session = Depends(get_db)):
     """Health check endpoint for monitoring and fly.io health checks."""
@@ -221,6 +238,11 @@ def status_overview(db: Session = Depends(get_db)):
     except Exception:
         db.rollback()
 
+    # Get active users (active in the last 15 minutes)
+    active_threshold = datetime.utcnow() - timedelta(minutes=15)
+    active_users = db.query(models.User.username).filter(models.User.last_active >= active_threshold).all()
+    active_user_names = [u[0] for u in active_users]
+
     return {
         "version": AQUARIUS_BACKEND_VERSION,
         "app": {
@@ -238,10 +260,12 @@ def status_overview(db: Session = Depends(get_db)):
         },
         "counts": {
             "users": db.query(models.User).count(),
+            "active_users": len(active_user_names),
             "kind": db.query(models.Kind).count(),
             "anmeldung": db.query(models.Anmeldung).count(),
             "wettkampf": db.query(models.Wettkampf).count(),
         },
+        "active_users": active_user_names,
     }
 
 

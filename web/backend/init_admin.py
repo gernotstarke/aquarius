@@ -19,11 +19,7 @@ def main():
 
     # Get password with validation loop
     while True:
-        password = getpass.getpass("Admin password (min 12 chars): ")
-
-        if len(password) < 12:
-            print("❌ Password must be at least 12 characters")
-            continue
+        password = getpass.getpass("Admin password: ")
 
         password2 = getpass.getpass("Confirm password: ")
 

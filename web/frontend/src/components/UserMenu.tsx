@@ -73,6 +73,12 @@ const UserMenu: React.FC = () => {
     setIsOpen(false);
   };
 
+  const getAvatarImage = () => {
+    if (user.role === 'CLEO') return '/cleo-glyph.png';
+    if (user.role === 'ADMIN' || user.role === 'ROOT') return '/admin-glyph.png';
+    return '/user-glyph.png';
+  };
+
   return (
     <div className="relative" ref={menuRef}>
       {/* User Avatar Button with Glyph */}
@@ -88,7 +94,7 @@ const UserMenu: React.FC = () => {
         title={user.full_name || user.username}
       >
         <img
-          src="/user-glyph.png"
+          src={getAvatarImage()}
           alt="User"
           className="w-16 h-16 object-contain"
         />

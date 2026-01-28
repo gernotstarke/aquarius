@@ -152,6 +152,8 @@ const App: React.FC = () => {
               </Route>
             </Route>
 
+            {/* Fallback: unknown routes redirect to app root */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
