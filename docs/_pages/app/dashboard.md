@@ -52,6 +52,13 @@ header:
     </ul>
   </div>
 
+  <div class="dashboard-card" style="background: #f8f9fa; border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <h3 style="margin-top: 0; color: #e83e8c;"><i class="fas fa-users"></i> Aktive Benutzer</h3>
+    <ul id="dash-active-users" style="list-style: none; padding: 0; margin: 0; max-height: 200px; overflow-y: auto;">
+      <li style="color: #666; font-style: italic;">Lade...</li>
+    </ul>
+  </div>
+
 </div>
 
 <p id="dash-error" style="color: #dc3545; display: none;"></p>
@@ -136,11 +143,31 @@ document.addEventListener("DOMContentLoaded", function() {
         updateText("dash-db-write-latency", formatMs(Number(data?.database?.write_latency_ms)));
         updateText("dash-db-read-latency", formatMs(Number(data?.database?.read_latency_ms)));
         updateText("dash-db-perf-rows", String(data?.database?.performance_rows ?? "-"));
-        updateText("dash-user-count", String(data?.counts?.users ?? "-"));
+        updateText("dash-user-count", `${data?.counts?.active_users ?? 0} / ${data?.counts?.users ?? "-"}`);
         updateText("dash-kind-count", String(data?.counts?.kind ?? "-"));
         updateText("dash-anmeldung-count", String(data?.counts?.anmeldung ?? "-"));
         updateText("dash-wettkampf-count", String(data?.counts?.wettkampf ?? "-"));
         updateText("dash-last-update", formatTime(new Date()));
+
+        // Update Active Users List
+        const activeUsersList = document.getElementById("dash-active-users");
+        if (activeUsersList) {
+          activeUsersList.innerHTML = "";
+          const activeUsers = data?.active_users || [];
+          if (activeUsers.length === 0) {
+             const li = document.createElement("li");
+             li.textContent = "Keine aktiven Benutzer";
+             li.style.color = "#666";
+             li.style.fontStyle = "italic";
+             activeUsersList.appendChild(li);
+          } else {
+             activeUsers.forEach(user => {
+               const li = document.createElement("li");
+               li.innerHTML = `<strong>${user}</strong> <span style="color: #28a745; font-size: 0.8em;">●</span>`;
+               activeUsersList.appendChild(li);
+             });
+          }
+        }
       })
       .catch(err => {
         const errorEl = document.getElementById("dash-error");
